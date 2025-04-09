@@ -4,6 +4,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-primary-background: var(--primary-background);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary-background: var(--secondary-background);
+  --color-secondary-text: var(--secondary-text);
+
+  --color-card-selected-background: var(--card-selected-background);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -44,6 +52,14 @@
 }
 
 :root {
+  --primary-background: #262829;
+  --primary-foreground: #b0b3b8;
+
+  --secondary-background: #1c1c1d;
+  --secondary-text: #b0b3b8;
+
+  --card-selected-background: #385898;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
