@@ -1,6 +1,9 @@
 package auth
 
 import (
+	"context"
+	"time"
+
 	"github.com/bookpanda/messenger-clone/internal/dto"
 	"github.com/bookpanda/messenger-clone/internal/model"
 	"github.com/bookpanda/messenger-clone/pkg/apperror"
@@ -18,7 +21,8 @@ import (
 // @Failure			400	{object}	dto.HttpError
 // @Failure			500	{object}	dto.HttpError
 func (h *Handler) HandleLogin(c *fiber.Ctx) error {
-	ctx := c.UserContext()
+	ctx, cancel := context.WithTimeout(c.UserContext(), 5*time.Second)
+	defer cancel()
 
 	req := new(dto.LoginRequest)
 	if err := c.BodyParser(req); err != nil {
