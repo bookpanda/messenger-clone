@@ -8,7 +8,7 @@ import { Header } from "./header"
 import { Sidebar } from "./sidebar"
 
 export const Messenger = () => {
-  const [openChatInfo, setOpenChatInfo] = useState(false)
+  const [openChatInfo, setOpenChatInfo] = useState(true)
 
   return (
     <div className="bg-secondary-background flex h-dvh flex-col">
