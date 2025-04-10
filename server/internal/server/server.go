@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	_ "github.com/bookpanda/messenger-clone/doc"
 	"github.com/bookpanda/messenger-clone/internal/database"
 	"github.com/bookpanda/messenger-clone/internal/dto"
 	"github.com/bookpanda/messenger-clone/internal/jwt"

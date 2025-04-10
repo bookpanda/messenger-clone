@@ -54,6 +54,8 @@ func main() {
 	// objectHandler := objects.NewHandler(store, config.Storage)
 	// messageHandler := message.NewHandler(store, authMiddleware, chatService)
 
+	server.RegisterDocs()
+
 	// routes
 	server.RegisterRoutes(
 		// authMiddleware,
