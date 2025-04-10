@@ -14,13 +14,15 @@ import {
 } from "@/components/ui/popover"
 
 interface MessageProps {
+  text: string
   reaction?: string
+  handleAddReaction: (reaction: string) => void
 }
 
 const reactionEmojis = ["🥰", "😢", "😂", "😡", "👍"]
 
 export const IncomingMessage = (props: MessageProps) => {
-  const { reaction } = props
+  const { text, reaction, handleAddReaction } = props
 
   const [isHover, setHover] = useState(false)
   const [isReactionOpen, setReactionOpen] = useState(false)
@@ -49,7 +51,7 @@ export const IncomingMessage = (props: MessageProps) => {
       </div>
       <div className="flex items-center gap-2">
         <div className="bg-chat-incoming-message-bubble-background-color relative rounded-full px-3 py-2">
-          <p>แต่กุศรัทธาใน work life unbalance</p>
+          <p>{text}</p>
           {reaction && (
             <div className="bg-primary-background absolute right-3 -bottom-3 z-10 flex size-5 items-center justify-center rounded-full">
               {reaction}
@@ -86,7 +88,13 @@ export const IncomingMessage = (props: MessageProps) => {
                 <Button
                   key={idx}
                   variant="ghost"
-                  className="size-8 p-0 px-3 text-2xl"
+                  className={cn("size-8 p-0 px-3 text-2xl", {
+                    "bg-secondary-background": reaction === emoji,
+                  })}
+                  onClick={() => {
+                    handleAddReaction(emoji)
+                    setReactionOpen(false)
+                  }}
                 >
                   {emoji}
                 </Button>
@@ -107,7 +115,7 @@ export const IncomingMessage = (props: MessageProps) => {
 }
 
 export const OutgoingMessage = (props: MessageProps) => {
-  const { reaction } = props
+  const { text, reaction, handleAddReaction } = props
 
   const [isHover, setHover] = useState(false)
   const [isReactionOpen, setReactionOpen] = useState(false)
@@ -164,7 +172,13 @@ export const OutgoingMessage = (props: MessageProps) => {
                 <Button
                   key={idx}
                   variant="ghost"
-                  className="size-8 p-0 px-3 text-2xl"
+                  className={cn("size-8 p-0 px-3 text-2xl", {
+                    "bg-secondary-background": reaction === emoji,
+                  })}
+                  onClick={() => {
+                    handleAddReaction(emoji)
+                    setReactionOpen(false)
+                  }}
                 >
                   {emoji}
                 </Button>
@@ -173,7 +187,7 @@ export const OutgoingMessage = (props: MessageProps) => {
           </Popover>
         </div>
         <div className="bg-chat-outgoing-message-bubble-background-color relative rounded-full px-3 py-2">
-          <p>แต่กุศรัทธาใน work life unbalance</p>
+          <p>{text}</p>
           {reaction && (
             <div className="bg-primary-background absolute right-3 -bottom-3 z-10 flex size-5 items-center justify-center rounded-full">
               {reaction}
