@@ -5,15 +5,15 @@ import { Sidebar } from "@/components/sidebar"
 
 export default function Home() {
   return (
-    <div className="bg-secondary-background flex h-dvh flex-col overflow-hidden">
+    <div className="bg-secondary-background flex h-dvh flex-col">
       <Header />
 
-      <div className="flex flex-1">
+      <div className="flex min-h-0 flex-1">
         {/* Sidebar */}
         <Sidebar />
 
         {/* Body */}
-        <div className="flex flex-1 gap-4 p-4">
+        <div className="flex min-h-0 flex-1 gap-4 p-4">
           <Chat />
           <ChatInfo />
         </div>

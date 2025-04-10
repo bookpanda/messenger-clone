@@ -49,7 +49,53 @@ export const Chat = () => {
       </div>
 
       {/* Body */}
-      <div className="flex-1 p-4"></div>
+      <div className="min-h-0 flex-1 overflow-y-auto p-4">
+        <div className="space-y-2">
+          {/* Chat messages go here */}
+          <div className="rounded bg-white p-2 text-black shadow">
+            Hey there!
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            What's up?
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            Hey there!
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            What's up?
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            Hey there!
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            What's up?
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            Hey there!
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            What's up?
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            Hey there!
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            What's up?
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            Hey there!
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            What's up?
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            Hey there!
+          </div>
+          <div className="rounded bg-white p-2 text-black shadow">
+            What's up?
+          </div>
+        </div>
+      </div>
 
       {/* Message Input */}
       <div className="flex flex-initial items-center gap-2 px-4 py-3">
