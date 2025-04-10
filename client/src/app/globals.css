@@ -6,11 +6,18 @@
 @theme inline {
   --color-primary-background: var(--primary-background);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-text: var(--primary-text);
 
   --color-secondary-background: var(--secondary-background);
   --color-secondary-text: var(--secondary-text);
 
   --color-card-selected-background: var(--card-selected-background);
+
+  --color-primary-icon: var(--primary-icon);
+  --color-chat-composer-button-color: var(--chat-composer-button-color);
+  --color-chat-composer-input-background-color: var(
+    --chat-composer-input-background-color
+  );
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -54,11 +61,16 @@
 :root {
   --primary-background: #262829;
   --primary-foreground: #b0b3b8;
+  --primary-text: #e2e5e9;
 
   --secondary-background: #1c1c1d;
   --secondary-text: #b0b3b8;
 
   --card-selected-background: #385898;
+
+  --primary-icon: #aa00ff;
+  --chat-composer-button-color: #0070f6;
+  --chat-composer-input-background-color: #333334;
 
   --radius: 0.625rem;
   --background: oklch(1 0 0);
