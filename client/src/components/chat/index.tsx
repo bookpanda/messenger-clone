@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { Message } from "@/types"
 
@@ -66,6 +66,25 @@ export const Chat = () => {
     )
   }
 
+  const handleSendMessage = (text: string) => {
+    const newMessage: Message = {
+      id: String(messages.length + 1),
+      type: "outgoing",
+      text,
+      date: new Date(),
+    }
+    setMessages((prevMessages) => [...prevMessages, newMessage])
+  }
+
+  const endOfMessagesRef = useRef<HTMLDivElement>(null)
+
+  // Scroll to the bottom every time messages change
+  useEffect(() => {
+    if (endOfMessagesRef.current) {
+      endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" })
+    }
+  }, [messages])
+
   return (
     <div className="bg-primary-background text-primary-foreground flex h-full flex-1 flex-col overflow-hidden rounded-md">
       <ChatHeader
@@ -98,10 +117,11 @@ export const Chat = () => {
               />
             )
           })}
+          <div ref={endOfMessagesRef} />
         </div>
       </div>
 
-      <ChatInput />
+      <ChatInput handleSendMessage={handleSendMessage} />
     </div>
   )
 }
