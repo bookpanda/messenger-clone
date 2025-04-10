@@ -72,7 +72,7 @@ func (h *Handler) HandleRegister(c *fiber.Ctx) error {
 }
 
 func (h *Handler) validateIDToken(c context.Context, idToken string) (*model.User, error) {
-	payload, err := idtoken.Validate(c, idToken, h.googleClientID)
+	payload, err := idtoken.Validate(c, idToken, h.oauthConfig.ClientID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to validate id token")
 	}
