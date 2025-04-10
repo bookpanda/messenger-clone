@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 
 import { Message } from "@/types"
 
 import { ChatHeader } from "./chat-header"
 import { ChatInput } from "./chat-input"
-import { IncomingMessage, OutgoingMessage, TimestampMessage } from "./messages"
+import { ChatMessages } from "./chat-messages"
 
 const profile = {
   name: "Chanotai Krajeam",
@@ -76,15 +76,6 @@ export const Chat = () => {
     setMessages((prevMessages) => [...prevMessages, newMessage])
   }
 
-  const endOfMessagesRef = useRef<HTMLDivElement>(null)
-
-  // Scroll to the bottom every time messages change
-  useEffect(() => {
-    if (endOfMessagesRef.current) {
-      endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" })
-    }
-  }, [messages])
-
   return (
     <div className="bg-primary-background text-primary-foreground flex h-full flex-1 flex-col overflow-hidden rounded-md">
       <ChatHeader
@@ -92,35 +83,7 @@ export const Chat = () => {
         image={profile.image}
         lastActive={profile.lastActive}
       />
-
-      <div className="min-h-0 flex-1 overflow-y-auto p-4">
-        <div className="space-y-2">
-          {/* Chat messages go here */}
-          {messages.map((message, idx) => {
-            return message.type === "incoming" ? (
-              <IncomingMessage
-                key={idx}
-                text={message.text}
-                handleAddReaction={(reaction: string) =>
-                  handleAddReaction(message.id, reaction)
-                }
-                reaction={message.reaction}
-              />
-            ) : (
-              <OutgoingMessage
-                key={idx}
-                text={message.text}
-                handleAddReaction={(reaction: string) =>
-                  handleAddReaction(message.id, reaction)
-                }
-                reaction={message.reaction}
-              />
-            )
-          })}
-          <div ref={endOfMessagesRef} />
-        </div>
-      </div>
-
+      <ChatMessages messages={messages} handleAddReaction={handleAddReaction} />
       <ChatInput handleSendMessage={handleSendMessage} />
     </div>
   )
