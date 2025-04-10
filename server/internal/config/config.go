@@ -5,6 +5,7 @@ import (
 
 	"github.com/bookpanda/messenger-clone/internal/jwt"
 	"github.com/bookpanda/messenger-clone/internal/server"
+	"github.com/bookpanda/messenger-clone/pkg/google"
 	"github.com/bookpanda/messenger-clone/pkg/logger"
 	"github.com/bookpanda/messenger-clone/pkg/postgres"
 	"github.com/bookpanda/messenger-clone/pkg/redis"
@@ -14,15 +15,15 @@ import (
 )
 
 type AppConfig struct {
-	Server         server.Config     `envPrefix:"SERVER_"`
-	Logger         logger.Config     `envPrefix:"LOGGER_"`
-	Postgres       postgres.Config   `envPrefix:"POSTGRES_"`
-	Redis          redis.Config      `envPrefix:"REDIS_"`
-	Cors           server.CorsConfig `envPrefix:"CORS_"`
-	JWT            jwt.Config        `envPrefix:"JWT_"`
-	Storage        storage.Config    `envPrefix:"STORAGE_"`
-	GoogleClientID string            `env:"GOOGLE_CLIENT_ID"`
-	FrontendURL    string            `env:"FRONTEND_URL"`
+	Server      server.Config     `envPrefix:"SERVER_"`
+	Logger      logger.Config     `envPrefix:"LOGGER_"`
+	Postgres    postgres.Config   `envPrefix:"POSTGRES_"`
+	Redis       redis.Config      `envPrefix:"REDIS_"`
+	Cors        server.CorsConfig `envPrefix:"CORS_"`
+	JWT         jwt.Config        `envPrefix:"JWT_"`
+	Storage     storage.Config    `envPrefix:"STORAGE_"`
+	Google      google.Config     `envPrefix:"GOOGLE_"`
+	FrontendURL string            `env:"FRONTEND_URL"`
 }
 
 func Load() *AppConfig {

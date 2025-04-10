@@ -14,6 +14,7 @@ import (
 	"github.com/bookpanda/messenger-clone/internal/server"
 	"github.com/bookpanda/messenger-clone/internal/services/auth"
 	"github.com/bookpanda/messenger-clone/internal/validator"
+	"github.com/bookpanda/messenger-clone/pkg/google"
 	"github.com/bookpanda/messenger-clone/pkg/logger"
 )
 
@@ -27,6 +28,7 @@ import (
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
 	config := config.Load()
+	oauthConfig := google.NewConfig(config.Google)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
@@ -47,7 +49,7 @@ func main() {
 	authMiddleware := authentication.NewAuthMiddleware(jwtService)
 
 	// handlers
-	authHandler := auth.NewHandler(store, validate, jwtService, authMiddleware, config.GoogleClientID)
+	authHandler := auth.NewHandler(store, validate, jwtService, authMiddleware, oauthConfig)
 	// userHandler := user.NewHandler(store, validate, authMiddleware)
 	// objectHandler := objects.NewHandler(store, config.Storage)
 	// messageHandler := message.NewHandler(store, authMiddleware, chatService)

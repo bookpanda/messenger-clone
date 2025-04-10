@@ -5,6 +5,7 @@ import (
 	"github.com/bookpanda/messenger-clone/internal/jwt"
 	"github.com/bookpanda/messenger-clone/internal/middlewares/authentication"
 	"github.com/go-playground/validator/v10"
+	"golang.org/x/oauth2"
 )
 
 type Handler struct {
@@ -12,17 +13,18 @@ type Handler struct {
 	validate   *validator.Validate
 	jwtService *jwt.JWT
 	// authmiddleware authentication.AuthMiddleware
-	googleClientID string
+	oauthConfig *oauth2.Config
 }
 
 func NewHandler(store *database.Store, validate *validator.Validate, jwtService *jwt.JWT,
 	authmiddleware authentication.AuthMiddleware,
-	googleClientID string) *Handler {
+	oauthConfig *oauth2.Config) *Handler {
+
 	return &Handler{
 		store:      store,
 		validate:   validate,
 		jwtService: jwtService,
 		// authmiddleware: authmiddleware,
-		googleClientID: googleClientID,
+		oauthConfig: oauthConfig,
 	}
 }
