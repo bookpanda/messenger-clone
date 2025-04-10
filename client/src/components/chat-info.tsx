@@ -56,21 +56,28 @@ export const ChatInfo = () => {
               variant="ghost"
               className="hover:text-primary-foreground h-auto w-full justify-start rounded-md p-2.5 hover:bg-white/10 hover:no-underline"
             >
-              <Pin className="size-5" />
+              <div className="relative size-5">
+                <Image
+                  src="/minecraft-themes.jpg"
+                  alt=""
+                  fill
+                  className="rounded-full object-cover"
+                />
+              </div>
               <span>Change themes</span>
             </Button>
             <Button
               variant="ghost"
               className="hover:text-primary-foreground h-auto w-full justify-start rounded-md p-2.5 hover:bg-white/10 hover:no-underline"
             >
-              <Pin className="size-5" />
+              <span className="text-xl">🤩</span>
               <span>Change emoji</span>
             </Button>
             <Button
               variant="ghost"
               className="hover:text-primary-foreground h-auto w-full justify-start rounded-md p-2.5 hover:bg-white/10 hover:no-underline"
             >
-              <Pin className="size-5" />
+              <span className="font-light">Aa</span>
               <span>Edit nicknames</span>
             </Button>
           </AccordionContent>

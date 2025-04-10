@@ -4,6 +4,8 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
+import { IncomingMessage, OutgoingMessage, TimestampMessage } from "./messages"
+
 export const Chat = () => {
   return (
     <div className="bg-primary-background text-primary-foreground flex h-full flex-1 flex-col overflow-hidden rounded-md">
@@ -52,48 +54,12 @@ export const Chat = () => {
       <div className="min-h-0 flex-1 overflow-y-auto p-4">
         <div className="space-y-2">
           {/* Chat messages go here */}
-          <div className="rounded bg-white p-2 text-black shadow">
-            Hey there!
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            What's up?
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            Hey there!
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            What's up?
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            Hey there!
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            What's up?
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            Hey there!
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            What's up?
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            Hey there!
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            What's up?
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            Hey there!
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            What's up?
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            Hey there!
-          </div>
-          <div className="rounded bg-white p-2 text-black shadow">
-            What's up?
-          </div>
+          <IncomingMessage />
+          <IncomingMessage />
+          <IncomingMessage />
+          <IncomingMessage />
+          <TimestampMessage />
+          <OutgoingMessage />
         </div>
       </div>
 

@@ -18,6 +18,14 @@
   --color-chat-composer-input-background-color: var(
     --chat-composer-input-background-color
   );
+  --color-chat-incoming-message-bubble-background-color: var(
+    --chat-incoming-message-bubble-background-color
+  );
+  --color-chat-outgoing-message-bubble-background-color: var(
+    --chat-outgoing-message-bubble-background-color
+  );
+
+  --color-placeholder-text: var(--placeholder-text);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -71,6 +79,10 @@
   --primary-icon: #aa00ff;
   --chat-composer-button-color: #0070f6;
   --chat-composer-input-background-color: #333334;
+  --chat-incoming-message-bubble-background-color: #303030;
+  --chat-outgoing-message-bubble-background-color: #0e92eb;
+
+  --placeholder-text: #a1a4a9;
 
   --radius: 0.625rem;
   --background: oklch(1 0 0);
