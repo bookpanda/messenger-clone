@@ -29,3 +29,7 @@ type LoginResponse struct {
 	TokenResponse
 	User UserResponse `json:"user"`
 }
+
+type GetGoogleLoginUrlResponse struct {
+	Url string `json:"url"`
+}
