@@ -1,4 +1,5 @@
 import { Chat } from "@/components/chat"
+import { ChatInfo } from "@/components/chat-info"
 import { Header } from "@/components/header"
 import { Sidebar } from "@/components/sidebar"
 
@@ -12,8 +13,9 @@ export default function Home() {
         <Sidebar />
 
         {/* Body */}
-        <div className="flex-1 p-4">
+        <div className="flex flex-1 gap-4 p-4">
           <Chat />
+          <ChatInfo />
         </div>
       </div>
     </div>

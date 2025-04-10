@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 
 export const Chat = () => {
   return (
-    <div className="bg-primary-background text-primary-foreground flex h-full flex-col overflow-hidden rounded-md">
+    <div className="bg-primary-background text-primary-foreground flex h-full flex-1 flex-col overflow-hidden rounded-md">
       {/* Header */}
       <div className="bg-primary-background flex flex-initial justify-between px-4 py-3 shadow">
         <div className="flex items-center gap-2">
@@ -47,8 +47,10 @@ export const Chat = () => {
           </Button>
         </div>
       </div>
+
       {/* Body */}
-      <div className="flex-1"></div>
+      <div className="flex-1 p-4"></div>
+
       {/* Message Input */}
       <div className="flex flex-initial items-center gap-2 px-4 py-3">
         <Button
