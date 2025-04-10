@@ -17,15 +17,16 @@ import (
 	"github.com/bookpanda/messenger-clone/pkg/logger"
 )
 
-// @title						Messenger API
+// @title						Pic Me Pls API
 // @version						0.1
-// @description					Messenger API Documentation
+// @description					Pic Me Pls API Documentation
 // @securityDefinitions.apikey ApiKeyAuth
 // @in							header
 // @name						Authorization
 // @externalDocs.description	OpenAPI
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
+	// hello
 	config := config.Load()
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
