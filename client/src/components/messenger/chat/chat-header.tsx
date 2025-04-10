@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react"
+
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import { Info, Phone, Video } from "lucide-react"
@@ -12,10 +14,11 @@ interface ChatHeaderProps {
   name: string
   image: string
   lastActive: Date
+  setOpenChatInfo: Dispatch<SetStateAction<boolean>>
 }
 
 export const ChatHeader = (props: ChatHeaderProps) => {
-  const { name, image, lastActive } = props
+  const { name, image, lastActive, setOpenChatInfo } = props
 
   const lastActiveTime = dayjs(lastActive).from(dayjs())
 
@@ -54,6 +57,7 @@ export const ChatHeader = (props: ChatHeaderProps) => {
           size="icon"
           className="text-primary-icon rounded-full"
           variant="ghost"
+          onClick={() => setOpenChatInfo((prev) => !prev)}
         >
           <Info className="size-5" />
         </Button>

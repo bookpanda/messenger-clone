@@ -1,23 +1,5 @@
-import { Chat } from "@/components/chat"
-import { ChatInfo } from "@/components/chat-info"
-import { Header } from "@/components/header"
-import { Sidebar } from "@/components/sidebar"
+import { Messenger } from "@/components/messenger"
 
 export default function Home() {
-  return (
-    <div className="bg-secondary-background flex h-dvh flex-col">
-      <Header />
-
-      <div className="flex min-h-0 flex-1">
-        {/* Sidebar */}
-        <Sidebar />
-
-        {/* Body */}
-        <div className="flex min-h-0 flex-1 gap-4 p-4">
-          <Chat />
-          <ChatInfo />
-        </div>
-      </div>
-    </div>
-  )
+  return <Messenger />
 }

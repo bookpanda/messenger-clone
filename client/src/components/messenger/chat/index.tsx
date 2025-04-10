@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 
 import { Message } from "@/types"
 
@@ -14,7 +14,13 @@ const profile = {
   lastActive: new Date(Date.now() - 3 * 3600 * 1000),
 }
 
-export const Chat = () => {
+interface ChatProps {
+  setOpenChatInfo: Dispatch<SetStateAction<boolean>>
+}
+
+export const Chat = (props: ChatProps) => {
+  const { setOpenChatInfo } = props
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -82,6 +88,7 @@ export const Chat = () => {
         name={profile.name}
         image={profile.image}
         lastActive={profile.lastActive}
+        setOpenChatInfo={setOpenChatInfo}
       />
       <ChatMessages messages={messages} handleAddReaction={handleAddReaction} />
       <ChatInput handleSendMessage={handleSendMessage} />
