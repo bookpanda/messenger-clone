@@ -7,3 +7,9 @@ export type Message = {
   date: Date
   reaction?: string
 }
+
+export type Profile = {
+  name: string
+  image: string
+  lastActive: Date
+}

@@ -2,24 +2,19 @@
 
 import { Dispatch, SetStateAction, useState } from "react"
 
-import { Message } from "@/types"
+import { Message, Profile } from "@/types"
 
 import { ChatHeader } from "./chat-header"
 import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
 
-const profile = {
-  name: "Chanotai Krajeam",
-  image: "/thumbnail.jpg",
-  lastActive: new Date(Date.now() - 3 * 3600 * 1000),
-}
-
 interface ChatProps {
+  profile: Profile
   setOpenChatInfo: Dispatch<SetStateAction<boolean>>
 }
 
 export const Chat = (props: ChatProps) => {
-  const { setOpenChatInfo } = props
+  const { profile, setOpenChatInfo } = props
 
   const [messages, setMessages] = useState<Message[]>([
     {

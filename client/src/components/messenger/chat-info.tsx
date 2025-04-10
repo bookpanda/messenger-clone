@@ -1,3 +1,4 @@
+import { Profile } from "@/types"
 import { Lock, Pin } from "lucide-react"
 import Image from "next/image"
 
@@ -9,19 +10,25 @@ import {
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 
-export const ChatInfo = () => {
+interface ChatInfoProps {
+  profile: Profile
+}
+
+export const ChatInfo = (props: ChatInfoProps) => {
+  const { profile } = props
+
   return (
     <div className="bg-primary-background text-primary-foreground w-75 space-y-5 rounded-md px-3 py-4">
       <div className="flex flex-col items-center gap-3">
         <div className="relative size-20">
           <Image
-            src="/thumbnail.jpg"
+            src={profile.image}
             alt=""
             className="rounded-full object-cover"
             fill
           />
         </div>
-        <h2 className="font-medium">Chanotai Krajeam</h2>
+        <h2 className="font-medium">{profile.name}</h2>
       </div>
 
       <div className="flex justify-center">
