@@ -10,12 +10,14 @@ import (
 	pglib "github.com/bookpanda/messenger-clone/pkg/postgres"
 	rdlib "github.com/bookpanda/messenger-clone/pkg/redis"
 	"github.com/bookpanda/messenger-clone/pkg/storage"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 type Store struct {
 	DB      *gorm.DB
+	Cache   *redis.Client
 	Storage *storage.Client
 }
 
@@ -25,6 +27,11 @@ func New(ctx context.Context, pgConfig pglib.Config, rdConfig rdlib.Config, stor
 		logger.PanicContext(ctx, "failed to connect to database", slog.Any("error", err))
 	}
 
+	redisConn, err := rdlib.New(ctx, rdConfig)
+	if err != nil {
+		logger.PanicContext(ctx, "failed to connect to redis", slog.Any("error", err))
+	}
+
 	storage, err := storage.New(ctx, storageConfig)
 	if err != nil {
 		logger.PanicContext(ctx, "failed to connect to storage", slog.Any("error", err))
@@ -32,6 +39,7 @@ func New(ctx context.Context, pgConfig pglib.Config, rdConfig rdlib.Config, stor
 
 	store := &Store{
 		DB:      db,
+		Cache:   redisConn,
 		Storage: storage,
 	}
 	store.migrate()
