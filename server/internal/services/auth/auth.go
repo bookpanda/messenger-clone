@@ -9,11 +9,11 @@ import (
 )
 
 type Handler struct {
-	store      *database.Store
-	validate   *validator.Validate
-	jwtService *jwt.JWT
-	// authmiddleware authentication.AuthMiddleware
-	oauthConfig *oauth2.Config
+	store          *database.Store
+	validate       *validator.Validate
+	jwtService     *jwt.JWT
+	authmiddleware authentication.AuthMiddleware
+	oauthConfig    *oauth2.Config
 }
 
 func NewHandler(store *database.Store, validate *validator.Validate, jwtService *jwt.JWT,
@@ -21,10 +21,10 @@ func NewHandler(store *database.Store, validate *validator.Validate, jwtService 
 	oauthConfig *oauth2.Config) *Handler {
 
 	return &Handler{
-		store:      store,
-		validate:   validate,
-		jwtService: jwtService,
-		// authmiddleware: authmiddleware,
-		oauthConfig: oauthConfig,
+		store:          store,
+		validate:       validate,
+		jwtService:     jwtService,
+		authmiddleware: authmiddleware,
+		oauthConfig:    oauthConfig,
 	}
 }

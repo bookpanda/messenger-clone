@@ -1,10 +1,13 @@
 package server
 
-import "github.com/bookpanda/messenger-clone/internal/services/auth"
+import (
+	"github.com/bookpanda/messenger-clone/internal/middlewares/authentication"
+	"github.com/bookpanda/messenger-clone/internal/services/auth"
+)
 
 func (s *Server) RegisterRoutes(
+	authMiddleware authentication.AuthMiddleware,
 	authHandler *auth.Handler,
-
 ) {
 	v1 := s.app.Group("/api/v1")
 
@@ -12,5 +15,6 @@ func (s *Server) RegisterRoutes(
 	auth := v1.Group("/auth")
 	auth.Post("/login", authHandler.HandleLogin)
 	auth.Post("/refresh-token", authHandler.HandleRefreshToken)
+	auth.Post("/logout", authMiddleware.Auth, authHandler.HandleLogout)
 
 }
