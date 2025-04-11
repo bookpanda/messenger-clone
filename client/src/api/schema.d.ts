@@ -4,45 +4,6 @@
  */
 
 export interface paths {
-    "/api/v1/auth/google-login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * GetGoogleLoginUrl
-         * @description gets the google login url
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["dto.HttpResponse-dto_GetGoogleLoginUrlResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -105,6 +66,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Logout
+         * @description Logout
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/refresh-token": {
         parameters: {
             query?: never;
@@ -139,68 +155,6 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["dto.HttpResponse-dto_TokenResponse"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["dto.HttpError"];
-                    };
-                };
-                /** @description Internal Server Error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["dto.HttpError"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/register": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Register
-         * @description Register
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description request request */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["dto.RegisterRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["dto.HttpResponse-dto_RegisterResponse"];
                     };
                 };
                 /** @description Bad Request */
@@ -336,20 +290,11 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        "dto.GetGoogleLoginUrlResponse": {
-            url?: string;
-        };
         "dto.HttpError": {
             error?: string;
         };
-        "dto.HttpResponse-dto_GetGoogleLoginUrlResponse": {
-            result?: components["schemas"]["dto.GetGoogleLoginUrlResponse"];
-        };
         "dto.HttpResponse-dto_LoginResponse": {
             result?: components["schemas"]["dto.LoginResponse"];
-        };
-        "dto.HttpResponse-dto_RegisterResponse": {
-            result?: components["schemas"]["dto.RegisterResponse"];
         };
         "dto.HttpResponse-dto_TokenResponse": {
             result?: components["schemas"]["dto.TokenResponse"];
@@ -370,17 +315,6 @@ export interface components {
         };
         "dto.RefreshTokenRequest": {
             refreshToken: string;
-        };
-        "dto.RegisterRequest": {
-            idToken: string;
-            /** @description GOOGLE */
-            provider: string;
-        };
-        "dto.RegisterResponse": {
-            accessToken?: string;
-            exp?: number;
-            refreshToken?: string;
-            user?: components["schemas"]["dto.UserResponse"];
         };
         "dto.TokenResponse": {
             accessToken?: string;

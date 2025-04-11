@@ -1,7 +1,8 @@
 "use client"
 
-import { signOut } from "@/auth"
+import { logout } from "@/actions/logout"
 import { Icon } from "@iconify/react"
+import { signOut } from "next-auth/react"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 
@@ -9,11 +10,11 @@ export const ProfileMenu = () => {
   const { data: session } = useSession()
 
   const handleLogout = async () => {
-    // const result = await logout()
-    // if (result?.error) {
-    //   console.error(result.error)
-    //   return
-    // }
+    const result = await logout()
+    if (result?.error) {
+      console.error(result.error)
+      return
+    }
     await signOut({
       redirect: true,
       redirectTo: "/",
