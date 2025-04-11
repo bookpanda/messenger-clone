@@ -16,6 +16,7 @@ export const authConfig: NextAuthOptions = {
           access_type: "offline",
           response_type: "code",
           scope: "openid email profile",
+          redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback/google`,
         },
       },
     }),
@@ -26,7 +27,7 @@ export const authConfig: NextAuthOptions = {
   pages: {
     signIn: "/login",
     signOut: "/",
-    error: "/login",
+    error: "/",
   },
   callbacks: {
     signIn: async ({ user, account }) => {
