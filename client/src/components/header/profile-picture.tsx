@@ -19,9 +19,13 @@ export const ProfilePicture = () => {
   console.log(session)
   return (
     <div>
-      hid
-      {session?.user?.image}
-      {/* <Image /> */}
+      <Image
+        alt="profile-pic"
+        src={session?.user?.image}
+        height={50}
+        width={50}
+        className="cursor-pointer rounded-full"
+      />
     </div>
   )
 }
