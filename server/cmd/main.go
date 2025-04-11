@@ -58,7 +58,7 @@ func main() {
 
 	// routes
 	server.RegisterRoutes(
-		// authMiddleware,
+		authMiddleware,
 		authHandler,
 		// userHandler,
 		// objectHandler,

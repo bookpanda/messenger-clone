@@ -3,10 +3,12 @@
 import { useState } from "react"
 
 import { Profile } from "@/types"
+import { useSession } from "next-auth/react"
 
+import { Header } from "../header"
+import { LoadingScreen } from "../loading-screen"
 import { Chat } from "./chat"
 import { ChatInfo } from "./chat-info"
-import { Header } from "./header"
 import { Sidebar } from "./sidebar"
 
 const profile: Profile = {
@@ -17,6 +19,11 @@ const profile: Profile = {
 
 export const Messenger = () => {
   const [openChatInfo, setOpenChatInfo] = useState(true)
+  const { status } = useSession()
+
+  if (status === "loading") {
+    return <LoadingScreen />
+  }
 
   return (
     <div className="bg-secondary-background flex h-dvh flex-col">
