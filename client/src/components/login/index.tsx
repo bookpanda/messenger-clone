@@ -8,7 +8,10 @@ import { Button } from "../ui/button"
 
 export default function LoginPageComponent() {
   const handleLogin = async () => {
-    await signIn("google")
+    await signIn("google", {
+      redirect: true,
+      redirectTo: "/",
+    })
   }
 
   return (
