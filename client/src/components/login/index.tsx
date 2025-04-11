@@ -9,7 +9,8 @@ import { Button } from "../ui/button"
 export default function LoginPageComponent() {
   const handleLogin = async () => {
     await signIn("google", {
-      redirectTo: "/",
+      redirect: true,
+      redirectTo: "/api/auth/callback/google",
     })
   }
 
