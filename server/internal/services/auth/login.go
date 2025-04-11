@@ -1,11 +1,16 @@
 package auth
 
 import (
+	"context"
+	"strings"
+
 	"github.com/bookpanda/messenger-clone/internal/dto"
 	"github.com/bookpanda/messenger-clone/internal/model"
 	"github.com/bookpanda/messenger-clone/pkg/apperror"
+	"github.com/bookpanda/messenger-clone/pkg/logger"
 	"github.com/cockroachdb/errors"
 	"github.com/gofiber/fiber/v2"
+	"google.golang.org/api/idtoken"
 	"gorm.io/gorm"
 )
 
@@ -39,8 +44,13 @@ func (h *Handler) HandleLogin(c *fiber.Ctx) error {
 
 	if err := h.store.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Where("email = ?", OAuthUser.Email).First(&user).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return apperror.NotFound("account not found", err)
+			if errors.Is(errors.Cause(err), gorm.ErrRecordNotFound) {
+				logger.InfoContext(ctx, "user not found, creating new user")
+				user, err = h.createUser(tx, OAuthUser)
+				if err != nil {
+					return errors.Wrap(err, "failed to get or create user")
+				}
+				return nil
 			}
 			return errors.Wrap(err, "failed getting user")
 		}
@@ -67,4 +77,44 @@ func (h *Handler) HandleLogin(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.LoginResponse]{
 		Result: result,
 	})
+}
+
+func (h *Handler) validateIDToken(c context.Context, idToken string) (*model.User, error) {
+	payload, err := idtoken.Validate(c, idToken, h.oauthConfig.ClientID)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to validate id token")
+	}
+
+	name, ok := payload.Claims["name"].(string)
+	if !ok {
+		return nil, errors.New("name claim not found in id token")
+	}
+
+	email, ok := payload.Claims["email"].(string)
+	if !ok {
+		return nil, errors.New("email claim not found in id token")
+	}
+
+	picture, ok := payload.Claims["picture"].(string)
+	if !ok {
+		return nil, errors.New("picture claim not found in id token")
+	}
+
+	return &model.User{
+		Name:              name,
+		Email:             email,
+		ProfilePictureURL: picture,
+	}, nil
+}
+
+func (h *Handler) createUser(tx *gorm.DB, user *model.User) (*model.User, error) {
+	if err := tx.Save(user).Error; err != nil {
+		if strings.Contains(err.Error(), "duplicate") {
+			return nil, apperror.BadRequest("this account already register", err)
+		}
+
+		return nil, errors.Wrap(err, "failed to create user")
+	}
+
+	return user, nil
 }
