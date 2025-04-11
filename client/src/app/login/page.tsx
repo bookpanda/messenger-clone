@@ -1,11 +1,5 @@
-import { Button } from "@/components/ui/button"
+import LoginPageComponent from "@/components/login"
 
-export default function Login() {
-  return (
-    <div className="bg-secondary-background flex h-dvh flex-col overflow-hidden">
-      <Button variant="outline" className="w-20">
-        Login
-      </Button>
-    </div>
-  )
+export default async function LoginPage() {
+  return <LoginPageComponent />
 }
