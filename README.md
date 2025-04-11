@@ -10,8 +10,9 @@ Download these tools before you start working on the project.
 - Prettier VSCode extension (also set format on save)
 - golang 1.23 or [later](https://go.dev)
 - makefile
-- [Go Air](https://github.com/air-verse/air)
 - Docker
+- [Go Air](https://github.com/air-verse/air)
+- swag v2 (`go install github.com/swaggo/swag/v2/cmd/swag@v2.0.0-rc4`)
 
 # Frontend (./client)
 
