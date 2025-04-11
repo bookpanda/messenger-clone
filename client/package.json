@@ -20,7 +20,7 @@
     "lucide-react": "^0.487.0",
     "motion": "^12.6.3",
     "next": "15.2.5",
-    "next-auth": "^4.24.11",
+    "next-auth": "5.0.0-beta.25",
     "openapi-fetch": "^0.13.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
