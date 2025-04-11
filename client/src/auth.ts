@@ -5,7 +5,7 @@ import Google from "next-auth/providers/google"
 import { client } from "./api/client"
 import { User as UserType } from "./types/user"
 
-export const authConfig: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     Google({
       clientId: process.env.AUTH_GOOGLE_ID || "",
@@ -86,7 +86,7 @@ export const authConfig: NextAuthOptions = {
   },
 }
 
-export const { handlers, signIn, signOut, auth } = NextAuth(authConfig)
+export const { handlers, signIn, signOut, auth } = NextAuth(authOptions)
 
 declare module "next-auth" {
   interface Session {
