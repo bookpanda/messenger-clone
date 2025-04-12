@@ -13,6 +13,14 @@ import (
 	"github.com/pkg/errors"
 )
 
+// @Summary			Create chat
+// @Description		Create chat with name and participants
+// @Tags			chat
+// @Router			/api/v1/chat [POST]
+// @Param 			RequestBody 	body 	dto.CreateChatRequest 	true 	"request request"
+// @Success			200	{object}	dto.HttpResponse[dto.CreateChatResponse]
+// @Failure			400	{object}	dto.HttpError
+// @Failure			500	{object}	dto.HttpError
 func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
 	_, cancel := context.WithTimeout(c.UserContext(), time.Second*5)
 	defer cancel()

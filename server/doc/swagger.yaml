@@ -1,9 +1,34 @@
 components:
   schemas:
+    dto.CreateChatRequest:
+      properties:
+        name:
+          type: string
+        participants:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+      required:
+      - name
+      - participants
+      type: object
+    dto.CreateChatResponse:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      type: object
     dto.HttpError:
       properties:
         error:
           type: string
+      type: object
+    dto.HttpResponse-dto_CreateChatResponse:
+      properties:
+        result:
+          $ref: '#/components/schemas/dto.CreateChatResponse'
       type: object
     dto.HttpResponse-dto_LoginResponse:
       properties:
@@ -177,6 +202,38 @@ paths:
       summary: Refresh Token
       tags:
       - auth
+  /api/v1/chat:
+    post:
+      description: Create chat with name and participants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dto.CreateChatRequest'
+        description: request request
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpResponse-dto_CreateChatResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Internal Server Error
+      summary: Create chat
+      tags:
+      - chat
   /api/v1/me:
     get:
       description: Get me
