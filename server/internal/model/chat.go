@@ -6,5 +6,6 @@ type Chat struct {
 	gorm.Model
 	Name string `gorm:"not null"`
 
-	Messages []Message
+	Messages     []Message
+	Participants []ChatParticipant
 }
