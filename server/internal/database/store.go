@@ -51,7 +51,11 @@ func (s *Store) migrate() {
 
 	if err := s.DB.AutoMigrate(
 		&model.User{},
+		&model.Chat{},
+		&model.ChatParticipant{},
 		&model.Message{},
+		// &model.MessageReaction{},
+		&model.Inbox{},
 	); err != nil {
 		logger.Panic("failed to migrate database", slog.Any("error", err))
 	}
