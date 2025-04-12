@@ -40,7 +40,4 @@ type User struct {
 	Name              string `gorm:"not null"`
 	Email             string `gorm:"not null;unique"`
 	ProfilePictureURL string
-
-	SenderMessages   []Message `gorm:"foreignKey:SenderID"`
-	ReceiverMessages []Message `gorm:"foreignKey:ReceiverID"`
 }
