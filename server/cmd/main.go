@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"flag"
+	"log"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -9,6 +11,7 @@ import (
 
 	"github.com/bookpanda/messenger-clone/internal/config"
 	"github.com/bookpanda/messenger-clone/internal/database"
+	"github.com/bookpanda/messenger-clone/internal/database/seeds"
 	"github.com/bookpanda/messenger-clone/internal/jwt"
 	"github.com/bookpanda/messenger-clone/internal/middlewares/authentication"
 	"github.com/bookpanda/messenger-clone/internal/server"
@@ -17,7 +20,24 @@ import (
 	"github.com/bookpanda/messenger-clone/internal/validator"
 	"github.com/bookpanda/messenger-clone/pkg/google"
 	"github.com/bookpanda/messenger-clone/pkg/logger"
+	"gorm.io/gorm"
 )
+
+func handleArgs(db *gorm.DB) {
+	flag.Parse()
+	args := flag.Args()
+
+	if len(args) >= 1 {
+		switch args[0] {
+		case "seed":
+			err := seeds.Execute(db)
+			if err != nil {
+				log.Fatalf("Failed to execute seed: %v", err)
+			}
+			os.Exit(0)
+		}
+	}
+}
 
 // @title						Messenger API
 // @version						0.1
@@ -41,6 +61,8 @@ func main() {
 	store := database.New(ctx, config.Postgres, config.Redis, config.Storage)
 	server := server.New(config.Server, config.Cors, config.JWT, store)
 	validate := validator.New()
+
+	handleArgs(store.DB)
 
 	// services
 	jwtService := jwt.New(config.JWT, store.Cache)
