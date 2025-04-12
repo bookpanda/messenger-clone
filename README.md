@@ -43,3 +43,6 @@ Download these tools before you start working on the project.
 1. Run `go mod download` to download all the dependencies.
 2. Copy `.env.template` file in root of the project as `.env` into the root of the project fill in the values
 3. Run `docker-compose up -d && air` or `make dev` to start the server
+
+## Seeding
+1. Run `make seed` to seed the database with some data.

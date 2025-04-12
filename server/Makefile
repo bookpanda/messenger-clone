@@ -10,5 +10,8 @@ lint:
 start:
 	docker-compose up -d && air
 
+seed:
+	go run cmd/main.go seed
+
 .PHONY:
 	server swagger start
