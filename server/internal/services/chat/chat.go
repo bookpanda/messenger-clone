@@ -1,4 +1,4 @@
-package auth
+package chat
 
 import (
 	"github.com/bookpanda/messenger-clone/internal/database"
