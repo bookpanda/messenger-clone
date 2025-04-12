@@ -21,6 +21,6 @@ func (s *Server) RegisterRoutes(
 
 	// chat
 	chat := v1.Group("/chat")
-	chat.Post("/create", authMiddleware.Auth, chatHandler.HandleCreateChat)
+	chat.Post("/", authMiddleware.Auth, chatHandler.HandleCreateChat)
 
 }
