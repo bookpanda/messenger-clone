@@ -11,6 +11,7 @@ import (
 	"github.com/bookpanda/messenger-clone/pkg/apperror"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 // @Summary			Create chat
@@ -58,14 +59,30 @@ func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
 		return apperror.BadRequest("some participants not found", errors.New("participants not found: "+strings.Join(notFound, ", ")))
 	}
 
-	chat, err := h.createChat(req.Name)
-	if err != nil {
+	var chat *model.Chat
+	var err error
+
+	if err := h.store.DB.Transaction(func(tx *gorm.DB) error {
+		chat, err = h.createChat(req.Name)
+		if err != nil {
+			return errors.Wrap(err, "failed to create chat")
+		}
+
+		// create chat participants
+		err = h.store.DB.Model(chat).Association("Participants").Append(participants)
+		if err != nil {
+			return errors.Wrap(err, "failed to add participants to chat")
+		}
+
+		return nil
+	}); err != nil {
 		return apperror.Internal("failed to create chat", err)
 	}
 
 	result := dto.CreateChatResponse{
-		ID:   chat.ID,
-		Name: chat.Name,
+		ID:           chat.ID,
+		Name:         chat.Name,
+		Participants: dto.ToUserResponseList(participants),
 	}
 
 	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.CreateChatResponse]{

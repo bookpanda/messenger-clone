@@ -14,20 +14,6 @@ type UserResponse struct {
 	ProfilePictureURL string `json:"profilePictureUrl"`
 }
 
-type CustomerResponse struct {
-	ID                uint   `json:"id"`
-	Name              string `json:"name"`
-	Email             string `json:"email"`
-	ProfilePictureURL string `json:"profilePictureUrl"`
-}
-
-type PublicUserResponse struct {
-	ID                uint   `json:"id"`
-	Name              string `json:"name"`
-	Email             string `json:"email"`
-	ProfilePictureURL string `json:"profilePictureUrl"`
-}
-
 func ToUserResponse(user model.User) UserResponse {
 	return UserResponse{
 		ID:                user.ID,
@@ -37,20 +23,10 @@ func ToUserResponse(user model.User) UserResponse {
 	}
 }
 
-func ToCustomerResponse(user model.User) CustomerResponse {
-	return CustomerResponse{
-		ID:                user.ID,
-		Name:              user.Name,
-		Email:             user.Email,
-		ProfilePictureURL: user.ProfilePictureURL,
+func ToUserResponseList(users []model.User) []UserResponse {
+	userResponses := make([]UserResponse, len(users))
+	for i, user := range users {
+		userResponses[i] = ToUserResponse(user)
 	}
-}
-
-func ToPublicUserResponse(user model.User) PublicUserResponse {
-	return PublicUserResponse{
-		ID:                user.ID,
-		Name:              user.Name,
-		Email:             user.Email,
-		ProfilePictureURL: user.ProfilePictureURL,
-	}
+	return userResponses
 }
