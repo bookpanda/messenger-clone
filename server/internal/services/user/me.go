@@ -33,7 +33,6 @@ func (h *Handler) HandleGetMe(c *fiber.Ctx) error {
 		ID:                user.ID,
 		Name:              user.Name,
 		Email:             user.Email,
-		PhoneNumber:       user.PhoneNumber,
 		ProfilePictureURL: user.ProfilePictureURL,
 	}
 

@@ -7,26 +7,29 @@ import (
 type MessageType string
 
 const (
-	MessageTypeText      MessageType = "TEXT"
-	MessageTypeImage     MessageType = "IMAGE"
-	MessageTypeQuotation MessageType = "QUOTATION"
-	MessageTypePreview   MessageType = "PREVIEW"
+	MessageTypeText  MessageType = "TEXT"
+	MessageTypeImage MessageType = "IMAGE"
+	MessageTypeFile  MessageType = "FILE"
 )
 
 type Message struct {
 	gorm.Model
-	Type    MessageType `gorm:"not null"`
-	Content string      `gorm:"not null"`
+	Content string `gorm:"not null"`
 
-	SenderID   uint `gorm:"not null"`
-	ReceiverID uint `gorm:"not null"`
-	Sender     User `gorm:"foreignKey:SenderID"`
-	Receiver   User `gorm:"foreignKey:ReceiverID"`
+	ChatID uint `gorm:"not null"`
+	Chat   Chat `gorm:"foreignKey:ChatID"`
+
+	SenderID uint `gorm:"not null"`
+	Sender   User `gorm:"foreignKey:SenderID"`
+
+	IsReply          bool     `gorm:"not null;default:false"`
+	ReplyToMessageID *uint    // nil if not a reply
+	ReplyToMessage   *Message `gorm:"foreignKey:ReplyToMessageID"` // self-reference
 }
 
 func ValidateMessageType(msgType string) bool {
 	switch MessageType(msgType) {
-	case MessageTypeText, MessageTypeImage, MessageTypeQuotation, MessageTypePreview:
+	case MessageTypeText, MessageTypeImage, MessageTypeFile:
 		return true
 	default:
 		return false
