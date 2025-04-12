@@ -8,7 +8,9 @@ import (
 
 	"github.com/bookpanda/messenger-clone/internal/dto"
 	"github.com/bookpanda/messenger-clone/internal/model"
+	"github.com/bookpanda/messenger-clone/internal/utils"
 	"github.com/bookpanda/messenger-clone/pkg/apperror"
+	"github.com/bookpanda/messenger-clone/pkg/logger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -32,8 +34,11 @@ func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
 	}
 
 	if err := h.validate.Struct(req); err != nil {
+		logger.Error("validate", "error", err)
 		return apperror.BadRequest("invalid request body", err)
 	}
+
+	req.Participants = utils.RemoveDuplicates(req.Participants)
 
 	// check participants exist
 	var participants []model.User
@@ -68,8 +73,16 @@ func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
 			return errors.Wrap(err, "failed to create chat")
 		}
 
-		// create chat participants
-		err = h.store.DB.Model(chat).Association("Participants").Append(participants)
+		// add chat participants
+		chatParticipants := make([]model.ChatParticipant, len(participants))
+		for i, participant := range participants {
+			chatParticipants[i] = model.ChatParticipant{
+				ChatID: chat.ID,
+				UserID: participant.ID,
+			}
+		}
+
+		err = h.store.DB.Model(chat).Association("Participants").Append(chatParticipants)
 		if err != nil {
 			return errors.Wrap(err, "failed to add participants to chat")
 		}
