@@ -325,12 +325,10 @@ export interface components {
             email?: string;
             id?: number;
             name?: string;
-            phoneNumber?: string;
             profilePictureUrl?: string;
         };
         "dto.UserUpdateRequest": {
             name?: string;
-            phoneNumber?: string;
             profilePictureUrl?: string;
         };
     };

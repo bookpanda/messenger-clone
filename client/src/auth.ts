@@ -79,7 +79,6 @@ export const authOptions: NextAuthOptions = {
       }
       if (token?.user && session.user) {
         session.user.userId = token.user.id as number
-        session.user.phoneNumber = token.user.phoneNumber
       }
       return session
     },

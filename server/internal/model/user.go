@@ -39,7 +39,6 @@ type User struct {
 	gorm.Model
 	Name              string `gorm:"not null"`
 	Email             string `gorm:"not null;unique"`
-	PhoneNumber       string `gorm:"size:10"`
 	ProfilePictureURL string
 
 	SenderMessages   []Message `gorm:"foreignKey:SenderID"`

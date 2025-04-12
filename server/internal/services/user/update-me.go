@@ -53,7 +53,6 @@ func (h *Handler) HandleUpdateMe(c *fiber.Ctx) error {
 		ID:                updatedUser.ID,
 		Name:              updatedUser.Name,
 		Email:             updatedUser.Email,
-		PhoneNumber:       updatedUser.PhoneNumber,
 		ProfilePictureURL: updatedUser.ProfilePictureURL,
 	}
 
@@ -81,7 +80,6 @@ func (h *Handler) updateUserDB(userID uint, req *dto.UserUpdateRequest) (*model.
 
 		updateField(&user.ProfilePictureURL, req.ProfilePictureURL)
 		updateField(&user.Name, req.Name)
-		updateField(&user.PhoneNumber, req.PhoneNumber)
 
 		if err := tx.Save(&user).Error; err != nil {
 			return errors.Wrap(err, "Failed to update user")

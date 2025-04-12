@@ -66,16 +66,12 @@ components:
           type: integer
         name:
           type: string
-        phoneNumber:
-          type: string
         profilePictureUrl:
           type: string
       type: object
     dto.UserUpdateRequest:
       properties:
         name:
-          type: string
-        phoneNumber:
           type: string
         profilePictureUrl:
           type: string
