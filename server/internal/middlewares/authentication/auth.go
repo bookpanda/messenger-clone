@@ -16,9 +16,6 @@ var (
 
 type AuthMiddleware interface {
 	Auth(ctx *fiber.Ctx) error
-	AuthAdmin(ctx *fiber.Ctx) error
-	AuthCustomer(ctx *fiber.Ctx) error
-	AuthPhotographer(ctx *fiber.Ctx) error
 	GetUserIDFromContext(ctx context.Context) (uint, error)
 	GetJWTEntityFromContext(ctx context.Context) (jwt.JWTentity, error)
 }
@@ -58,42 +55,6 @@ func (r *authMiddleware) getClaims(ctx *fiber.Ctx) (jwt.JWTentity, error) {
 }
 
 func (r *authMiddleware) Auth(ctx *fiber.Ctx) error {
-	claims, err := r.getClaims(ctx)
-	if err != nil {
-		return errors.Wrap(err, "failed to get claims")
-	}
-
-	userContext := r.withJWTEntity(ctx.UserContext(), claims)
-	ctx.SetUserContext(userContext)
-
-	return ctx.Next()
-}
-
-func (r *authMiddleware) AuthAdmin(ctx *fiber.Ctx) error {
-	claims, err := r.getClaims(ctx)
-	if err != nil {
-		return errors.Wrap(err, "failed to get claims")
-	}
-
-	userContext := r.withJWTEntity(ctx.UserContext(), claims)
-	ctx.SetUserContext(userContext)
-
-	return ctx.Next()
-}
-
-func (r *authMiddleware) AuthCustomer(ctx *fiber.Ctx) error {
-	claims, err := r.getClaims(ctx)
-	if err != nil {
-		return errors.Wrap(err, "failed to get claims")
-	}
-
-	userContext := r.withJWTEntity(ctx.UserContext(), claims)
-	ctx.SetUserContext(userContext)
-
-	return ctx.Next()
-}
-
-func (r *authMiddleware) AuthPhotographer(ctx *fiber.Ctx) error {
 	claims, err := r.getClaims(ctx)
 	if err != nil {
 		return errors.Wrap(err, "failed to get claims")
