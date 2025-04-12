@@ -15,13 +15,13 @@ const (
 
 type Message struct {
 	gorm.Model
-	Type    MessageType `gorm:"not null"`
-	Content string      `gorm:"not null"`
+	Content string `gorm:"not null"`
 
-	SenderID   uint `gorm:"not null"`
-	ReceiverID uint `gorm:"not null"`
-	Sender     User `gorm:"foreignKey:SenderID"`
-	Receiver   User `gorm:"foreignKey:ReceiverID"`
+	ChatID uint `gorm:"not null"`
+	Chat   Chat `gorm:"foreignKey:ChatID"`
+
+	SenderID uint `gorm:"not null"`
+	Sender   User `gorm:"foreignKey:SenderID"`
 }
 
 func ValidateMessageType(msgType string) bool {
