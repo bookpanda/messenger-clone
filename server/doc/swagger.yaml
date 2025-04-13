@@ -1,5 +1,17 @@
 components:
   schemas:
+    dto.ChatResponse:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        participants:
+          items:
+            $ref: '#/components/schemas/dto.UserResponse'
+          type: array
+          uniqueItems: false
+      type: object
     dto.CreateChatRequest:
       properties:
         name:
@@ -13,27 +25,33 @@ components:
       - name
       - participants
       type: object
-    dto.CreateChatResponse:
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-      type: object
     dto.HttpError:
       properties:
         error:
           type: string
       type: object
-    dto.HttpResponse-dto_CreateChatResponse:
+    dto.HttpListResponse-dto_ChatResponse:
       properties:
         result:
-          $ref: '#/components/schemas/dto.CreateChatResponse'
+          items:
+            $ref: '#/components/schemas/dto.ChatResponse'
+          type: array
+          uniqueItems: false
+      type: object
+    dto.HttpResponse-dto_ChatResponse:
+      properties:
+        result:
+          $ref: '#/components/schemas/dto.ChatResponse'
       type: object
     dto.HttpResponse-dto_LoginResponse:
       properties:
         result:
           $ref: '#/components/schemas/dto.LoginResponse'
+      type: object
+    dto.HttpResponse-dto_ModifyParticipantResponse:
+      properties:
+        result:
+          $ref: '#/components/schemas/dto.ModifyParticipantResponse'
       type: object
     dto.HttpResponse-dto_TokenResponse:
       properties:
@@ -66,6 +84,27 @@ components:
           type: string
         user:
           $ref: '#/components/schemas/dto.UserResponse'
+      type: object
+    dto.ModifyParticipantRequest:
+      properties:
+        action:
+          type: string
+        participants:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+      required:
+      - action
+      - participants
+      type: object
+    dto.ModifyParticipantResponse:
+      properties:
+        participants:
+          items:
+            $ref: '#/components/schemas/dto.UserResponse'
+          type: array
+          uniqueItems: false
       type: object
     dto.RefreshTokenRequest:
       properties:
@@ -203,21 +242,14 @@ paths:
       tags:
       - auth
   /api/v1/chat:
-    post:
-      description: Create chat with name and participants
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/dto.CreateChatRequest'
-        description: request request
-        required: true
+    get:
+      description: Get all chats of the user
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/dto.HttpResponse-dto_CreateChatResponse'
+                $ref: '#/components/schemas/dto.HttpListResponse-dto_ChatResponse'
           description: OK
         "400":
           content:
@@ -231,7 +263,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/dto.HttpError'
           description: Internal Server Error
-      summary: Create chat
+      summary: My chats
+      tags:
+      - chat
+    post:
+      description: Add/remove participants to/from chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dto.ModifyParticipantRequest'
+        description: request request
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpResponse-dto_ModifyParticipantResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Internal Server Error
+      summary: Modify participants
       tags:
       - chat
   /api/v1/me:

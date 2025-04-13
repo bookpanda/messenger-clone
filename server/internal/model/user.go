@@ -40,4 +40,6 @@ type User struct {
 	Name              string `gorm:"not null"`
 	Email             string `gorm:"not null;unique"`
 	ProfilePictureURL string
+
+	Chats []Chat `gorm:"many2many:chat_participants;"`
 }

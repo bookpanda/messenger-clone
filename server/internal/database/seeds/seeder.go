@@ -16,9 +16,6 @@ func Execute(db *gorm.DB) error {
 	if err := seedModel(db, &model.Chat{}, toInterfaceSlice(Chats)); err != nil {
 		return err
 	}
-	if err := seedModel(db, &model.ChatParticipant{}, toInterfaceSlice(Participants)); err != nil {
-		return err
-	}
 
 	log.Println("All seeder done")
 	return nil

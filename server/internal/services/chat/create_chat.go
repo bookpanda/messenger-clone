@@ -2,8 +2,6 @@ package chat
 
 import (
 	"context"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/bookpanda/messenger-clone/internal/dto"
@@ -20,7 +18,7 @@ import (
 // @Tags			chat
 // @Router			/api/v1/chat [POST]
 // @Param 			RequestBody 	body 	dto.CreateChatRequest 	true 	"request request"
-// @Success			200	{object}	dto.HttpResponse[dto.CreateChatResponse]
+// @Success			200	{object}	dto.HttpResponse[dto.ChatResponse]
 // @Failure			400	{object}	dto.HttpError
 // @Failure			500	{object}	dto.HttpError
 func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
@@ -38,52 +36,20 @@ func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
 
 	req.Participants = utils.RemoveDuplicates(req.Participants)
 
-	// check participants exist
-	var participants []model.User
-	if err := h.store.DB.Where("id IN ?", req.Participants).Find(&participants).Error; err != nil {
-		return errors.Wrap(err, "failed to find participants")
-	}
-
-	if len(participants) != len(req.Participants) {
-		// check which participants not found
-		foundIDs := make(map[string]struct{}, len(participants))
-		for _, p := range participants {
-			idStr := strconv.FormatUint(uint64(p.ID), 10)
-			foundIDs[idStr] = struct{}{}
-		}
-
-		var notFound []string
-		for _, id := range req.Participants {
-			if _, ok := foundIDs[id]; !ok {
-				notFound = append(notFound, id)
-			}
-		}
-
-		return apperror.BadRequest(
-			"some participants not found",
-			errors.New("participants not found: "+strings.Join(notFound, ", ")),
-		)
+	participants, err := h.VerifyParticipants(req.Participants)
+	if err != nil {
+		return apperror.BadRequest("some participants not found", err)
 	}
 
 	var chat *model.Chat
-	var err error
-
+	var finalParticipants []model.User
 	if err := h.store.DB.Transaction(func(tx *gorm.DB) error {
 		chat, err = h.createChat(req.Name)
 		if err != nil {
 			return errors.Wrap(err, "failed to create chat")
 		}
 
-		// add chat participants
-		chatParticipants := make([]model.ChatParticipant, len(participants))
-		for i, participant := range participants {
-			chatParticipants[i] = model.ChatParticipant{
-				ChatID: chat.ID,
-				UserID: participant.ID,
-			}
-		}
-
-		err = h.store.DB.Model(chat).Association("Participants").Append(chatParticipants)
+		finalParticipants, err = h.ModifyParticipants(dto.AddParticipant, chat.ID, participants)
 		if err != nil {
 			return errors.Wrap(err, "failed to add participants to chat")
 		}
@@ -93,13 +59,13 @@ func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
 		return apperror.Internal("failed to create chat", err)
 	}
 
-	result := dto.CreateChatResponse{
+	result := dto.ChatResponse{
 		ID:           chat.ID,
 		Name:         chat.Name,
-		Participants: dto.ToUserResponseList(participants),
+		Participants: dto.ToUserResponseList(finalParticipants),
 	}
 
-	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.CreateChatResponse]{
+	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.ChatResponse]{
 		Result: result,
 	})
 }

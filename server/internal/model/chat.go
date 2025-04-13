@@ -7,5 +7,5 @@ type Chat struct {
 	Name string `gorm:"not null"`
 
 	Messages     []Message
-	Participants []ChatParticipant
+	Participants []User `gorm:"many2many:chat_participants;"`
 }

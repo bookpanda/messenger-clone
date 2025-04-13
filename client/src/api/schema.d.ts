@@ -183,6 +183,109 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My chats
+         * @description Get all chats of the user
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpListResponse-dto_ChatResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Modify participants
+         * @description Add/remove participants to/from chat
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description request request */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["dto.ModifyParticipantRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpResponse-dto_ModifyParticipantResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me": {
         parameters: {
             query?: never;
@@ -290,11 +393,29 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        "dto.ChatResponse": {
+            id?: number;
+            name?: string;
+            participants?: components["schemas"]["dto.UserResponse"][];
+        };
+        "dto.CreateChatRequest": {
+            name: string;
+            participants: string[];
+        };
         "dto.HttpError": {
             error?: string;
         };
+        "dto.HttpListResponse-dto_ChatResponse": {
+            result?: components["schemas"]["dto.ChatResponse"][];
+        };
+        "dto.HttpResponse-dto_ChatResponse": {
+            result?: components["schemas"]["dto.ChatResponse"];
+        };
         "dto.HttpResponse-dto_LoginResponse": {
             result?: components["schemas"]["dto.LoginResponse"];
+        };
+        "dto.HttpResponse-dto_ModifyParticipantResponse": {
+            result?: components["schemas"]["dto.ModifyParticipantResponse"];
         };
         "dto.HttpResponse-dto_TokenResponse": {
             result?: components["schemas"]["dto.TokenResponse"];
@@ -312,6 +433,13 @@ export interface components {
             exp?: number;
             refreshToken?: string;
             user?: components["schemas"]["dto.UserResponse"];
+        };
+        "dto.ModifyParticipantRequest": {
+            action: string;
+            participants: string[];
+        };
+        "dto.ModifyParticipantResponse": {
+            participants?: components["schemas"]["dto.UserResponse"][];
         };
         "dto.RefreshTokenRequest": {
             refreshToken: string;
