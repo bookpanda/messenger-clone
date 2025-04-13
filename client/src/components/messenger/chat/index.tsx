@@ -20,7 +20,7 @@ interface ChatProps {
 export const Chat = (props: ChatProps) => {
   const { profile, setOpenChatInfo } = props
   const { data: session } = useSession()
-  const { currentChat, messages, setMessages } = useChatContext()
+  const { currentChat, messages, setMessages, setChats } = useChatContext()
   if (!messages || !currentChat) {
     return null
   }
@@ -62,6 +62,14 @@ export const Chat = (props: ChatProps) => {
       reactions: [],
     }
     setMessages((prevMessages) => [...prevMessages, newMessage])
+    setChats((prevChats) =>
+      produce(prevChats, (draft) => {
+        const chat = draft.find((c) => c.id === currentChat.id)
+        if (!chat) return
+
+        chat.last_message = newMessage
+      })
+    )
 
     const response = await sendMessage(currentChat.id, content)
     if (!response) {
