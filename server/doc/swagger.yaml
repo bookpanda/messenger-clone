@@ -410,4 +410,4 @@ paths:
           description: Internal Server Error
       summary: Send message
       tags:
-      - chat
+      - message

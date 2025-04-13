@@ -14,7 +14,7 @@ import (
 
 // @Summary			Send message
 // @Description		Send message to a chat and distribute it to participants
-// @Tags			chat
+// @Tags			message
 // @Router			/api/v1/message [POST]
 // @Param 			RequestBody 	body 	dto.SendMessageRequest 	true 	"request request"
 // @Success			200	{object}	dto.HttpResponse[dto.MessageResponse]
