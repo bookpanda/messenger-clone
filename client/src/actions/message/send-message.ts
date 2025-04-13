@@ -2,7 +2,7 @@
 
 import { client } from "@/api/client"
 
-export async function getChatMessages(chatID: number, content: string) {
+export async function sendMessage(chatID: number, content: string) {
   const { response, data } = await client.POST("/api/v1/message", {
     body: {
       chat_id: chatID,

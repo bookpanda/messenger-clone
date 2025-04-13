@@ -1,8 +1,12 @@
 "use client"
 
-import { Dispatch, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction } from "react"
 
-import { Message, Profile } from "@/types"
+import { sendMessage } from "@/actions/message/send-message"
+import { useChatContext } from "@/contexts/chat-context"
+import { ChatMessage, Profile } from "@/types"
+import { produce } from "immer"
+import { useSession } from "next-auth/react"
 
 import { ChatHeader } from "./chat-header"
 import { ChatInput } from "./chat-input"
@@ -15,66 +19,55 @@ interface ChatProps {
 
 export const Chat = (props: ChatProps) => {
   const { profile, setOpenChatInfo } = props
+  const { data: session } = useSession()
+  const { currentChat, messages, setMessages } = useChatContext()
+  if (!messages || !currentChat) {
+    return null
+  }
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      type: "incoming",
-      text: "สวัสดีครับ",
-      date: new Date(Date.now() - 3 * 3600 * 1000),
-    },
-    {
-      id: 2,
-      type: "incoming",
-      text: "พอจะมีเวลาว่างสัก 2-3 ชั่วโมงไหมครับ",
-      date: new Date(Date.now() - 3 * 3600 * 1000),
-    },
-    {
-      id: 3,
-      type: "incoming",
-      text: "เรามาสร้าง chain connection กันเถอะ",
-      date: new Date(Date.now() - 3 * 3600 * 1000),
-    },
-    {
-      id: 4,
-      type: "outgoing",
-      text: "ขาย Amway หรอครับ",
-      date: new Date(Date.now() - 3 * 3600 * 1000),
-    },
-    {
-      id: 5,
-      type: "outgoing",
-      text: "ไม่เอาโว้ยยยยยย",
-      date: new Date(Date.now() - 3 * 3600 * 1000),
-    },
-  ])
-
-  const handleAddReaction = (messageId: number, reaction: string) => {
+  const handleAddReaction = (messageId: number, emoji: string) => {
     setMessages((prevMessages) =>
-      prevMessages.map((message) => {
-        if (message.id === messageId) {
-          // If the reaction is already the same, remove it
-          if (message.reaction === reaction) {
-            // Remove the property entirely
-            const { reaction, ...updatedMessage } = message
-            return updatedMessage
-          }
-          // Otherwise, set the reaction
-          return { ...message, reaction }
+      produce(prevMessages, (draft) => {
+        const message = draft.find((m) => m.id === messageId)
+        if (!message) return
+
+        const existingIndex = message.reactions.findIndex(
+          (r) => r.sender_id === session?.user?.userId && r.emoji === emoji
+        )
+
+        if (existingIndex !== -1) {
+          // remove the reaction if it already exists
+          message.reactions.splice(existingIndex, 1)
+        } else {
+          // add new reaction
+          message.reactions.push({
+            id: message.reactions.length + 1,
+            message_id: messageId,
+            sender_id: session?.user?.userId || 0,
+            emoji,
+            created_at: new Date().toDateString(),
+          })
         }
-        return message
       })
     )
   }
 
-  const handleSendMessage = (text: string) => {
-    const newMessage: Message = {
+  const handleSendMessage = async (content: string) => {
+    const newMessage: ChatMessage = {
       id: messages.length + 1,
-      type: "outgoing",
-      text,
-      date: new Date(),
+      chat_id: currentChat.id,
+      content,
+      created_at: new Date().toDateString(),
+      sender_id: session?.user?.userId as number,
+      reactions: [],
     }
     setMessages((prevMessages) => [...prevMessages, newMessage])
+
+    const response = await sendMessage(currentChat.id, content)
+    if (!response) {
+      // Handle error
+      return
+    }
   }
 
   return (
