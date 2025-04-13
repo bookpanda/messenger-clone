@@ -1,3 +1,5 @@
+"use server"
+
 import { client } from "@/api/client"
 
 export async function getAllUsers() {

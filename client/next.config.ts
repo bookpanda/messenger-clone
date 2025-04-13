@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
         pathname: "**",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "avatar.iran.liara.run",
+        pathname: "/username",
+      },
     ],
   },
 }
