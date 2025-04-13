@@ -513,6 +513,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/message/chat/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get messages
+         * @description Get messages of a chat
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description request request */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["dto.SendMessageRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpListResponse-dto_MessageResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/user": {
         parameters: {
             query?: never;
@@ -591,6 +653,9 @@ export interface components {
         };
         "dto.HttpListResponse-dto_ChatResponse": {
             result?: components["schemas"]["dto.ChatResponse"][];
+        };
+        "dto.HttpListResponse-dto_MessageResponse": {
+            result?: components["schemas"]["dto.MessageResponse"][];
         };
         "dto.HttpListResponse-dto_UserResponse": {
             result?: components["schemas"]["dto.UserResponse"][];

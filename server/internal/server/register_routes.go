@@ -41,5 +41,6 @@ func (s *Server) RegisterRoutes(
 	// message
 	message := v1.Group("/message")
 	message.Post("/", authMiddleware.Auth, messageHandler.HandleSendMessage)
+	message.Get("/chat/:id", authMiddleware.Auth, messageHandler.HandleGetMessages)
 
 }

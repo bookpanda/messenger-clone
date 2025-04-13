@@ -50,6 +50,14 @@ components:
           type: array
           uniqueItems: false
       type: object
+    dto.HttpListResponse-dto_MessageResponse:
+      properties:
+        result:
+          items:
+            $ref: '#/components/schemas/dto.MessageResponse'
+          type: array
+          uniqueItems: false
+      type: object
     dto.HttpListResponse-dto_UserResponse:
       properties:
         result:
@@ -482,6 +490,38 @@ paths:
                 $ref: '#/components/schemas/dto.HttpError'
           description: Internal Server Error
       summary: Send message
+      tags:
+      - message
+  /api/v1/message/chat/{id}:
+    get:
+      description: Get messages of a chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dto.SendMessageRequest'
+        description: request request
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpListResponse-dto_MessageResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Internal Server Error
+      summary: Get messages
       tags:
       - message
   /api/v1/user:

@@ -9,7 +9,6 @@ import (
 	"github.com/bookpanda/messenger-clone/pkg/apperror"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
-	"gorm.io/gorm"
 )
 
 // @Summary			Get messages
@@ -17,14 +16,14 @@ import (
 // @Tags			message
 // @Router			/api/v1/message/chat/{id} [GET]
 // @Param 			RequestBody 	body 	dto.SendMessageRequest 	true 	"request request"
-// @Success			200	{object}	dto.HttpResponse[dto.MessageResponse]
+// @Success			200	{object}	dto.HttpListResponse[dto.MessageResponse]
 // @Failure			400	{object}	dto.HttpError
 // @Failure			500	{object}	dto.HttpError
 func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
 	_, cancel := context.WithTimeout(c.UserContext(), time.Second*5)
 	defer cancel()
 
-	req := new(dto.SendMessageRequest)
+	req := new(dto.GetMessagesRequest)
 	if err := c.BodyParser(req); err != nil {
 		return apperror.BadRequest("invalid request body", err)
 	}
@@ -33,37 +32,36 @@ func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
 		return apperror.BadRequest("invalid request body", err)
 	}
 
+	var chat model.Chat
+	err := h.store.DB.Model(&model.Chat{}).
+		Where("id = ?", req.ChatID).
+		Preload("Participants").First(&chat).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to find chat")
+	}
+
+	// Check if user is a participant of the chat
 	userID, err := h.authMiddleware.GetUserIDFromContext(c.UserContext())
 	if err != nil {
 		return apperror.Internal("failed to get user id from context", err)
 	}
-
-	var message *model.Message
-	if err := h.store.DB.Transaction(func(tx *gorm.DB) error {
-		message, err = h.createMessage(req.ChatID, req.Content, userID)
-		if err != nil {
-			return errors.Wrap(err, "failed to create chat")
+	isParticipant := false
+	for _, participant := range chat.Participants {
+		if participant.ID == userID {
+			isParticipant = true
+			break
 		}
-
-		err = h.sendMessageToParticipants(req.ChatID, message.ID, userID)
-		if err != nil {
-			return errors.Wrap(err, "failed to send message to participants")
-		}
-
-		return nil
-	}); err != nil {
-		return apperror.Internal("failed to create chat", err)
+	}
+	if !isParticipant {
+		return apperror.Forbidden("user is not a participant of the chat", errors.New("user is not a participant of the chat"))
 	}
 
-	result := dto.MessageResponse{
-		ID:        message.ID,
-		ChatID:    message.ChatID,
-		Content:   message.Content,
-		SenderID:  message.SenderID,
-		CreatedAt: message.CreatedAt,
-	}
+	var messages []model.Message
+	err = h.store.DB.Model(&model.Message{}).Where("chat_id = ?", req.ChatID).Find(&messages).Error
 
-	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.MessageResponse]{
+	result := dto.ToMessageResponseList(messages)
+
+	return c.Status(fiber.StatusOK).JSON(dto.HttpListResponse[dto.MessageResponse]{
 		Result: result,
 	})
 }
