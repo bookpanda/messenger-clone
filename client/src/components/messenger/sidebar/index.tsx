@@ -1,8 +1,8 @@
 import { useState } from "react"
 
-import { ChatCard } from "../chat-card"
 import { InboxTab } from "./inbox-tab"
 import { PeopleTab } from "./people-tab"
+import { TabButton } from "./tab-button"
 
 export const Sidebar = () => {
   const [activeTab, setActiveTab] = useState<"inbox" | "people">("inbox")
@@ -13,26 +13,18 @@ export const Sidebar = () => {
 
       {/* Tab Buttons */}
       <div className="flex space-x-2">
-        <button
+        <TabButton
           onClick={() => setActiveTab("inbox")}
-          className={`rounded-full px-3 py-1 text-sm font-medium ${
-            activeTab === "inbox"
-              ? "bg-primary text-white"
-              : "bg-muted text-muted-foreground"
-          }`}
+          isActive={activeTab === "inbox"}
         >
           Inbox
-        </button>
-        <button
+        </TabButton>
+        <TabButton
           onClick={() => setActiveTab("people")}
-          className={`rounded-full px-3 py-1 text-sm font-medium ${
-            activeTab === "people"
-              ? "bg-primary text-white"
-              : "bg-muted text-muted-foreground"
-          }`}
+          isActive={activeTab === "people"}
         >
-          People
-        </button>
+          Inbox
+        </TabButton>
       </div>
 
       {/* Tab Content */}
