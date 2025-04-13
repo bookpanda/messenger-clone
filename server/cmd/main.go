@@ -73,7 +73,7 @@ func main() {
 
 	// handlers
 	authHandler := auth.NewHandler(store, validate, jwtService, authMiddleware, oauthConfig)
-	chatHandler := chat.NewHandler(store, validate)
+	chatHandler := chat.NewHandler(store, validate, authMiddleware)
 	// userHandler := user.NewHandler(store, validate, authMiddleware)
 	// objectHandler := objects.NewHandler(store, config.Storage)
 	// messageHandler := message.NewHandler(store, authMiddleware, chatService)
