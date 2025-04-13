@@ -17,6 +17,10 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     setChats(myChats)
+    if (!myChats[0]) {
+      return
+    }
+
     setCurrentChat(myChats[0])
     ;(async () => {
       const res = await getChatMessages(myChats[0].id)
