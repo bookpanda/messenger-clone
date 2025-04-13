@@ -289,6 +289,38 @@ paths:
       tags:
       - chat
     post:
+      description: Create chat with name and participants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dto.CreateChatRequest'
+        description: request request
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpResponse-dto_ChatResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Internal Server Error
+      summary: Create chat
+      tags:
+      - chat
+  /api/v1/chat/{id}/participants:
+    patch:
       description: Add/remove participants to/from chat
       requestBody:
         content:
