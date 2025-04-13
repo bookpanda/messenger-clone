@@ -17,6 +17,7 @@ import (
 // @Description		Create chat with name and participants
 // @Tags			chat
 // @Router			/api/v1/chat [POST]
+// @Security		ApiKeyAuth
 // @Param 			RequestBody 	body 	dto.CreateChatRequest 	true 	"request request"
 // @Success			200	{object}	dto.HttpResponse[dto.ChatResponse]
 // @Failure			400	{object}	dto.HttpError

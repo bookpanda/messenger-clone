@@ -15,6 +15,7 @@ import (
 // @Description		Get all chats of the user
 // @Tags			chat
 // @Router			/api/v1/chat [GET]
+// @Security		ApiKeyAuth
 // @Success			200	{object}	dto.HttpListResponse[dto.ChatResponse]
 // @Failure			400	{object}	dto.HttpError
 // @Failure			500	{object}	dto.HttpError
