@@ -30,10 +30,6 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
     })()
   }, [myChats])
 
-  useEffect(() => {
-    setChats((prevChats) => sortChats(prevChats))
-  }, [chats])
-
   const addChat = (chat: Chat) => {
     setChats(
       produce((draft) => {

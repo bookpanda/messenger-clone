@@ -68,6 +68,13 @@ export const Chat = (props: ChatProps) => {
         if (!chat) return
 
         chat.last_message = newMessage
+
+        // move chat to the top
+        const chatIndex = draft.findIndex((c) => c.id === currentChat.id)
+        if (chatIndex !== -1) {
+          draft.splice(chatIndex, 1)
+          draft.unshift(chat)
+        }
       })
     )
 
