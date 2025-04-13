@@ -4,9 +4,10 @@ import { cn } from "@/lib/utils"
 
 interface CardProps extends PropsWithChildren {
   isActive: boolean
+  onClick?: () => void
 }
 
-export const BaseCard = ({ isActive, children }: CardProps) => {
+export const BaseCard = ({ isActive, onClick, children }: CardProps) => {
   return (
     <div
       className={cn(
@@ -16,6 +17,7 @@ export const BaseCard = ({ isActive, children }: CardProps) => {
             isActive,
         }
       )}
+      onClick={onClick}
     >
       {children}
     </div>

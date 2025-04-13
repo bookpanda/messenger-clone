@@ -11,8 +11,10 @@ interface PeopleCardProps {
 export const PeopleCard = (props: PeopleCardProps) => {
   const { name, image, isActive } = props
 
+  const handleGetChat = () => {}
+
   return (
-    <BaseCard isActive={isActive}>
+    <BaseCard isActive={isActive} onClick={handleGetChat}>
       <div className="relative size-14">
         <Image src={image} alt="" fill className="rounded-full object-cover" />
       </div>
