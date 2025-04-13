@@ -21,15 +21,18 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
       return
     }
 
-    setCurrentChat(myChats[0])
+    const sortedChats = sortChats(myChats)
+    setChats(sortedChats)
+    setCurrentChat(sortedChats[0])
     ;(async () => {
-      const res = await getChatMessages(myChats[0].id)
-      if (!res) {
-        return
-      }
-      setMessages(res)
+      const res = await getChatMessages(sortedChats[0].id)
+      if (res) setMessages(res)
     })()
   }, [myChats])
+
+  useEffect(() => {
+    setChats((prevChats) => sortChats(prevChats))
+  }, [chats])
 
   const addChat = (chat: Chat) => {
     setChats(
@@ -54,4 +57,12 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
       {children}
     </ChatContext.Provider>
   )
+}
+
+const sortChats = (chats: Chat[]) => {
+  return [...chats].sort((a, b) => {
+    const dateA = new Date(a.last_message?.created_at ?? 0).getTime()
+    const dateB = new Date(b.last_message?.created_at ?? 0).getTime()
+    return dateB - dateA // latest message first
+  })
 }

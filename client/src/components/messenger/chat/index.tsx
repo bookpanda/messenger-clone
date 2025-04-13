@@ -57,7 +57,7 @@ export const Chat = (props: ChatProps) => {
       id: messages.length + 1,
       chat_id: currentChat.id,
       content,
-      created_at: new Date().toDateString(),
+      created_at: new Date().toISOString(),
       sender_id: session?.user?.userId as number,
       reactions: [],
     }
