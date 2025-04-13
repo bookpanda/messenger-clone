@@ -10,7 +10,6 @@ import (
 	"github.com/bookpanda/messenger-clone/internal/model"
 	"github.com/bookpanda/messenger-clone/internal/utils"
 	"github.com/bookpanda/messenger-clone/pkg/apperror"
-	"github.com/bookpanda/messenger-clone/pkg/logger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -34,7 +33,6 @@ func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
 	}
 
 	if err := h.validate.Struct(req); err != nil {
-		logger.Error("validate", "error", err)
 		return apperror.BadRequest("invalid request body", err)
 	}
 
