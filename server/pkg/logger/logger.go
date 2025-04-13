@@ -30,9 +30,7 @@ func Init(config Config) error {
 			Level: slog.LevelDebug,
 		}))
 	default:
-		logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelDebug,
-		}))
+		logger = slog.New(NewColorHandler())
 	}
 
 	return nil
