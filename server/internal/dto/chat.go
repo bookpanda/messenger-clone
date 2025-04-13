@@ -36,7 +36,5 @@ type ModifyParticipantRequest struct {
 }
 
 type ModifyParticipantResponse struct {
-	ID           uint           `json:"id"`
-	Name         string         `json:"name"`
 	Participants []UserResponse `json:"participants"`
 }
