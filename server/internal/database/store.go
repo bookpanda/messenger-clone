@@ -52,7 +52,6 @@ func (s *Store) migrate() {
 	if err := s.DB.AutoMigrate(
 		&model.User{},
 		&model.Chat{},
-		&model.ChatParticipant{},
 		&model.Message{},
 		&model.Reaction{},
 		&model.Inbox{},
