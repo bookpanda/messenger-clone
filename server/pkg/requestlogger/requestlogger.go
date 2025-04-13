@@ -2,6 +2,7 @@ package requestlogger
 
 import (
 	"errors"
+	"fmt"
 	"log/slog"
 
 	"github.com/bookpanda/messenger-clone/internal/dto"
@@ -39,7 +40,7 @@ func handleError(c *fiber.Ctx, err error, requestID string) error {
 		message = appError.Message
 	}
 
-	logger.ErrorContext(c.UserContext(), "Request Error", slog.String("request_id", requestID), slog.String("method", c.Method()), slog.String("path", c.Path()), slog.Int("status", status), slog.Any("error", err))
+	logger.ErrorContext(c.UserContext(), fmt.Sprintf("%s %s %d", c.Method(), c.Path(), status), slog.Any("error", err))
 	return c.Status(status).JSON(dto.HttpError{
 		Error: message,
 	})

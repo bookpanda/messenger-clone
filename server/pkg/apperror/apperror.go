@@ -25,7 +25,7 @@ func New(code int, msg string, err error) *AppError {
 
 	return &AppError{
 		Code:    code,
-		Message: msg,
+		Message: msg + ": " + err.Error(),
 		Err:     Err,
 	}
 }
