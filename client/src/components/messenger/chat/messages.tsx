@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 
 import { cn } from "@/lib/utils"
+import { ChatMessage } from "@/types"
 import { EllipsisVertical, Smile } from "lucide-react"
 import Image from "next/image"
 
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/popover"
 
 interface MessageProps {
-  text: string
+  message: ChatMessage
   reaction?: string
   handleAddReaction: (reaction: string) => void
 }
@@ -22,7 +23,8 @@ interface MessageProps {
 const reactionEmojis = ["🥰", "😢", "😂", "😡", "👍"]
 
 export const IncomingMessage = (props: MessageProps) => {
-  const { text, reaction, handleAddReaction } = props
+  const { message, reaction, handleAddReaction } = props
+  const { content } = message
 
   const [isHover, setHover] = useState(false)
   const [isReactionOpen, setReactionOpen] = useState(false)
@@ -51,7 +53,7 @@ export const IncomingMessage = (props: MessageProps) => {
       </div>
       <div className="flex items-center gap-2">
         <div className="bg-chat-incoming-message-bubble-background-color relative rounded-full px-3 py-2">
-          <p>{text}</p>
+          <p>{content}</p>
           {reaction && (
             <div className="bg-primary-background absolute right-3 -bottom-3 z-10 flex size-5 items-center justify-center rounded-full">
               {reaction}
@@ -115,7 +117,8 @@ export const IncomingMessage = (props: MessageProps) => {
 }
 
 export const OutgoingMessage = (props: MessageProps) => {
-  const { text, reaction, handleAddReaction } = props
+  const { message, reaction, handleAddReaction } = props
+  const { content } = message
 
   const [isHover, setHover] = useState(false)
   const [isReactionOpen, setReactionOpen] = useState(false)
@@ -187,7 +190,7 @@ export const OutgoingMessage = (props: MessageProps) => {
           </Popover>
         </div>
         <div className="bg-chat-outgoing-message-bubble-background-color relative rounded-full px-3 py-2">
-          <p>{text}</p>
+          <p>{content}</p>
           {reaction && (
             <div className="bg-primary-background absolute right-3 -bottom-3 z-10 flex size-5 items-center justify-center rounded-full">
               {reaction}
