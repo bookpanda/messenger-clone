@@ -235,7 +235,7 @@ export interface paths {
         put?: never;
         /**
          * Create chat
-         * @description Create chat with name and participants
+         * @description Create chat with name and participants. If is_direct is true, it will create that direct chat or return the existing one.
          */
         post: {
             parameters: {
@@ -576,10 +576,12 @@ export interface components {
     schemas: {
         "dto.ChatResponse": {
             id?: number;
+            is_direct?: boolean;
             name?: string;
             participants?: components["schemas"]["dto.UserResponse"][];
         };
         "dto.CreateChatRequest": {
+            is_direct?: boolean;
             name: string;
             participants: string[];
         };

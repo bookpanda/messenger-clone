@@ -5,11 +5,13 @@ import "github.com/bookpanda/messenger-clone/internal/model"
 type ChatResponse struct {
 	ID           uint           `json:"id"`
 	Name         string         `json:"name"`
+	IsDirect     bool           `json:"is_direct"`
 	Participants []UserResponse `json:"participants"`
 }
 
 type CreateChatRequest struct {
 	Name         string   `json:"name" validate:"required"`
+	IsDirect     bool     `json:"is_direct"`
 	Participants []string `json:"participants" validate:"required"`
 }
 

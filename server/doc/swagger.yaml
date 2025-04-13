@@ -4,6 +4,8 @@ components:
       properties:
         id:
           type: integer
+        is_direct:
+          type: boolean
         name:
           type: string
         participants:
@@ -14,6 +16,8 @@ components:
       type: object
     dto.CreateChatRequest:
       properties:
+        is_direct:
+          type: boolean
         name:
           type: string
         participants:
@@ -299,7 +303,8 @@ paths:
       tags:
       - chat
     post:
-      description: Create chat with name and participants
+      description: Create chat with name and participants. If is_direct is true, it
+        will create that direct chat or return the existing one.
       requestBody:
         content:
           application/json:
