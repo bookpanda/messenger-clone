@@ -74,16 +74,7 @@ func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
 			return errors.Wrap(err, "failed to create chat")
 		}
 
-		// add chat participants
-		chatParticipants := make([]model.ChatParticipant, len(participants))
-		for i, participant := range participants {
-			chatParticipants[i] = model.ChatParticipant{
-				ChatID: chat.ID,
-				UserID: participant.ID,
-			}
-		}
-
-		err = h.store.DB.Model(chat).Association("Participants").Append(chatParticipants)
+		err = h.store.DB.Model(chat).Association("Participants").Append(participants)
 		if err != nil {
 			return errors.Wrap(err, "failed to add participants to chat")
 		}

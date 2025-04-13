@@ -50,13 +50,13 @@ func (h *Handler) HandleModifyParticipants(c *fiber.Ctx) error {
 	if err != nil {
 		return apperror.BadRequest("invalid chat id", err)
 	}
-	err = h.ModifyParticipants(dto.ParticipantAction(req.Action), uint(chatID), participants)
-	if err != nil {
-		return apperror.Internal("failed to modify participants", err)
+	finalParticipants, apperr := h.ModifyParticipants(dto.ParticipantAction(req.Action), uint(chatID), participants)
+	if apperr != nil {
+		return apperr
 	}
 
 	result := dto.ModifyParticipantResponse{
-		Participants: dto.ToUserResponseList(participants),
+		Participants: dto.ToUserResponseList(finalParticipants),
 	}
 
 	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.ModifyParticipantResponse]{
@@ -92,13 +92,37 @@ func (h *Handler) VerifyParticipants(participants []string) ([]model.User, error
 	return participantUsers, nil
 }
 
-func (h *Handler) ModifyParticipants(action dto.ParticipantAction, chatID uint, participants []model.User) error {
-	chatParticipants := make([]model.ChatParticipant, len(participants))
-	for i, participant := range participants {
-		chatParticipants[i] = model.ChatParticipant{
-			ChatID: chatID,
-			UserID: participant.ID,
+func (h *Handler) ModifyParticipants(action dto.ParticipantAction, chatID uint, participants []model.User) ([]model.User, error) {
+	var chat model.Chat
+	if err := h.store.DB.Preload("Participants").First(&chat, chatID).Error; err != nil {
+		return nil, apperror.Internal("failed to load chat participants", err)
+	}
+
+	existingMap := make(map[uint]struct{}, len(chat.Participants))
+	for _, participant := range chat.Participants {
+		existingMap[participant.ID] = struct{}{}
+	}
+
+	// prepare participants and check for conflict
+	var conflictIDs []string
+	for _, p := range participants {
+		_, exists := existingMap[p.ID]
+		if action == dto.AddParticipant && exists {
+			conflictIDs = append(conflictIDs, strconv.FormatUint(uint64(p.ID), 10))
 		}
+		if action == dto.RemoveParticipant && !exists {
+			conflictIDs = append(conflictIDs, strconv.FormatUint(uint64(p.ID), 10))
+		}
+	}
+
+	if len(conflictIDs) > 0 {
+		var msg string
+		if action == dto.AddParticipant {
+			msg = "participants already in chat: "
+		} else {
+			msg = "participants not in chat: "
+		}
+		return nil, apperror.BadRequest("conflict in participants", errors.New(msg+strings.Join(conflictIDs, ", ")))
 	}
 
 	var err error
@@ -108,19 +132,23 @@ func (h *Handler) ModifyParticipants(action dto.ParticipantAction, chatID uint, 
 			Model: gorm.Model{
 				ID: chatID,
 			},
-		}).Association("Participants").Append(chatParticipants)
+		}).Association("Participants").Append(participants)
 	case dto.RemoveParticipant:
 		err = h.store.DB.Model(&model.Chat{
 			Model: gorm.Model{
 				ID: chatID,
 			},
-		}).Association("Participants").Delete(chatParticipants)
+		}).Association("Participants").Delete(participants)
 	default:
-		return apperror.BadRequest("invalid action", errors.New("action must be ADD or REMOVE"))
+		return nil, apperror.BadRequest("invalid action", errors.New("action must be ADD or REMOVE"))
 	}
 	if err != nil {
-		return errors.Wrap(err, "failed to add participants to chat")
+		return nil, apperror.Internal("failed to add participants to chat", err)
 	}
 
-	return nil
+	if err := h.store.DB.Preload("Participants").First(&chat, chatID).Error; err != nil {
+		return nil, apperror.Internal("failed to load chat with participants", err)
+	}
+
+	return chat.Participants, nil
 }
