@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 import { useGetAllUsers } from "@/hooks/use-get-all-users"
 import { useSession } from "next-auth/react"
 
@@ -8,6 +10,7 @@ import { PeopleCard } from "./card/people-card"
 export const PeopleTab = () => {
   const { users, loading } = useGetAllUsers()
   const { data: session } = useSession()
+  const [currentPerson, setCurrentPerson] = useState<number | null>(null)
 
   if (loading) {
     return (
@@ -21,7 +24,7 @@ export const PeopleTab = () => {
 
   return (
     <div>
-      {users.map((user) => {
+      {users.map((user, i) => {
         if (
           !user.id ||
           !user.name ||
@@ -31,12 +34,13 @@ export const PeopleTab = () => {
           return null
         }
         return (
-          <PeopleCard
-            key={user.id}
-            isActive={false}
-            name={user.name}
-            image={user.profilePictureUrl}
-          />
+          <div key={user.id} onClick={() => setCurrentPerson(i)}>
+            <PeopleCard
+              isActive={currentPerson === i}
+              name={user.name}
+              image={user.profilePictureUrl}
+            />
+          </div>
         )
       })}
     </div>
