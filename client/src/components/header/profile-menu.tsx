@@ -29,7 +29,7 @@ export const ProfileMenu = () => {
       <div className="mb-4 flex items-center gap-2">
         <Image
           alt="profile-pic"
-          src={session?.user?.image}
+          src={session?.user?.image || ""}
           height={30}
           width={30}
           className="rounded-full"
