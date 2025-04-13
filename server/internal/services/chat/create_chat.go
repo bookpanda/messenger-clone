@@ -18,7 +18,7 @@ import (
 // @Tags			chat
 // @Router			/api/v1/chat [POST]
 // @Param 			RequestBody 	body 	dto.CreateChatRequest 	true 	"request request"
-// @Success			200	{object}	dto.HttpResponse[dto.CreateChatResponse]
+// @Success			200	{object}	dto.HttpResponse[dto.ChatResponse]
 // @Failure			400	{object}	dto.HttpError
 // @Failure			500	{object}	dto.HttpError
 func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
@@ -59,13 +59,13 @@ func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
 		return apperror.Internal("failed to create chat", err)
 	}
 
-	result := dto.CreateChatResponse{
+	result := dto.ChatResponse{
 		ID:           chat.ID,
 		Name:         chat.Name,
 		Participants: dto.ToUserResponseList(finalParticipants),
 	}
 
-	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.CreateChatResponse]{
+	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.ChatResponse]{
 		Result: result,
 	})
 }
