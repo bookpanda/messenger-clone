@@ -1,11 +1,12 @@
-import { getMyChats } from "@/actions/chat/get-my-chats"
+import { useGetAllUsers } from "@/hooks/use-get-all-users"
 
 import { ChatCard } from "../chat-card"
 
-export const PeopleTab = async () => {
-  const chats = await getMyChats()
-  if (!chats || chats.length === 0) {
-    return <div className="text-center text-gray-500">No chats found</div>
+export const PeopleTab = () => {
+  const { users, loading } = useGetAllUsers()
+
+  if (loading) {
+    return <p>loading</p>
   }
 
   return (

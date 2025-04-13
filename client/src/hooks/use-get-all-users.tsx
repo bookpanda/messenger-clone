@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
 
-import { getAllUsers } from "@/actions/chat/get-all-users"
+import { getAllUsers } from "@/actions/user/get-all-users"
 import { User } from "@/types/user"
 
-export const useGetAllUsers = (roomId: string) => {
+export const useGetAllUsers = () => {
   const [loading, setLoading] = useState(true)
   const [users, setUsers] = useState<User[]>([])
 
@@ -17,7 +17,7 @@ export const useGetAllUsers = (roomId: string) => {
       setUsers(res)
       setLoading(false)
     })()
-  }, [roomId])
+  }, [])
 
   return { users, loading }
 }
