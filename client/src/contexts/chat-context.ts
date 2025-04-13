@@ -1,21 +1,25 @@
 import { Dispatch, SetStateAction, createContext, useContext } from "react"
 
-import { Chat } from "@/types"
+import { Chat, ChatMessage } from "@/types"
 
 interface ChatContext {
   chats: Chat[]
   setChats: Dispatch<SetStateAction<Chat[]>>
   addChat: (chat: Chat) => void
-  currentChat: Chat | undefined
-  setCurrentChat: Dispatch<SetStateAction<Chat | undefined>>
+  currentChat: Chat
+  setCurrentChat: Dispatch<SetStateAction<Chat>>
+  messages: ChatMessage[]
+  setMessages: Dispatch<SetStateAction<ChatMessage[]>>
 }
 
 export const ChatContext = createContext<ChatContext>({
   chats: [],
   setChats: () => {},
   addChat: () => {},
-  currentChat: undefined,
+  currentChat: {} as Chat,
   setCurrentChat: () => {},
+  messages: [],
+  setMessages: () => {},
 })
 
 export const useChatContext = () => {

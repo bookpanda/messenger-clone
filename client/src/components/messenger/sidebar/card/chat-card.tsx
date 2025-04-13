@@ -1,3 +1,5 @@
+import { getChatMessages } from "@/actions/message/get-chat-messages"
+import { useChatContext } from "@/contexts/chat-context"
 import { Chat } from "@/types"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
@@ -16,6 +18,7 @@ export const ChatCard = (props: ChatCardProps) => {
   const lastMessage = chat.last_message
 
   const { data: session } = useSession()
+  const { setMessages, setCurrentChat } = useChatContext()
 
   const isLastMessageFromMe = lastMessage?.sender_id === session?.user?.userId
   const lastMessageDate = new Date(lastMessage?.created_at || "")
@@ -30,8 +33,18 @@ export const ChatCard = (props: ChatCardProps) => {
     chatImage = participants[0]?.profilePictureUrl || ""
   }
 
+  const handleMessages = async (chatID: number) => {
+    const messages = await getChatMessages(chatID)
+
+    if (!messages) {
+      return
+    }
+    setMessages(messages)
+    setCurrentChat(chat)
+  }
+
   return (
-    <BaseCard isActive={isActive}>
+    <BaseCard isActive={isActive} onClick={() => handleMessages(chat.id)}>
       <div className="relative size-14">
         <Image
           src={chatImage}

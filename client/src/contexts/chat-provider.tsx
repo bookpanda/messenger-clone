@@ -3,17 +3,20 @@
 import { FC, PropsWithChildren, useEffect, useState } from "react"
 
 import { useGetMyChats } from "@/hooks/use-get-my-chats"
-import { Chat } from "@/types"
+import { Chat, ChatMessage } from "@/types"
 import { produce } from "immer"
 
 import { ChatContext } from "./chat-context"
 
 export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
   const [chats, setChats] = useState<Chat[]>([])
+  const [currentChat, setCurrentChat] = useState<Chat>({} as Chat)
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const { chats: myChats } = useGetMyChats()
 
   useEffect(() => {
     setChats(myChats)
+    setCurrentChat(myChats[0])
   }, [myChats])
 
   const addChat = (chat: Chat) => {
@@ -24,8 +27,6 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
     )
   }
 
-  const [currentChat, setCurrentChat] = useState<Chat | undefined>(undefined)
-
   return (
     <ChatContext.Provider
       value={{
@@ -34,6 +35,8 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         addChat,
         chats,
         setChats,
+        messages,
+        setMessages,
       }}
     >
       {children}

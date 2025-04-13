@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 
 import { cn } from "@/lib/utils"
-import { EllipsisVertical, Fan, Smile } from "lucide-react"
+import { EllipsisVertical, Smile } from "lucide-react"
 import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
