@@ -6,6 +6,8 @@ components:
           type: integer
         is_direct:
           type: boolean
+        last_message:
+          $ref: '#/components/schemas/dto.MessageResponse'
         name:
           type: string
         participants:
@@ -13,6 +15,11 @@ components:
             $ref: '#/components/schemas/dto.UserResponse'
           type: array
           uniqueItems: false
+      required:
+      - id
+      - is_direct
+      - name
+      - participants
       type: object
     dto.CreateChatRequest:
       properties:
@@ -26,6 +33,7 @@ components:
           type: array
           uniqueItems: false
       required:
+      - is_direct
       - name
       - participants
       type: object
@@ -104,10 +112,22 @@ components:
       type: object
     dto.MessageResponse:
       properties:
+        chat_id:
+          type: integer
+        created_at:
+          type: string
         id:
           type: integer
         name:
           type: string
+        sender_id:
+          type: integer
+      required:
+      - chat_id
+      - created_at
+      - id
+      - name
+      - sender_id
       type: object
     dto.ModifyParticipantRequest:
       properties:
@@ -129,6 +149,8 @@ components:
             $ref: '#/components/schemas/dto.UserResponse'
           type: array
           uniqueItems: false
+      required:
+      - participants
       type: object
     dto.RefreshTokenRequest:
       properties:

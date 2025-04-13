@@ -36,7 +36,19 @@ func (h *Handler) HandleGetMyChats(c *fiber.Ctx) error {
 		return apperror.Internal("failed to get chats", err)
 	}
 
-	result := dto.ToChatResponseList(user.Chats)
+	lastMessages := make([]model.Message, len(user.Chats))
+	chatIDs := make([]uint, len(user.Chats))
+	for i, chat := range user.Chats {
+		chatIDs[i] = chat.ID
+	}
+	err = h.store.DB.Raw(`
+	SELECT DISTINCT ON (chat_id) *
+	FROM messages
+	WHERE chat_id IN ?
+	ORDER BY chat_id, created_at DESC
+	`, chatIDs).Scan(&lastMessages).Error
+
+	result := dto.ToChatResponseList(user.Chats, lastMessages)
 
 	return c.Status(fiber.StatusOK).JSON(dto.HttpListResponse[dto.ChatResponse]{
 		Result: result,

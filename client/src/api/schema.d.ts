@@ -575,13 +575,14 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         "dto.ChatResponse": {
-            id?: number;
-            is_direct?: boolean;
-            name?: string;
-            participants?: components["schemas"]["dto.UserResponse"][];
+            id: number;
+            is_direct: boolean;
+            last_message?: components["schemas"]["dto.MessageResponse"];
+            name: string;
+            participants: components["schemas"]["dto.UserResponse"][];
         };
         "dto.CreateChatRequest": {
-            is_direct?: boolean;
+            is_direct: boolean;
             name: string;
             participants: string[];
         };
@@ -624,15 +625,18 @@ export interface components {
             user?: components["schemas"]["dto.UserResponse"];
         };
         "dto.MessageResponse": {
-            id?: number;
-            name?: string;
+            chat_id: number;
+            created_at: string;
+            id: number;
+            name: string;
+            sender_id: number;
         };
         "dto.ModifyParticipantRequest": {
             action: string;
             participants: string[];
         };
         "dto.ModifyParticipantResponse": {
-            participants?: components["schemas"]["dto.UserResponse"][];
+            participants: components["schemas"]["dto.UserResponse"][];
         };
         "dto.RefreshTokenRequest": {
             refreshToken: string;
