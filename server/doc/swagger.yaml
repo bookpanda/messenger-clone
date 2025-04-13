@@ -128,6 +128,11 @@ components:
           type: string
         id:
           type: integer
+        reactions:
+          items:
+            $ref: '#/components/schemas/dto.ReactionResponse'
+          type: array
+          uniqueItems: false
         sender_id:
           type: integer
       required:
@@ -135,6 +140,7 @@ components:
       - content
       - created_at
       - id
+      - reactions
       - sender_id
       type: object
     dto.ModifyParticipantRequest:
@@ -159,6 +165,25 @@ components:
           uniqueItems: false
       required:
       - participants
+      type: object
+    dto.ReactionResponse:
+      properties:
+        created_at:
+          type: string
+        emoji:
+          type: string
+        id:
+          type: integer
+        message_id:
+          type: integer
+        sender_id:
+          type: integer
+      required:
+      - created_at
+      - emoji
+      - id
+      - message_id
+      - sender_id
       type: object
     dto.RefreshTokenRequest:
       properties:

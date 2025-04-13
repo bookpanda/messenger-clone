@@ -57,7 +57,7 @@ func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
 	}
 
 	var messages []model.Message
-	err = h.store.DB.Model(&model.Message{}).Where("chat_id = ?", chatID).Find(&messages).Error
+	err = h.store.DB.Model(&model.Message{}).Preload("Reactions").Where("chat_id = ?", chatID).Find(&messages).Error
 
 	result := dto.ToMessageResponseList(messages)
 

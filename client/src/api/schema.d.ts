@@ -692,6 +692,7 @@ export interface components {
             content: string;
             created_at: string;
             id: number;
+            reactions: components["schemas"]["dto.ReactionResponse"][];
             sender_id: number;
         };
         "dto.ModifyParticipantRequest": {
@@ -700,6 +701,13 @@ export interface components {
         };
         "dto.ModifyParticipantResponse": {
             participants: components["schemas"]["dto.UserResponse"][];
+        };
+        "dto.ReactionResponse": {
+            created_at: string;
+            emoji: string;
+            id: number;
+            message_id: number;
+            sender_id: number;
         };
         "dto.RefreshTokenRequest": {
             refreshToken: string;

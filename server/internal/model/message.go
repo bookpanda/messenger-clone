@@ -26,6 +26,8 @@ type Message struct {
 	IsReply          bool     `gorm:"not null;default:false"`
 	ReplyToMessageID *uint    // nil if not a reply
 	ReplyToMessage   *Message `gorm:"foreignKey:ReplyToMessageID"` // self-reference
+
+	Reactions []Reaction `gorm:"foreignKey:MessageID"`
 }
 
 func ValidateMessageType(msgType string) bool {
