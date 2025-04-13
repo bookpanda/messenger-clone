@@ -48,20 +48,23 @@ func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
 
 	if len(participants) != len(req.Participants) {
 		// check which participants not found
+		foundIDs := make(map[string]struct{}, len(participants))
+		for _, p := range participants {
+			idStr := strconv.FormatUint(uint64(p.ID), 10)
+			foundIDs[idStr] = struct{}{}
+		}
+
 		var notFound []string
 		for _, id := range req.Participants {
-			found := false
-			for _, p := range participants {
-				if strconv.FormatUint(uint64(p.ID), 10) == id {
-					found = true
-					break
-				}
-			}
-			if !found {
+			if _, ok := foundIDs[id]; !ok {
 				notFound = append(notFound, id)
 			}
 		}
-		return apperror.BadRequest("some participants not found", errors.New("participants not found: "+strings.Join(notFound, ", ")))
+
+		return apperror.BadRequest(
+			"some participants not found",
+			errors.New("participants not found: "+strings.Join(notFound, ", ")),
+		)
 	}
 
 	var chat *model.Chat
