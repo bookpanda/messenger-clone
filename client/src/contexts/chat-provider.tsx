@@ -2,6 +2,7 @@
 
 import { FC, PropsWithChildren, useEffect, useState } from "react"
 
+import { getChatMessages } from "@/actions/message/get-chat-messages"
 import { useGetMyChats } from "@/hooks/use-get-my-chats"
 import { Chat, ChatMessage } from "@/types"
 import { produce } from "immer"
@@ -17,6 +18,13 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     setChats(myChats)
     setCurrentChat(myChats[0])
+    ;(async () => {
+      const res = await getChatMessages(myChats[0].id)
+      if (!res) {
+        return
+      }
+      setMessages(res)
+    })()
   }, [myChats])
 
   const addChat = (chat: Chat) => {

@@ -18,38 +18,38 @@ export const Chat = (props: ChatProps) => {
 
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: "1",
+      id: 1,
       type: "incoming",
       text: "สวัสดีครับ",
       date: new Date(Date.now() - 3 * 3600 * 1000),
     },
     {
-      id: "2",
+      id: 2,
       type: "incoming",
       text: "พอจะมีเวลาว่างสัก 2-3 ชั่วโมงไหมครับ",
       date: new Date(Date.now() - 3 * 3600 * 1000),
     },
     {
-      id: "3",
+      id: 3,
       type: "incoming",
       text: "เรามาสร้าง chain connection กันเถอะ",
       date: new Date(Date.now() - 3 * 3600 * 1000),
     },
     {
-      id: "4",
+      id: 4,
       type: "outgoing",
       text: "ขาย Amway หรอครับ",
       date: new Date(Date.now() - 3 * 3600 * 1000),
     },
     {
-      id: "5",
+      id: 5,
       type: "outgoing",
       text: "ไม่เอาโว้ยยยยยย",
       date: new Date(Date.now() - 3 * 3600 * 1000),
     },
   ])
 
-  const handleAddReaction = (messageId: string, reaction: string) => {
+  const handleAddReaction = (messageId: number, reaction: string) => {
     setMessages((prevMessages) =>
       prevMessages.map((message) => {
         if (message.id === messageId) {
@@ -69,7 +69,7 @@ export const Chat = (props: ChatProps) => {
 
   const handleSendMessage = (text: string) => {
     const newMessage: Message = {
-      id: String(messages.length + 1),
+      id: messages.length + 1,
       type: "outgoing",
       text,
       date: new Date(),
@@ -84,7 +84,7 @@ export const Chat = (props: ChatProps) => {
         lastActive={profile.lastActive}
         setOpenChatInfo={setOpenChatInfo}
       />
-      <ChatMessages messages={messages} handleAddReaction={handleAddReaction} />
+      <ChatMessages handleAddReaction={handleAddReaction} />
       <ChatInput handleSendMessage={handleSendMessage} />
     </div>
   )

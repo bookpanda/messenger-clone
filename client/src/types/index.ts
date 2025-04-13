@@ -3,7 +3,7 @@ import { components } from "@/api/schema"
 export type MessageType = "incoming" | "outgoing"
 
 export type Message = {
-  id: string
+  id: number
   type: MessageType
   text: string
   date: Date
