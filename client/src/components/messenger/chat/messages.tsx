@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 
 import { cn } from "@/lib/utils"
-import { ChatMessage } from "@/types"
+import { ChatMessage, User } from "@/types"
 import { EllipsisVertical, Smile } from "lucide-react"
 import Image from "next/image"
 
@@ -16,6 +16,7 @@ import {
 
 interface MessageProps {
   message: ChatMessage
+  sender: User
   reaction?: string
   handleAddReaction: (reaction: string) => void
 }
@@ -23,7 +24,7 @@ interface MessageProps {
 const reactionEmojis = ["🥰", "😢", "😂", "😡", "👍"]
 
 export const IncomingMessage = (props: MessageProps) => {
-  const { message, reaction, handleAddReaction } = props
+  const { message, sender, reaction, handleAddReaction } = props
   const { content } = message
 
   const [isHover, setHover] = useState(false)
@@ -45,7 +46,7 @@ export const IncomingMessage = (props: MessageProps) => {
     >
       <div className="relative size-7">
         <Image
-          src="/thumbnail.jpg"
+          src={sender.profilePictureUrl || ""}
           alt=""
           fill
           className="rounded-full object-cover"

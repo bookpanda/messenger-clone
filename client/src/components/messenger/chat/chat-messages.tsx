@@ -16,7 +16,7 @@ interface ChatMessagesProps {
 export const ChatMessages = (props: ChatMessagesProps) => {
   const { handleAddReaction } = props
   const { data: session } = useSession()
-  const { messages } = useChatContext()
+  const { messages, currentChat } = useChatContext()
 
   const endOfMessagesRef = useRef<HTMLDivElement>(null)
 
@@ -32,10 +32,18 @@ export const ChatMessages = (props: ChatMessagesProps) => {
       <div className="space-y-2">
         {/* Chat messages go here */}
         {messages.map((message, idx) => {
-          return message.sender_id === session?.user?.userId ? (
+          const sender = currentChat?.participants.find(
+            (participant) => participant.id === message.sender_id
+          )
+          if (!sender) {
+            return null
+          }
+
+          return message.sender_id !== session?.user?.userId ? (
             <IncomingMessage
               key={idx}
               message={message}
+              sender={sender}
               handleAddReaction={(reaction: string) =>
                 handleAddReaction(message.id, reaction)
               }
@@ -45,6 +53,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
             <OutgoingMessage
               key={idx}
               message={message}
+              sender={sender}
               handleAddReaction={(reaction: string) =>
                 handleAddReaction(message.id, reaction)
               }
