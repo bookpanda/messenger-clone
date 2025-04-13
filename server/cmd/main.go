@@ -17,6 +17,8 @@ import (
 	"github.com/bookpanda/messenger-clone/internal/server"
 	"github.com/bookpanda/messenger-clone/internal/services/auth"
 	"github.com/bookpanda/messenger-clone/internal/services/chat"
+	"github.com/bookpanda/messenger-clone/internal/services/message"
+	"github.com/bookpanda/messenger-clone/internal/services/user"
 	"github.com/bookpanda/messenger-clone/internal/validator"
 	"github.com/bookpanda/messenger-clone/pkg/google"
 	"github.com/bookpanda/messenger-clone/pkg/logger"
@@ -74,9 +76,9 @@ func main() {
 	// handlers
 	authHandler := auth.NewHandler(store, validate, jwtService, authMiddleware, oauthConfig)
 	chatHandler := chat.NewHandler(store, validate, authMiddleware)
-	// userHandler := user.NewHandler(store, validate, authMiddleware)
+	userHandler := user.NewHandler(store, validate, authMiddleware)
+	messageHandler := message.NewHandler(store, validate, authMiddleware)
 	// objectHandler := objects.NewHandler(store, config.Storage)
-	// messageHandler := message.NewHandler(store, authMiddleware, chatService)
 
 	server.RegisterDocs()
 
@@ -84,10 +86,10 @@ func main() {
 	server.RegisterRoutes(
 		authMiddleware,
 		authHandler,
+		userHandler,
 		chatHandler,
-		// userHandler,
+		messageHandler,
 		// objectHandler,
-		// messageHandler,
 	)
 
 	server.Start(ctx, stop)

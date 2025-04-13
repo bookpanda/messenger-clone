@@ -14,7 +14,8 @@ const (
 
 type Message struct {
 	gorm.Model
-	Content string `gorm:"not null"`
+	Type    MessageType `gorm:"not null;default:TEXT"`
+	Content string      `gorm:"not null"`
 
 	ChatID uint `gorm:"not null"`
 	Chat   Chat `gorm:"foreignKey:ChatID"`
