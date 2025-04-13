@@ -1,32 +1,20 @@
+import { useChatContext } from "@/contexts/chat-context"
+
 import { ChatCard } from "./card/chat-card"
 
 export const InboxTab = () => {
+  const { chats, currentChat } = useChatContext()
+
   return (
     <div>
-      <ChatCard
-        name="Chanotai Krajeam"
-        image="/thumbnail.jpg"
-        lastMessage="hi"
-        lastMessageFromMe={true}
-        lastMessageDate={new Date()}
-        isActive={true}
-      />
-      <ChatCard
-        name="Chanotai Krajeam"
-        image="/thumbnail.jpg"
-        lastMessage="hi"
-        lastMessageFromMe={false}
-        lastMessageDate={new Date()}
-        isActive={false}
-      />
-      <ChatCard
-        name="Chanotai Krajeam"
-        image="/thumbnail.jpg"
-        lastMessage="hi"
-        lastMessageFromMe={true}
-        lastMessageDate={new Date()}
-        isActive={false}
-      />
+      {chats.map((chat) => (
+        <ChatCard
+          key={chat.id}
+          chat={chat}
+          image="/thumbnail.jpg"
+          isActive={chat.id === currentChat?.id}
+        />
+      ))}
     </div>
   )
 }

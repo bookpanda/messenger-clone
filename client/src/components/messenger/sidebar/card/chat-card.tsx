@@ -1,42 +1,64 @@
+import { Chat } from "@/types"
+import { useSession } from "next-auth/react"
 import Image from "next/image"
 
 import { BaseCard } from "."
 
 interface ChatCardProps {
-  name: string
+  chat: Chat
   image: string
-  lastMessage: string
-  lastMessageFromMe: boolean
-  lastMessageDate: Date
   isActive: boolean
 }
 
 export const ChatCard = (props: ChatCardProps) => {
-  const {
-    name,
-    image,
-    lastMessage,
-    lastMessageFromMe,
-    lastMessageDate,
-    isActive,
-  } = props
+  const { chat, image, isActive } = props
+  const { name, is_direct } = chat
+  const lastMessage = chat.last_message
+
+  const { data: session } = useSession()
+
+  const isLastMessageFromMe = lastMessage?.sender_id === session?.user?.userId
+  const lastMessageDate = new Date(lastMessage?.created_at || "")
+
+  let chatName = name
+  let chatImage = image
+  if (is_direct) {
+    const participants = chat.participants.filter(
+      (participant) => participant.id !== session?.user?.userId
+    )
+    chatName = participants[0]?.name || ""
+    chatImage = participants[0]?.profilePictureUrl || ""
+  }
 
   return (
     <BaseCard isActive={isActive}>
       <div className="relative size-14">
-        <Image src={image} alt="" fill className="rounded-full object-cover" />
+        <Image
+          src={chatImage}
+          alt=""
+          fill
+          className="rounded-full object-cover"
+        />
       </div>
       <div className="space-y-1">
-        <h2>{name}</h2>
+        <h2>{chatName}</h2>
         <div className="text-secondary-text flex items-center gap-1 text-xs">
-          <p>{lastMessageFromMe ? `You: ${lastMessage}` : lastMessage}</p>
-          <p>&#8226;</p>
-          <p>
-            {lastMessageDate.toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </p>
+          {lastMessage?.content && (
+            <>
+              <p>
+                {isLastMessageFromMe
+                  ? `You: ${lastMessage?.content}`
+                  : lastMessage.content}
+              </p>
+              <p>&#8226;</p>
+              <p>
+                {lastMessageDate.toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </>
+          )}
         </div>
       </div>
     </BaseCard>
