@@ -13,20 +13,22 @@ import { Button } from "@/components/ui/button"
 dayjs.extend(relativeTime)
 
 interface ChatHeaderProps {
-  name: string
   image: string
   lastActive: Date
   setOpenChatInfo: Dispatch<SetStateAction<boolean>>
 }
 
 export const ChatHeader = (props: ChatHeaderProps) => {
-  const { name, image, lastActive, setOpenChatInfo } = props
+  const { image, lastActive, setOpenChatInfo } = props
 
   const { data: session } = useSession()
   const { currentChat } = useChatContext()
+  if (!currentChat) {
+    return null
+  }
   const { is_direct, participants } = currentChat
 
-  let chatName = name
+  let chatName = currentChat.name
   let chatImage = image
   if (is_direct) {
     const members = participants.filter(

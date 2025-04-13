@@ -80,7 +80,6 @@ export const Chat = (props: ChatProps) => {
   return (
     <div className="bg-primary-background text-primary-foreground flex h-full flex-1 flex-col overflow-hidden rounded-md">
       <ChatHeader
-        name={profile.name}
         image={profile.image}
         lastActive={profile.lastActive}
         setOpenChatInfo={setOpenChatInfo}
