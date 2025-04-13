@@ -8,7 +8,7 @@ import { Messenger } from "@/components/messenger"
 export default async function Home() {
   const session: Session | null | undefined = await auth()
 
-  // console.log("session", session)
+  console.log("session", session)
 
   if (!session) {
     redirect("/login")
