@@ -1,6 +1,6 @@
 import { useGetAllUsers } from "@/hooks/use-get-all-users"
 
-import { ChatCard } from "../chat-card"
+import { ChatCard } from "./card/chat-card"
 
 export const PeopleTab = () => {
   const { users, loading } = useGetAllUsers()

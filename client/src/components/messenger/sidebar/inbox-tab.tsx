@@ -1,4 +1,4 @@
-import { ChatCard } from "../chat-card"
+import { ChatCard } from "./card/chat-card"
 
 export const InboxTab = () => {
   return (
