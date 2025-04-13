@@ -4,9 +4,9 @@ import "gorm.io/gorm"
 
 type Inbox struct {
 	gorm.Model
-	MessageID string  `gorm:"not null"`
+	MessageID uint    `gorm:"not null;index:idx_message_user,unique"`
 	Message   Message `gorm:"foreignKey:MessageID"`
 
-	UserID string `gorm:"not null;unique"`
-	User   User   `gorm:"foreignKey:UserID"`
+	UserID uint `gorm:"not null;index:idx_message_user,unique"`
+	User   User `gorm:"foreignKey:UserID"`
 }

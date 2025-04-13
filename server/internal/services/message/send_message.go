@@ -45,6 +45,11 @@ func (h *Handler) HandleSendMessage(c *fiber.Ctx) error {
 			return errors.Wrap(err, "failed to create chat")
 		}
 
+		err = h.sendMessageToParticipants(req.ChatID, message.ID, userID)
+		if err != nil {
+			return errors.Wrap(err, "failed to send message to participants")
+		}
+
 		return nil
 	}); err != nil {
 		return apperror.Internal("failed to create chat", err)
@@ -72,4 +77,36 @@ func (h *Handler) createMessage(chatID uint, content string, senderID uint) (*mo
 	}
 
 	return message, nil
+}
+
+func (h *Handler) sendMessageToParticipants(chatID uint, messageID uint, senderID uint) error {
+	var chat model.Chat
+	err := h.store.DB.Model(&model.Chat{}).
+		Where("id = ?", chatID).
+		Preload("Participants").First(&chat).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to find chat")
+	}
+
+	var inboxes []model.Inbox
+	for _, participant := range chat.Participants {
+		// skip sender
+		if participant.ID == senderID {
+			continue
+		}
+
+		inbox := model.Inbox{
+			MessageID: messageID,
+			UserID:    participant.ID,
+		}
+		inboxes = append(inboxes, inbox)
+	}
+
+	if len(inboxes) > 0 {
+		if err := h.store.DB.Create(&inboxes).Error; err != nil {
+			return errors.Wrap(err, "failed to create inbox entries")
+		}
+	}
+
+	return nil
 }
