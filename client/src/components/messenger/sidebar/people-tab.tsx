@@ -35,11 +35,7 @@ export const PeopleTab = () => {
         }
         return (
           <div key={user.id} onClick={() => setCurrentPerson(i)}>
-            <PeopleCard
-              isActive={currentPerson === i}
-              name={user.name}
-              image={user.profilePictureUrl}
-            />
+            <PeopleCard isActive={currentPerson === i} user={user} />
           </div>
         )
       })}
