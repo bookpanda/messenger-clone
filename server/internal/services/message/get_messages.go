@@ -2,6 +2,8 @@ package message
 
 import (
 	"context"
+	"log"
+	"strconv"
 	"time"
 
 	"github.com/bookpanda/messenger-clone/internal/dto"
@@ -23,18 +25,14 @@ func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
 	_, cancel := context.WithTimeout(c.UserContext(), time.Second*5)
 	defer cancel()
 
-	req := new(dto.GetMessagesRequest)
-	if err := c.BodyParser(req); err != nil {
-		return apperror.BadRequest("invalid request body", err)
-	}
-
-	if err := h.validate.Struct(req); err != nil {
-		return apperror.BadRequest("invalid request body", err)
+	chatID, err := strconv.ParseUint(c.Params("id"), 10, 0)
+	if err != nil {
+		return apperror.BadRequest("invalid chat id", err)
 	}
 
 	var chat model.Chat
-	err := h.store.DB.Model(&model.Chat{}).
-		Where("id = ?", req.ChatID).
+	err = h.store.DB.Model(&model.Chat{}).
+		Where("id = ?", chatID).
 		Preload("Participants").First(&chat).Error
 	if err != nil {
 		return errors.Wrap(err, "failed to find chat")
@@ -45,6 +43,8 @@ func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
 	if err != nil {
 		return apperror.Internal("failed to get user id from context", err)
 	}
+	log.Println("userID", userID)
+	log.Println("chat.Participants", chat.Participants)
 	isParticipant := false
 	for _, participant := range chat.Participants {
 		if participant.ID == userID {
@@ -57,7 +57,7 @@ func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
 	}
 
 	var messages []model.Message
-	err = h.store.DB.Model(&model.Message{}).Where("chat_id = ?", req.ChatID).Find(&messages).Error
+	err = h.store.DB.Model(&model.Message{}).Where("chat_id = ?", chatID).Find(&messages).Error
 
 	result := dto.ToMessageResponseList(messages)
 

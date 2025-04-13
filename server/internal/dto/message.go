@@ -19,10 +19,6 @@ type SendMessageRequest struct {
 	Content string `json:"content" validate:"required" binding:"required"`
 }
 
-type GetMessagesRequest struct {
-	ChatID uint `json:"chat_id" validate:"required" binding:"required"`
-}
-
 func ToMessageResponse(message model.Message) MessageResponse {
 	return MessageResponse{
 		ID:        message.ID,
