@@ -495,13 +495,13 @@ paths:
   /api/v1/message/chat/{id}:
     get:
       description: Get messages of a chat
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/dto.SendMessageRequest'
-        description: request request
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
         required: true
+        schema:
+          type: integer
       responses:
         "200":
           content:

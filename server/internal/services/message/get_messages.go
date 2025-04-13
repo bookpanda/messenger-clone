@@ -17,7 +17,7 @@ import (
 // @Description		Get messages of a chat
 // @Tags			message
 // @Router			/api/v1/message/chat/{id} [GET]
-// @Param 			RequestBody 	body 	dto.SendMessageRequest 	true 	"request request"
+// @Param           id path uint true "Chat ID"
 // @Success			200	{object}	dto.HttpListResponse[dto.MessageResponse]
 // @Failure			400	{object}	dto.HttpError
 // @Failure			500	{object}	dto.HttpError

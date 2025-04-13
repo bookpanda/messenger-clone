@@ -528,15 +528,13 @@ export interface paths {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    /** @description Chat ID */
+                    id: number;
+                };
                 cookie?: never;
             };
-            /** @description request request */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["dto.SendMessageRequest"];
-                };
-            };
+            requestBody?: never;
             responses: {
                 /** @description OK */
                 200: {
