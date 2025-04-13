@@ -1,8 +1,10 @@
 import { Dispatch, SetStateAction } from "react"
 
+import { useChatContext } from "@/contexts/chat-context"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import { Info, Phone, Video } from "lucide-react"
+import { useSession } from "next-auth/react"
 import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
@@ -20,6 +22,20 @@ interface ChatHeaderProps {
 export const ChatHeader = (props: ChatHeaderProps) => {
   const { name, image, lastActive, setOpenChatInfo } = props
 
+  const { data: session } = useSession()
+  const { currentChat } = useChatContext()
+  const { is_direct, participants } = currentChat
+
+  let chatName = name
+  let chatImage = image
+  if (is_direct) {
+    const members = participants.filter(
+      (participant) => participant.id !== session?.user?.userId
+    )
+    chatName = members[0]?.name || ""
+    chatImage = members[0]?.profilePictureUrl || ""
+  }
+
   const lastActiveTime = dayjs(lastActive).from(dayjs())
 
   return (
@@ -27,14 +43,14 @@ export const ChatHeader = (props: ChatHeaderProps) => {
       <div className="flex items-center gap-2">
         <div className="relative size-10">
           <Image
-            src={image}
+            src={chatImage}
             alt=""
             fill
             className="rounded-full object-cover"
           />
         </div>
         <div>
-          <h2>{name}</h2>
+          <h2>{chatName}</h2>
           <p className="text-secondary-text text-xs">Active {lastActiveTime}</p>
         </div>
       </div>
