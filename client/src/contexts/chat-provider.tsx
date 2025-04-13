@@ -4,6 +4,7 @@ import { FC, PropsWithChildren, useEffect, useState } from "react"
 
 import { useGetMyChats } from "@/hooks/use-get-my-chats"
 import { Chat } from "@/types"
+import { produce } from "immer"
 
 import { ChatContext } from "./chat-context"
 
@@ -15,6 +16,15 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
     setChats(myChats)
   }, [myChats])
 
+  const addChat = (chat: Chat) => {
+    setChats(
+      // @ts-expect-error immer
+      produce((draft) => {
+        draft.unshift(chat)
+      })
+    )
+  }
+
   const [currentChat, setCurrentChat] = useState<Chat | undefined>(undefined)
 
   return (
@@ -22,6 +32,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
       value={{
         currentChat,
         setCurrentChat,
+        addChat,
         chats,
         setChats,
       }}

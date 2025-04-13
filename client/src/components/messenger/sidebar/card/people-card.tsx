@@ -1,4 +1,5 @@
 import { createChat } from "@/actions/chat/create-chat"
+import { useChatContext } from "@/contexts/chat-context"
 import { User } from "@/types"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
@@ -12,6 +13,7 @@ interface PeopleCardProps {
 
 export const PeopleCard = ({ user, isActive }: PeopleCardProps) => {
   const { data: session } = useSession()
+  const { addChat } = useChatContext()
 
   const handleGetChat = async () => {
     const chat = await createChat({
@@ -26,6 +28,7 @@ export const PeopleCard = ({ user, isActive }: PeopleCardProps) => {
     if (!chat) {
       return
     }
+    addChat(chat)
   }
 
   return (
