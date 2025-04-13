@@ -28,6 +28,10 @@ func (s *Server) RegisterRoutes(
 	me.Get("/", authMiddleware.Auth, userHandler.HandleGetMe)
 	me.Patch("/", authMiddleware.Auth, userHandler.HandleUpdateMe)
 
+	// user
+	user := v1.Group("/user")
+	user.Get("/", authMiddleware.Auth, userHandler.HandleGetAllUsers)
+
 	// chat
 	chat := v1.Group("/chat")
 	chat.Post("/", authMiddleware.Auth, chatHandler.HandleCreateChat)
@@ -37,5 +41,6 @@ func (s *Server) RegisterRoutes(
 	// message
 	message := v1.Group("/message")
 	message.Post("/", authMiddleware.Auth, messageHandler.HandleSendMessage)
+	message.Get("/chat/:id", authMiddleware.Auth, messageHandler.HandleGetMessages)
 
 }

@@ -32,7 +32,7 @@ func handleArgs(db *gorm.DB) {
 	if len(args) >= 1 {
 		switch args[0] {
 		case "seed":
-			err := seeds.Execute(db)
+			err := seeds.Execute(db, args[1])
 			if err != nil {
 				log.Fatalf("Failed to execute seed: %v", err)
 			}

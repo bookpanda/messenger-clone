@@ -1,16 +1,22 @@
 import { useEffect, useRef } from "react"
 
-import { Message } from "@/types"
+import { useChatContext } from "@/contexts/chat-context"
+import { useSession } from "next-auth/react"
 
-import { IncomingMessage, OutgoingMessage, TimestampMessage } from "./messages"
+import {
+  IncomingMessage,
+  OutgoingMessage,
+  //  TimestampMessage
+} from "./messages"
 
 interface ChatMessagesProps {
-  messages: Message[]
-  handleAddReaction: (messageId: string, reaction: string) => void
+  handleAddReaction: (messageId: number, reaction: string) => void
 }
 
 export const ChatMessages = (props: ChatMessagesProps) => {
-  const { messages, handleAddReaction } = props
+  const { handleAddReaction } = props
+  const { data: session } = useSession()
+  const { messages, currentChat } = useChatContext()
 
   const endOfMessagesRef = useRef<HTMLDivElement>(null)
 
@@ -26,23 +32,30 @@ export const ChatMessages = (props: ChatMessagesProps) => {
       <div className="space-y-2">
         {/* Chat messages go here */}
         {messages.map((message, idx) => {
-          return message.type === "incoming" ? (
+          const sender = currentChat?.participants.find(
+            (participant) => participant.id === message.sender_id
+          )
+          if (!sender) {
+            return null
+          }
+
+          return message.sender_id !== session?.user?.userId ? (
             <IncomingMessage
               key={idx}
-              text={message.text}
+              message={message}
+              sender={sender}
               handleAddReaction={(reaction: string) =>
                 handleAddReaction(message.id, reaction)
               }
-              reaction={message.reaction}
             />
           ) : (
             <OutgoingMessage
               key={idx}
-              text={message.text}
+              message={message}
+              sender={sender}
               handleAddReaction={(reaction: string) =>
                 handleAddReaction(message.id, reaction)
               }
-              reaction={message.reaction}
             />
           )
         })}

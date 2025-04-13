@@ -4,6 +4,10 @@ components:
       properties:
         id:
           type: integer
+        is_direct:
+          type: boolean
+        last_message:
+          $ref: '#/components/schemas/dto.MessageResponse'
         name:
           type: string
         participants:
@@ -11,9 +15,16 @@ components:
             $ref: '#/components/schemas/dto.UserResponse'
           type: array
           uniqueItems: false
+      required:
+      - id
+      - is_direct
+      - name
+      - participants
       type: object
     dto.CreateChatRequest:
       properties:
+        is_direct:
+          type: boolean
         name:
           type: string
         participants:
@@ -22,6 +33,7 @@ components:
           type: array
           uniqueItems: false
       required:
+      - is_direct
       - name
       - participants
       type: object
@@ -35,6 +47,22 @@ components:
         result:
           items:
             $ref: '#/components/schemas/dto.ChatResponse'
+          type: array
+          uniqueItems: false
+      type: object
+    dto.HttpListResponse-dto_MessageResponse:
+      properties:
+        result:
+          items:
+            $ref: '#/components/schemas/dto.MessageResponse'
+          type: array
+          uniqueItems: false
+      type: object
+    dto.HttpListResponse-dto_UserResponse:
+      properties:
+        result:
+          items:
+            $ref: '#/components/schemas/dto.UserResponse'
           type: array
           uniqueItems: false
       type: object
@@ -92,10 +120,28 @@ components:
       type: object
     dto.MessageResponse:
       properties:
+        chat_id:
+          type: integer
+        content:
+          type: string
+        created_at:
+          type: string
         id:
           type: integer
-        name:
-          type: string
+        reactions:
+          items:
+            $ref: '#/components/schemas/dto.ReactionResponse'
+          type: array
+          uniqueItems: false
+        sender_id:
+          type: integer
+      required:
+      - chat_id
+      - content
+      - created_at
+      - id
+      - reactions
+      - sender_id
       type: object
     dto.ModifyParticipantRequest:
       properties:
@@ -117,6 +163,27 @@ components:
             $ref: '#/components/schemas/dto.UserResponse'
           type: array
           uniqueItems: false
+      required:
+      - participants
+      type: object
+    dto.ReactionResponse:
+      properties:
+        created_at:
+          type: string
+        emoji:
+          type: string
+        id:
+          type: integer
+        message_id:
+          type: integer
+        sender_id:
+          type: integer
+      required:
+      - created_at
+      - emoji
+      - id
+      - message_id
+      - sender_id
       type: object
     dto.RefreshTokenRequest:
       properties:
@@ -285,11 +352,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/dto.HttpError'
           description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
       summary: My chats
       tags:
       - chat
     post:
-      description: Create chat with name and participants
+      description: Create chat with name and participants. If is_direct is true, it
+        will create that direct chat or return the existing one.
       requestBody:
         content:
           application/json:
@@ -316,6 +386,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/dto.HttpError'
           description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
       summary: Create chat
       tags:
       - chat
@@ -348,6 +420,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/dto.HttpError'
           description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
       summary: Modify participants
       tags:
       - chat
@@ -443,3 +517,62 @@ paths:
       summary: Send message
       tags:
       - message
+  /api/v1/message/chat/{id}:
+    get:
+      description: Get messages of a chat
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpListResponse-dto_MessageResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Internal Server Error
+      summary: Get messages
+      tags:
+      - message
+  /api/v1/user:
+    get:
+      description: Get all users
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpListResponse-dto_UserResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get all users
+      tags:
+      - user

@@ -7,7 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
-func Execute(db *gorm.DB) error {
+func Execute(db *gorm.DB, modelName string) error {
+	if modelName == "messages" {
+		log.Println("Seeding messages...")
+		if err := seedMessages(db); err != nil {
+			return err
+		}
+		return nil
+	}
 	log.Println("Running seeder...")
 
 	var count int
@@ -21,6 +28,11 @@ func Execute(db *gorm.DB) error {
 		return err
 	}
 	log.Printf("Seeded %d chats\n", count)
+
+	err = seedMessages(db)
+	if err != nil {
+		return err
+	}
 
 	log.Println("All seeder done")
 	return nil
@@ -48,4 +60,42 @@ func toInterfaceSlice[T any](items []T) []interface{} {
 		result[i] = &v
 	}
 	return result
+}
+
+func seedMessages(db *gorm.DB) error {
+	var chats []model.Chat
+	err := db.Preload("Participants").Find(&chats).Error
+	if err != nil {
+		return err
+	}
+
+	var count int
+	messages := GenerateMessagesForChats(chats)
+	if count, err = seedModel(db, &model.Message{}, toInterfaceSlice(messages)); err != nil {
+		return err
+	}
+	log.Printf("Seeded %d messages\n", count)
+
+	// Create inbox entries for each message
+	for _, message := range messages {
+		var inboxes []model.Inbox
+		for _, participant := range message.Chat.Participants {
+			if participant.ID == message.SenderID {
+				continue
+			}
+			inbox := model.Inbox{
+				MessageID: message.ID,
+				UserID:    participant.ID,
+			}
+			inboxes = append(inboxes, inbox)
+		}
+		if len(inboxes) > 0 {
+			if err := db.Create(&inboxes).Error; err != nil {
+				return err
+			}
+		}
+	}
+	log.Printf("Seeded %d inbox entries\n", len(messages))
+
+	return nil
 }

@@ -19,6 +19,7 @@ import (
 // @Description		Add/remove participants to/from chat
 // @Tags			chat
 // @Router			/api/v1/chat/{id}/participants [PATCH]
+// @Security		ApiKeyAuth
 // @Param 			RequestBody 	body 	dto.ModifyParticipantRequest 	true 	"request request"
 // @Success			200	{object}	dto.HttpResponse[dto.ModifyParticipantResponse]
 // @Failure			400	{object}	dto.HttpError

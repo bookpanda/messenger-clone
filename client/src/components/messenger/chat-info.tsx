@@ -1,5 +1,6 @@
-import { Profile } from "@/types"
+import { useChatContext } from "@/contexts/chat-context"
 import { Lock, Pin } from "lucide-react"
+import { useSession } from "next-auth/react"
 import Image from "next/image"
 
 import {
@@ -10,25 +11,37 @@ import {
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 
-interface ChatInfoProps {
-  profile: Profile
-}
+export const ChatInfo = () => {
+  const { data: session } = useSession()
+  const { currentChat } = useChatContext()
+  if (!currentChat) {
+    return null
+  }
 
-export const ChatInfo = (props: ChatInfoProps) => {
-  const { profile } = props
+  const { name, is_direct, participants } = currentChat
+
+  let chatName = name
+  let chatImage = "/thumbnail.jpg"
+  if (is_direct) {
+    const members = participants.filter(
+      (participant) => participant.id !== session?.user?.userId
+    )
+    chatName = members[0]?.name || ""
+    chatImage = members[0]?.profilePictureUrl || ""
+  }
 
   return (
     <div className="bg-primary-background text-primary-foreground w-75 space-y-5 rounded-md px-3 py-4">
       <div className="flex flex-col items-center gap-3">
         <div className="relative size-20">
           <Image
-            src={profile.image}
+            src={chatImage}
             alt=""
             className="rounded-full object-cover"
             fill
           />
         </div>
-        <h2 className="font-medium">{profile.name}</h2>
+        <h2 className="font-medium">{chatName}</h2>
       </div>
 
       <div className="flex justify-center">

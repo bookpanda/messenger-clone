@@ -234,10 +234,76 @@ export interface paths {
         };
         put?: never;
         /**
+         * Create chat
+         * @description Create chat with name and participants. If is_direct is true, it will create that direct chat or return the existing one.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description request request */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["dto.CreateChatRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpResponse-dto_ChatResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat/{id}/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
          * Modify participants
          * @description Add/remove participants to/from chat
          */
-        post: {
+        patch: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -280,10 +346,6 @@ export interface paths {
                 };
             };
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
         trace?: never;
     };
     "/api/v1/me": {
@@ -389,16 +451,198 @@ export interface paths {
         };
         trace?: never;
     };
+    "/api/v1/message": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send message
+         * @description Send message to a chat and distribute it to participants
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description request request */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["dto.SendMessageRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpResponse-dto_MessageResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/message/chat/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get messages
+         * @description Get messages of a chat
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Chat ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpListResponse-dto_MessageResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/user": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all users
+         * @description Get all users
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpListResponse-dto_UserResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         "dto.ChatResponse": {
-            id?: number;
-            name?: string;
-            participants?: components["schemas"]["dto.UserResponse"][];
+            id: number;
+            is_direct: boolean;
+            last_message?: components["schemas"]["dto.MessageResponse"];
+            name: string;
+            participants: components["schemas"]["dto.UserResponse"][];
         };
         "dto.CreateChatRequest": {
+            is_direct: boolean;
             name: string;
             participants: string[];
         };
@@ -408,11 +652,20 @@ export interface components {
         "dto.HttpListResponse-dto_ChatResponse": {
             result?: components["schemas"]["dto.ChatResponse"][];
         };
+        "dto.HttpListResponse-dto_MessageResponse": {
+            result?: components["schemas"]["dto.MessageResponse"][];
+        };
+        "dto.HttpListResponse-dto_UserResponse": {
+            result?: components["schemas"]["dto.UserResponse"][];
+        };
         "dto.HttpResponse-dto_ChatResponse": {
             result?: components["schemas"]["dto.ChatResponse"];
         };
         "dto.HttpResponse-dto_LoginResponse": {
             result?: components["schemas"]["dto.LoginResponse"];
+        };
+        "dto.HttpResponse-dto_MessageResponse": {
+            result?: components["schemas"]["dto.MessageResponse"];
         };
         "dto.HttpResponse-dto_ModifyParticipantResponse": {
             result?: components["schemas"]["dto.ModifyParticipantResponse"];
@@ -434,15 +687,34 @@ export interface components {
             refreshToken?: string;
             user?: components["schemas"]["dto.UserResponse"];
         };
+        "dto.MessageResponse": {
+            chat_id: number;
+            content: string;
+            created_at: string;
+            id: number;
+            reactions: components["schemas"]["dto.ReactionResponse"][];
+            sender_id: number;
+        };
         "dto.ModifyParticipantRequest": {
             action: string;
             participants: string[];
         };
         "dto.ModifyParticipantResponse": {
-            participants?: components["schemas"]["dto.UserResponse"][];
+            participants: components["schemas"]["dto.UserResponse"][];
+        };
+        "dto.ReactionResponse": {
+            created_at: string;
+            emoji: string;
+            id: number;
+            message_id: number;
+            sender_id: number;
         };
         "dto.RefreshTokenRequest": {
             refreshToken: string;
+        };
+        "dto.SendMessageRequest": {
+            chat_id: number;
+            content: string;
         };
         "dto.TokenResponse": {
             accessToken?: string;

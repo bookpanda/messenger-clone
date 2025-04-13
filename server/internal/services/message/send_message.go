@@ -56,8 +56,11 @@ func (h *Handler) HandleSendMessage(c *fiber.Ctx) error {
 	}
 
 	result := dto.MessageResponse{
-		ID:      message.ID,
-		Content: message.Content,
+		ID:        message.ID,
+		ChatID:    message.ChatID,
+		Content:   message.Content,
+		SenderID:  message.SenderID,
+		CreatedAt: message.CreatedAt,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.MessageResponse]{

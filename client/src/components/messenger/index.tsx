@@ -36,7 +36,7 @@ export const Messenger = () => {
         {/* Body */}
         <div className="flex min-h-0 flex-1 gap-4 p-4">
           <Chat profile={profile} setOpenChatInfo={setOpenChatInfo} />
-          {openChatInfo && <ChatInfo profile={profile} />}
+          {openChatInfo && <ChatInfo />}
         </div>
       </div>
     </div>
