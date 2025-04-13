@@ -23,7 +23,7 @@ export const Sidebar = () => {
           onClick={() => setActiveTab("people")}
           isActive={activeTab === "people"}
         >
-          Inbox
+          People
         </TabButton>
       </div>
 
