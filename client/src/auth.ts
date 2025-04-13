@@ -1,11 +1,11 @@
-import NextAuth, { NextAuthOptions } from "next-auth"
+import NextAuth, { NextAuthConfig } from "next-auth"
 import "next-auth/jwt"
 import Google from "next-auth/providers/google"
 
 import { client } from "./api/client"
 import { User as UserType } from "./types/user"
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthConfig = {
   providers: [
     Google({
       clientId: process.env.AUTH_GOOGLE_ID || "",
@@ -89,17 +89,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth(authOptions)
 
 declare module "next-auth" {
   interface Session {
+    // used in session callback and after signIn
     accessToken?: string
     refreshToken?: string
     expireAt?: number
-    user?: Omit<UserType, "id"> & { userId: number }
+    user?: Omit<UserType, "id"> & { userId: number } & { image: string }
   }
 
   interface User {
+    // used in signIn callback
     id?: string
-    name?: string | null
-    email?: string | null
-    image?: string | null
+    name?: string | null // automatically set by Google provider
+    email?: string | null // automatically set by Google provider
+    image?: string | null // automatically set by Google provider
     accessToken?: string
     refreshToken?: string
     expireAt?: number
