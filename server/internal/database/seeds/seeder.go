@@ -22,6 +22,18 @@ func Execute(db *gorm.DB) error {
 	}
 	log.Printf("Seeded %d chats\n", count)
 
+	var chats []model.Chat
+	err = db.Preload("Participants").Find(&chats).Error
+	if err != nil {
+		return err
+	}
+
+	messages := GenerateMessagesForChats(chats)
+	if count, err = seedModel(db, &model.Message{}, toInterfaceSlice(messages)); err != nil {
+		return err
+	}
+	log.Printf("Seeded %d messages\n", count)
+
 	log.Println("All seeder done")
 	return nil
 }
