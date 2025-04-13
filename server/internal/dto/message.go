@@ -8,7 +8,7 @@ import (
 
 type MessageResponse struct {
 	ID        uint      `json:"id" binding:"required"`
-	Content   string    `json:"name" binding:"required"`
+	Content   string    `json:"content" binding:"required"`
 	ChatID    uint      `json:"chat_id" binding:"required"`
 	SenderID  uint      `json:"sender_id" binding:"required"`
 	CreatedAt time.Time `json:"created_at" binding:"required"`

@@ -114,19 +114,19 @@ components:
       properties:
         chat_id:
           type: integer
+        content:
+          type: string
         created_at:
           type: string
         id:
           type: integer
-        name:
-          type: string
         sender_id:
           type: integer
       required:
       - chat_id
+      - content
       - created_at
       - id
-      - name
       - sender_id
       type: object
     dto.ModifyParticipantRequest:

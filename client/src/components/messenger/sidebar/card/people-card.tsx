@@ -1,5 +1,5 @@
 import { createChat } from "@/actions/chat/create-chat"
-import { User } from "@/types/user"
+import { User } from "@/types"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 

@@ -3,7 +3,7 @@
 import { FC, PropsWithChildren, useEffect, useState } from "react"
 
 import { useGetMyChats } from "@/hooks/use-get-my-chats"
-import { Chat } from "@/types/chat"
+import { Chat } from "@/types"
 
 import { ChatContext } from "./chat-context"
 

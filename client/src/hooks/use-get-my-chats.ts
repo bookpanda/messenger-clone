@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 
 import { getMyChats } from "@/actions/chat/get-my-chats"
-import { Chat } from "@/types/chat"
+import { Chat } from "@/types"
 
 export const useGetMyChats = () => {
   const [loading, setLoading] = useState(true)

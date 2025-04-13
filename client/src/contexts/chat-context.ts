@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, createContext, useContext } from "react"
 
-import { Chat } from "@/types/chat"
+import { Chat } from "@/types"
 
 interface ChatContext {
   chats: Chat[]

@@ -3,7 +3,7 @@ import "next-auth/jwt"
 import Google from "next-auth/providers/google"
 
 import { client } from "./api/client"
-import { User as UserType } from "./types/user"
+import { User as UserType } from "./types"
 
 export const authOptions: NextAuthConfig = {
   providers: [

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 
 import { getAllUsers } from "@/actions/user/get-all-users"
-import { User } from "@/types/user"
+import { User } from "@/types"
 
 export const useGetAllUsers = () => {
   const [loading, setLoading] = useState(true)

@@ -626,9 +626,9 @@ export interface components {
         };
         "dto.MessageResponse": {
             chat_id: number;
+            content: string;
             created_at: string;
             id: number;
-            name: string;
             sender_id: number;
         };
         "dto.ModifyParticipantRequest": {
