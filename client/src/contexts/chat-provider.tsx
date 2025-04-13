@@ -18,7 +18,6 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const addChat = (chat: Chat) => {
     setChats(
-      // @ts-expect-error immer
       produce((draft) => {
         draft.unshift(chat)
       })
