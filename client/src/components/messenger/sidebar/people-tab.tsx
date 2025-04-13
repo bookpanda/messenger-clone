@@ -21,7 +21,7 @@ export const PeopleTab = () => {
             key={user.id}
             isActive={false}
             name={user.name}
-            image={user.image}
+            image={user.profilePictureUrl}
           />
         )
       })}
