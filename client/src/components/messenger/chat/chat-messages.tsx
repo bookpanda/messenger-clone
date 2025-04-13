@@ -2,7 +2,11 @@ import { useEffect, useRef } from "react"
 
 import { Message } from "@/types"
 
-import { IncomingMessage, OutgoingMessage, TimestampMessage } from "./messages"
+import {
+  IncomingMessage,
+  OutgoingMessage,
+  //  TimestampMessage
+} from "./messages"
 
 interface ChatMessagesProps {
   messages: Message[]
