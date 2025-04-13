@@ -17,18 +17,19 @@ import {
 interface MessageProps {
   message: ChatMessage
   sender: User
-  reaction?: string
   handleAddReaction: (reaction: string) => void
 }
 
 const reactionEmojis = ["🥰", "😢", "😂", "😡", "👍"]
 
 export const IncomingMessage = (props: MessageProps) => {
-  const { message, sender, reaction, handleAddReaction } = props
-  const { content } = message
+  const { message, sender, handleAddReaction } = props
+  const { content, reactions } = message
 
   const [isHover, setHover] = useState(false)
   const [isReactionOpen, setReactionOpen] = useState(false)
+
+  const reaction = reactions?.[0]?.emoji
 
   useEffect(() => {
     if (!isHover) {
@@ -118,11 +119,13 @@ export const IncomingMessage = (props: MessageProps) => {
 }
 
 export const OutgoingMessage = (props: MessageProps) => {
-  const { message, reaction, handleAddReaction } = props
-  const { content } = message
+  const { message, handleAddReaction } = props
+  const { content, reactions } = message
 
   const [isHover, setHover] = useState(false)
   const [isReactionOpen, setReactionOpen] = useState(false)
+
+  const reaction = reactions?.[0]?.emoji
 
   useEffect(() => {
     if (!isHover) {

@@ -19,3 +19,4 @@ export type Profile = {
 export type Chat = components["schemas"]["dto.ChatResponse"]
 export type User = components["schemas"]["dto.UserResponse"]
 export type ChatMessage = components["schemas"]["dto.MessageResponse"]
+export type Reaction = components["schemas"]["dto.ReactionResponse"]

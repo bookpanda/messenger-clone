@@ -47,7 +47,6 @@ export const ChatMessages = (props: ChatMessagesProps) => {
               handleAddReaction={(reaction: string) =>
                 handleAddReaction(message.id, reaction)
               }
-              // reaction={message.reaction}
             />
           ) : (
             <OutgoingMessage
@@ -57,7 +56,6 @@ export const ChatMessages = (props: ChatMessagesProps) => {
               handleAddReaction={(reaction: string) =>
                 handleAddReaction(message.id, reaction)
               }
-              // reaction={message.reaction}
             />
           )
         })}
