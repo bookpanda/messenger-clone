@@ -11,7 +11,7 @@ start:
 	docker-compose up -d && air
 
 seed: 
-	go run cmd/main.go seed
+	go run cmd/main.go seed all
 
 seed-messages:
 	go run cmd/main.go seed messages
