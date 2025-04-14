@@ -20,6 +20,10 @@ type SendMessageRequest struct {
 	Content string `json:"content" validate:"required" binding:"required"`
 }
 
+type SendRealtimeMessageRequest struct {
+	Content string `json:"content" validate:"required" binding:"required"`
+}
+
 func ToMessageResponse(message model.Message) MessageResponse {
 	return MessageResponse{
 		ID:        message.ID,

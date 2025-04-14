@@ -29,30 +29,14 @@ func (h *Handler) HandleSendMessage(c *fiber.Ctx) error {
 		return apperror.BadRequest("invalid request body", err)
 	}
 
-	if err := h.validate.Struct(req); err != nil {
-		return apperror.BadRequest("invalid request body", err)
-	}
-
 	userID, err := h.authMiddleware.GetUserIDFromContext(c.UserContext())
 	if err != nil {
 		return apperror.Internal("failed to get user id from context", err)
 	}
 
-	var message *model.Message
-	if err := h.store.DB.Transaction(func(tx *gorm.DB) error {
-		message, err = h.createMessage(req.ChatID, req.Content, userID)
-		if err != nil {
-			return errors.Wrap(err, "failed to create chat")
-		}
-
-		err = h.sendMessageToParticipants(req.ChatID, message.ID, userID)
-		if err != nil {
-			return errors.Wrap(err, "failed to send message to participants")
-		}
-
-		return nil
-	}); err != nil {
-		return apperror.Internal("failed to create chat", err)
+	message, err := h.SendMessage(*req, userID)
+	if err != nil {
+		return err
 	}
 
 	result := dto.MessageResponse{
@@ -66,6 +50,32 @@ func (h *Handler) HandleSendMessage(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.MessageResponse]{
 		Result: result,
 	})
+}
+
+func (h *Handler) SendMessage(req dto.SendMessageRequest, senderID uint) (*model.Message, error) {
+	if err := h.validate.Struct(req); err != nil {
+		return nil, apperror.BadRequest("invalid request body", err)
+	}
+
+	var message *model.Message
+	var err error
+	if err := h.store.DB.Transaction(func(tx *gorm.DB) error {
+		message, err = h.createMessage(req.ChatID, req.Content, senderID)
+		if err != nil {
+			return errors.Wrap(err, "failed to create chat")
+		}
+
+		err = h.sendMessageToParticipants(req.ChatID, message.ID, senderID)
+		if err != nil {
+			return errors.Wrap(err, "failed to send message to participants")
+		}
+
+		return nil
+	}); err != nil {
+		return nil, apperror.Internal("failed to create chat", err)
+	}
+
+	return message, nil
 }
 
 func (h *Handler) createMessage(chatID uint, content string, senderID uint) (*model.Message, error) {
