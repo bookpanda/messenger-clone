@@ -84,8 +84,9 @@ func (s *Server) Logout(userID uint, chatID uint) {
 	}
 }
 
-func (s *Server) SendRawString(chatID uint, msg string, senderID uint) {
-	var msgReq dto.SendMessageRequest
+// msg is a raw JSON string
+func (s *Server) SendToChat(chatID uint, msg string, senderID uint) {
+	var msgReq dto.SendRealtimeMessageRequest
 	if err := json.Unmarshal([]byte(msg), &msgReq); err != nil {
 		logger.Error("Failed Unmarshal json", slog.Any("error", err))
 		s.broadcastToRoom(EventError, chatID, "invalid message", senderID)
@@ -98,29 +99,7 @@ func (s *Server) SendRawString(chatID uint, msg string, senderID uint) {
 		return
 	}
 
-	// msgModel := dto.ToMessageModel(senderID, msgReq)
-	// if msgModel.ReceiverID == senderID {
-	// 	logger.Error("cannot send message to yourself")
-	// 	s.broadcastToRoom(EventError, chatID, "cannot send message to yourself", senderID)
-	// 	return
-	// }
-
-	// if err := c.store.DB.Create(&msgModel).Error; err != nil {
-	// 	logger.Error("failed inserting message to database", slog.Any("error", err))
-	// 	c.sendMessage(EventError, senderID, "internal error")
-	// 	return
-	// }
-
-	// json, err := json.Marshal(dto.ToRealTimeMessageResponse(msgModel))
-	// if err != nil {
-	// 	logger.Error("failed Marshal realtime message response to json", slog.Any("error", err))
-	// 	c.sendMessage(EventError, senderID, "internal error")
-	// 	return
-	// }
-
 	s.broadcastToRoom(EventMessage, chatID, msg, senderID)
-	// c.sendMessage(EventMessage, msgModel.ReceiverID, string(json))
-	// c.sendMessage(EventMessage, msgModel.SenderID, string(json))
 }
 
 func (s *Server) broadcastToRoom(event EventType, chatID uint, msg string, senderID uint) {
