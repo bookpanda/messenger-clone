@@ -48,5 +48,8 @@ func (s *Server) RegisterRoutes(
 	// Auth: checks if the accessToken is valid
 	// HandleWebsocket: upgrade the connection to websocket, set jwtEntity, chatID to context
 	message.Use("/ws", messageHandler.HandleSupportWebAPI, authMiddleware.Auth, messageHandler.HandleWebsocket)
+
+	// spawns a read and write goroutines for each client
+	// this endpoints interacts with chatServer
 	message.Get("/ws", websocket.New(messageHandler.HandleRealTimeMessages))
 }
