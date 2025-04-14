@@ -1,6 +1,9 @@
 package message
 
 import (
+	"strconv"
+
+	"github.com/bookpanda/messenger-clone/pkg/apperror"
 	"github.com/cockroachdb/errors"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +29,10 @@ func (h *Handler) HandleWebsocket(c *fiber.Ctx) error {
 		}
 		c.Locals(jwtEntityKey, jwtEntity)
 
-		chatID := c.Query("chatID")
+		chatID, err := strconv.ParseUint(c.Query("chatID"), 10, 0)
+		if err != nil {
+			return apperror.BadRequest("invalid chat id", err)
+		}
 		c.Locals(chatIDKey, chatID)
 
 		return c.Next()

@@ -17,12 +17,7 @@ func (h *Handler) HandleRealTimeMessages(c *websocket.Conn) {
 		return
 	}
 
-	chatID, ok := c.Locals(chatIDKey).(uint)
-	if !ok {
-		logger.Error("failed receive chatID from context")
-		return
-	}
-
+	chatID := uint(c.Locals(chatIDKey).(uint64))
 	client := h.chatServer.Register(jwtEntity.ID, chatID)
 
 	var wg sync.WaitGroup

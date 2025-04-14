@@ -1,6 +1,8 @@
 package message
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
 func (h *Handler) HandleSupportWebAPI(c *fiber.Ctx) error {
 	header := c.Query("accessToken")
