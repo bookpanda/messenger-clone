@@ -1,14 +1,10 @@
 package chat
 
 import (
-	"encoding/json"
 	"fmt"
-	"log/slog"
 	"sync"
 
 	"github.com/bookpanda/messenger-clone/internal/database"
-	"github.com/bookpanda/messenger-clone/internal/dto"
-	"github.com/bookpanda/messenger-clone/pkg/logger"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -84,31 +80,14 @@ func (s *Server) Logout(userID uint, chatID uint) {
 	}
 }
 
-// msg is a raw JSON string
-func (s *Server) SendToChat(chatID uint, msg string, senderID uint) {
-	var msgReq dto.SendRealtimeMessageRequest
-	if err := json.Unmarshal([]byte(msg), &msgReq); err != nil {
-		logger.Error("Failed Unmarshal json", slog.Any("error", err))
-		s.broadcastToRoom(EventError, chatID, "invalid message", senderID)
-		return
-	}
-
-	if err := s.validate.Struct(msgReq); err != nil {
-		logger.Error("Failed validate message request", slog.Any("error", err))
-		s.broadcastToRoom(EventError, chatID, "invalid message", senderID)
-		return
-	}
-
-	s.broadcastToRoom(EventMessage, chatID, msg, senderID)
-}
-
-func (s *Server) broadcastToRoom(event EventType, chatID uint, msg string, senderID uint) {
+func (s *Server) BroadcastToRoom(event EventType, chatID uint, msg string, senderID uint) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	msg = fmt.Sprintf("%s %s", event, msg)
 
-	if event == EventError { // if event is error, send to sender only
+	// if event is error, send to sender only
+	if event == EventError {
 		client := s.chats[chatID][senderID]
 		if client != nil {
 			client.Message <- msg
