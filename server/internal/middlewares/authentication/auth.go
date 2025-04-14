@@ -69,7 +69,7 @@ func (r *authMiddleware) Auth(ctx *fiber.Ctx) error {
 func (r *authMiddleware) validateToken(ctx context.Context, bearerToken string) (jwt.JWTentity, error) {
 	parsedToken, err := r.jwtService.ParseToken(bearerToken, false)
 	if err != nil {
-		return jwt.JWTentity{}, errors.Wrap(err, "failed to parse  token")
+		return jwt.JWTentity{}, errors.Wrap(err, "failed to parse token")
 	}
 
 	cachedToken, err := r.jwtService.GetCachedTokens(ctx, parsedToken.ID)
