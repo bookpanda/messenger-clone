@@ -50,9 +50,9 @@ func (h *Handler) HandleLogin(c *fiber.Ctx) error {
 				if err != nil {
 					return errors.Wrap(err, "failed to get or create user")
 				}
-				return nil
+			} else {
+				return errors.Wrap(err, "failed getting user")
 			}
-			return errors.Wrap(err, "failed getting user")
 		}
 
 		token, err = h.jwtService.GenerateAndStoreTokenPair(ctx, user)
