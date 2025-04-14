@@ -6,6 +6,7 @@ import (
 	"github.com/bookpanda/messenger-clone/internal/services/chat"
 	"github.com/bookpanda/messenger-clone/internal/services/message"
 	"github.com/bookpanda/messenger-clone/internal/services/user"
+	"github.com/gofiber/contrib/websocket"
 )
 
 func (s *Server) RegisterRoutes(
@@ -43,4 +44,9 @@ func (s *Server) RegisterRoutes(
 	message.Post("/", authMiddleware.Auth, messageHandler.HandleSendMessage)
 	message.Get("/chat/:id", authMiddleware.Auth, messageHandler.HandleGetMessages)
 
+	// HandleSupportWebAPI: put accessToken into Auth header
+	// Auth: checks if the accessToken is valid
+	// HandleWebsocket: upgrade the connection to websocket, set jwtEntity, chatID to context
+	message.Use("/ws", messageHandler.HandleSupportWebAPI, authMiddleware.Auth, messageHandler.HandleWebsocket)
+	message.Get("/ws", websocket.New(messageHandler.HandleRealTimeMessages))
 }
