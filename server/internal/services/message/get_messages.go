@@ -2,7 +2,6 @@ package message
 
 import (
 	"context"
-	"log"
 	"strconv"
 	"time"
 
@@ -43,8 +42,6 @@ func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
 	if err != nil {
 		return apperror.Internal("failed to get user id from context", err)
 	}
-	log.Println("userID", userID)
-	log.Println("chat.Participants", chat.Participants)
 	isParticipant := false
 	for _, participant := range chat.Participants {
 		if participant.ID == userID {
