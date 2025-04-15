@@ -46,3 +46,7 @@ Download these tools before you start working on the project.
 
 ## Seeding
 1. Run `make seed` to seed the database with some data.
+
+## Tips
+1. If redis is deleted, don't forget to also delete cookies in chrome (next-auth stores the tokens in cookies, it'd be invalidated if redis is deleted)
+2. If backend is rerun e.g. from code changes, refresh the browser to reconnect websockets
