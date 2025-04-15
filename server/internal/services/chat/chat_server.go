@@ -2,10 +2,13 @@ package chat
 
 import (
 	"encoding/json"
+	"fmt"
 	"sync"
 
 	"github.com/bookpanda/messenger-clone/internal/database"
 	"github.com/bookpanda/messenger-clone/internal/dto"
+	"github.com/bookpanda/messenger-clone/internal/model"
+	"github.com/bookpanda/messenger-clone/pkg/logger"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 )
@@ -51,12 +54,31 @@ func (s *Server) Register(userID uint, chatID uint) *Client {
 		UserID:    userID,
 	}
 
+	// create chat map if it doesn't exist
 	if s.chats[chatID] == nil {
 		s.chats[chatID] = make(map[uint]*Client)
 	}
-	// TODO: check if user is actually member of the chat
-	s.chats[chatID][userID] = client
 
+	// check if user is actually member of the chat
+	var user model.User
+	err := s.store.DB.Model(&model.User{}).Preload("Chats").Where("id = ?", userID).First(&user).Error
+	if err != nil {
+		return nil
+	}
+
+	isInChat := false
+	for _, chat := range user.Chats {
+		if chat.ID == chatID {
+			isInChat = true
+			break
+		}
+	}
+	if !isInChat {
+		logger.Error(fmt.Sprintf("User %d is not in chat %d", userID, chatID))
+		return nil
+	}
+
+	s.chats[chatID][userID] = client
 	return client
 }
 

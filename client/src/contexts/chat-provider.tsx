@@ -15,6 +15,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
   const [chats, setChats] = useState<Chat[]>([])
   const [currentChat, setCurrentChat] = useState<Chat>({} as Chat)
   const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [typingUserIDs, setTypingUserIDs] = useState<number[]>([])
   const { chats: myChats } = useGetMyChats()
 
   const { data: session } = useSession()
@@ -49,19 +50,42 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
     const message: RealtimeMessage = JSON.parse(lastMessage.data)
     console.log("message", message)
 
-    setMessages((prevMessages) =>
-      produce(prevMessages, (draft) => {
-        const newMessage: ChatMessage = {
-          id: prevMessages.length + 1,
-          chat_id: currentChat.id,
-          sender_id: message.sender_id,
-          content: message.content,
-          created_at: new Date().toDateString(),
-          reactions: [],
-        }
-        draft.push(newMessage)
-      })
-    )
+    switch (message.event_type) {
+      case "MESSAGE":
+        setMessages((prevMessages) =>
+          produce(prevMessages, (draft) => {
+            const newMessage: ChatMessage = {
+              id: prevMessages.length + 1,
+              chat_id: currentChat.id,
+              sender_id: message.sender_id,
+              content: message.content,
+              created_at: new Date().toDateString(),
+              reactions: [],
+            }
+            draft.push(newMessage)
+          })
+        )
+        break
+      case "TYPING_START":
+        setTypingUserIDs((prev) =>
+          produce(prev, (draft) => {
+            if (!draft.includes(message.sender_id)) {
+              draft.push(message.sender_id)
+            }
+          })
+        )
+        break
+      case "TYPING_END":
+        setTypingUserIDs((prev) =>
+          produce(prev, (draft) => {
+            const index = draft.indexOf(message.sender_id)
+            if (index !== -1) {
+              draft.splice(index, 1)
+            }
+          })
+        )
+        break
+    }
   }, [lastMessage, currentChat.id])
 
   const addChat = (chat: Chat) => {
@@ -87,6 +111,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         messages,
         setMessages,
         sendMessage,
+        typingUserIDs,
       }}
     >
       {children}

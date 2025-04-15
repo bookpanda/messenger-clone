@@ -21,6 +21,11 @@ func (h *Handler) HandleRealTimeMessages(c *websocket.Conn) {
 
 	chatID := uint(c.Locals(chatIDKey).(uint64))
 	client := h.chatServer.Register(jwtEntity.ID, chatID)
+	if client == nil {
+		logger.Error("failed to register client")
+		c.Close()
+		return
+	}
 
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -70,16 +75,19 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 			continue
 		}
 
+		// msgType is from lib, not same as our EventType
 		if msgType == websocket.TextMessage {
 			h.chatServer.BroadcastToRoom(msgReq, chatID, senderID)
 		}
 
 		// create Message object in database
-		req := dto.SendMessageRequest{
-			Content: msgReq.Content,
-			ChatID:  chatID,
+		if msgReq.EventType == dto.EventMessage {
+			req := dto.SendMessageRequest{
+				Content: msgReq.Content,
+				ChatID:  chatID,
+			}
+			h.SendMessage(req, senderID)
 		}
-		h.SendMessage(req, senderID)
 	}
 }
 

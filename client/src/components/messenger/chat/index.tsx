@@ -83,6 +83,11 @@ export const Chat = (props: ChatProps) => {
     sendMessage(content, "MESSAGE")
   }
 
+  const handleTyping = (type: "START" | "END") => {
+    if (type === "START") sendMessage("<placeholder>", "TYPING_START")
+    else sendMessage("<placeholder>", "TYPING_END")
+  }
+
   return (
     <div className="bg-primary-background text-primary-foreground flex h-full flex-1 flex-col overflow-hidden rounded-md">
       <ChatHeader
@@ -91,7 +96,10 @@ export const Chat = (props: ChatProps) => {
         setOpenChatInfo={setOpenChatInfo}
       />
       <ChatMessages handleAddReaction={handleAddReaction} />
-      <ChatInput handleSendMessage={handleSendMessage} />
+      <ChatInput
+        handleSendMessage={handleSendMessage}
+        handleTyping={handleTyping}
+      />
     </div>
   )
 }
