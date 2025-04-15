@@ -152,6 +152,7 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 				logger.Error("failed to delete inbox", slog.Any("error", err))
 				h.chatServer.BroadcastToRoom(errorMsg, chatID, senderID)
 			}
+			h.chatServer.BroadcastToRoom(msgReq, chatID, senderID)
 			continue
 		}
 

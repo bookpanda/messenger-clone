@@ -75,6 +75,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
 
     switch (message.event_type) {
       case "MESSAGE":
+      case "UNREAD_MESSAGE":
         const newMessage: ChatMessage = {
           id: message.message_id || 0,
           chat_id: currentChat.id,
@@ -104,6 +105,24 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
           })
         )
         sendMessage("<read>", "READ", message.message_id)
+        break
+      case "READ":
+        setMessages((prevMessages) =>
+          produce(prevMessages, (draft) => {
+            const prevReadMessage = draft.find((m) =>
+              m.last_read_users.includes(message.sender_id)
+            )
+            if (prevReadMessage) {
+              const index = prevReadMessage.last_read_users.indexOf(
+                message.sender_id
+              )
+              if (index !== -1) prevReadMessage.last_read_users.splice(index, 1)
+            }
+            const readMessage = draft.find((m) => m.id === message.message_id)
+            if (!readMessage) return
+            readMessage.last_read_users.push(message.sender_id)
+          })
+        )
         break
       case "TYPING_START":
         setTypingUserIDs((prev) =>
