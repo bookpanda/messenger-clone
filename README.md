@@ -21,7 +21,7 @@ Download these tools before you start working on the project.
 - typescript
 - nextjs
 - tailwindcss
-- socket.io
+- websocket
 
 ## Setup
 
@@ -36,7 +36,7 @@ Download these tools before you start working on the project.
 - golang
 - PostgreSQL
 - Redis
-- socket.io
+- websocket
 
 ## Setup
 
