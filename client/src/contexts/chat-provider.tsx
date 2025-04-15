@@ -76,7 +76,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
     switch (message.event_type) {
       case "MESSAGE":
         const newMessage: ChatMessage = {
-          id: messages.length + 1,
+          id: message.message_id || 0,
           chat_id: currentChat.id,
           sender_id: message.sender_id,
           content: message.content,
@@ -124,7 +124,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         )
         break
     }
-  }, [lastMessage, currentChat.id, sendMessage, messages.length])
+  }, [lastMessage, currentChat.id, sendMessage])
 
   const addChat = (chat: Chat) => {
     setChats(
