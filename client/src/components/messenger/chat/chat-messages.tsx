@@ -22,11 +22,12 @@ export const ChatMessages = (props: ChatMessagesProps) => {
   const endOfMessagesRef = useRef<HTMLDivElement>(null)
 
   // Scroll to the bottom every time messages change
+  const typingDependency = typingUserIDs.join(",")
   useEffect(() => {
     if (endOfMessagesRef.current) {
       endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" })
     }
-  }, [messages, typingUserIDs])
+  }, [messages, typingDependency])
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto p-4">
