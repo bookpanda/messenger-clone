@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction, createContext, useContext } from "react"
 
 import { Chat, ChatMessage } from "@/types"
-import { SendMessage } from "react-use-websocket"
 
 interface ChatContext {
   chats: Chat[]
@@ -11,8 +10,7 @@ interface ChatContext {
   setCurrentChat: Dispatch<SetStateAction<Chat>>
   messages: ChatMessage[]
   setMessages: Dispatch<SetStateAction<ChatMessage[]>>
-  sendMessage: SendMessage
-  lastMessage: MessageEvent | null
+  sendMessage: (content: string, eventType: "MESSAGE" | "ERROR") => void
 }
 
 export const ChatContext = createContext<ChatContext>({
@@ -24,7 +22,6 @@ export const ChatContext = createContext<ChatContext>({
   messages: [],
   setMessages: () => {},
   sendMessage: () => {},
-  lastMessage: null,
 })
 
 export const useChatContext = () => {

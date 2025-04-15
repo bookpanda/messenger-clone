@@ -4,7 +4,7 @@ import { FC, PropsWithChildren, useEffect, useMemo, useState } from "react"
 
 import { getChatMessages } from "@/actions/message/get-chat-messages"
 import { useGetMyChats } from "@/hooks/use-get-my-chats"
-import { Chat, ChatMessage } from "@/types"
+import { Chat, ChatMessage, RealtimeMessage } from "@/types"
 import { produce } from "immer"
 import { useSession } from "next-auth/react"
 import useWebSocket from "react-use-websocket"
@@ -23,7 +23,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
     return `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/v1/message/ws?accessToken=${session.accessToken}&chatID=${currentChat.id}`
   }, [session?.accessToken, currentChat?.id])
 
-  const { sendMessage, lastMessage } = useWebSocket(socketUrl, {
+  const { sendMessage: wsSendMessage, lastMessage } = useWebSocket(socketUrl, {
     onOpen: () => console.log("open"),
     onError: (event) => console.log("error", event),
     onClose: () => console.log("close"),
@@ -44,12 +44,36 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
     })()
   }, [myChats])
 
+  useEffect(() => {
+    if (!lastMessage) return
+    const message: RealtimeMessage = JSON.parse(lastMessage.data)
+    console.log("message", message)
+
+    setMessages((prevMessages) =>
+      produce(prevMessages, (draft) => {
+        const newMessage: ChatMessage = {
+          id: prevMessages.length + 1,
+          chat_id: currentChat.id,
+          sender_id: message.sender_id,
+          content: message.content,
+          created_at: new Date().toDateString(),
+          reactions: [],
+        }
+        draft.push(newMessage)
+      })
+    )
+  }, [lastMessage, currentChat.id])
+
   const addChat = (chat: Chat) => {
     setChats(
       produce((draft) => {
         draft.unshift(chat)
       })
     )
+  }
+
+  const sendMessage = (content: string, eventType: "MESSAGE" | "ERROR") => {
+    wsSendMessage(JSON.stringify({ event_type: eventType, content }))
   }
 
   return (
@@ -63,7 +87,6 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         messages,
         setMessages,
         sendMessage,
-        lastMessage,
       }}
     >
       {children}

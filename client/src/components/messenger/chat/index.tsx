@@ -80,7 +80,7 @@ export const Chat = (props: ChatProps) => {
       })
     )
 
-    sendMessage(JSON.stringify({ content }))
+    sendMessage(content, "MESSAGE")
   }
 
   return (
