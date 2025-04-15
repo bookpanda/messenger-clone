@@ -15,7 +15,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
   const [chats, setChats] = useState<Chat[]>([])
   const [currentChat, setCurrentChat] = useState<Chat>({} as Chat)
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [typingUsers, setTypingUsers] = useState<number[]>([])
+  const [typingUserIDs, setTypingUserIDs] = useState<number[]>([])
   const { chats: myChats } = useGetMyChats()
 
   const { data: session } = useSession()
@@ -67,7 +67,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         )
         break
       case "TYPING_START":
-        setTypingUsers((prev) =>
+        setTypingUserIDs((prev) =>
           produce(prev, (draft) => {
             if (!draft.includes(message.sender_id)) {
               draft.push(message.sender_id)
@@ -76,7 +76,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         )
         break
       case "TYPING_END":
-        setTypingUsers((prev) =>
+        setTypingUserIDs((prev) =>
           produce(prev, (draft) => {
             const index = draft.indexOf(message.sender_id)
             if (index !== -1) {
@@ -111,7 +111,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         messages,
         setMessages,
         sendMessage,
-        typingUsers,
+        typingUserIDs,
       }}
     >
       {children}

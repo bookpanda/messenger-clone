@@ -84,8 +84,8 @@ export const Chat = (props: ChatProps) => {
   }
 
   const handleTyping = (type: "START" | "END") => {
-    if (type === "START") sendMessage("", "TYPING_START")
-    else sendMessage("", "TYPING_END")
+    if (type === "START") sendMessage("<placeholder>", "TYPING_START")
+    else sendMessage("<placeholder>", "TYPING_END")
   }
 
   return (

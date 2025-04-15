@@ -1,4 +1,4 @@
-import { SyntheticEvent, useState } from "react"
+import { SyntheticEvent, useRef, useState } from "react"
 
 import { Images, ThumbsUp } from "lucide-react"
 
@@ -11,9 +11,32 @@ interface ChatInputProps {
 }
 
 export const ChatInput = (props: ChatInputProps) => {
-  const { handleSendMessage } = props
+  const { handleSendMessage, handleTyping } = props
 
   const [message, setMessage] = useState("")
+  const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isTyping = useRef(false)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    setMessage(val)
+
+    if (!isTyping.current && val.trim() !== "") {
+      handleTyping("START")
+      isTyping.current = true
+    }
+
+    if (typingTimeout.current) {
+      clearTimeout(typingTimeout.current)
+    }
+
+    typingTimeout.current = setTimeout(() => {
+      if (isTyping.current) {
+        handleTyping("END")
+        isTyping.current = false
+      }
+    }, 2000) // 2 seconds of no typing triggers END
+  }
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -22,6 +45,12 @@ export const ChatInput = (props: ChatInputProps) => {
 
     handleSendMessage(message)
     setMessage("")
+
+    if (isTyping.current) {
+      handleTyping("END")
+      isTyping.current = false
+      if (typingTimeout.current) clearTimeout(typingTimeout.current)
+    }
   }
 
   return (
@@ -37,7 +66,7 @@ export const ChatInput = (props: ChatInputProps) => {
         <Input
           className="bg-chat-composer-input-background-color text-primary-text rounded-full border-none ring-0 outline-none"
           placeholder="Aa"
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={handleChange}
           value={message}
         />
       </form>
