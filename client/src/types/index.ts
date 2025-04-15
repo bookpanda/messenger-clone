@@ -2,14 +2,6 @@ import { components } from "@/api/schema"
 
 export type MessageType = "incoming" | "outgoing"
 
-export type Message = {
-  id: number
-  type: MessageType
-  text: string
-  date: Date
-  reaction?: string
-}
-
 export type Profile = {
   name: string
   image: string
