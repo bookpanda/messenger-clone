@@ -7,6 +7,7 @@ import (
 
 	"github.com/bookpanda/messenger-clone/internal/dto"
 	"github.com/bookpanda/messenger-clone/internal/jwt"
+	"github.com/bookpanda/messenger-clone/internal/model"
 	"github.com/bookpanda/messenger-clone/internal/services/chat"
 	"github.com/bookpanda/messenger-clone/pkg/logger"
 	"github.com/gofiber/contrib/websocket"
@@ -30,9 +31,9 @@ func (h *Handler) HandleRealTimeMessages(c *websocket.Conn) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
-	// server receives from sender client
+	// server receives from client
 	go h.receiveRealtimeMessage(&wg, c, jwtEntity.ID, chatID)
-	// server sends to receiver client
+	// server sends to client
 	go h.sendRealtimeMessage(&wg, c, jwtEntity.ID, chatID, client)
 
 	wg.Wait()
@@ -75,18 +76,45 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 			continue
 		}
 
-		// msgType is from lib, not same as our EventType
-		if msgType == websocket.TextMessage {
-			h.chatServer.BroadcastToRoom(msgReq, chatID, senderID)
-		}
+		// logger.Info("receive message", msgReq)
 
-		// create Message object in database
+		// create Message object in database, then send to all clients
 		if msgReq.EventType == dto.EventMessage {
 			req := dto.SendMessageRequest{
 				Content: msgReq.Content,
 				ChatID:  chatID,
 			}
-			h.SendMessage(req, senderID)
+			message, err := h.SendMessage(req, senderID)
+			if err != nil {
+				logger.Error("failed to send message", slog.Any("error", err))
+				h.chatServer.BroadcastToRoom(errorMsg, chatID, senderID)
+				continue
+			}
+
+			msgReq.MessageID = message.ID
+			// msgType is from lib, not same as our EventType
+			if msgType == websocket.TextMessage {
+				h.chatServer.BroadcastToRoom(msgReq, chatID, senderID)
+			}
+
+			continue
+		}
+
+		// sender (receiver of message) has read
+		if msgReq.EventType == dto.EventRead {
+			err := h.store.DB.
+				Where("message_id = ? AND user_id = ?", msgReq.MessageID, senderID).
+				Delete(&model.Inbox{}).Error
+			if err != nil {
+				logger.Error("failed to delete inbox", slog.Any("error", err))
+				h.chatServer.BroadcastToRoom(errorMsg, chatID, senderID)
+			}
+			continue
+		}
+
+		// for other events, just send to all clients
+		if msgType == websocket.TextMessage {
+			h.chatServer.BroadcastToRoom(msgReq, chatID, senderID)
 		}
 	}
 }

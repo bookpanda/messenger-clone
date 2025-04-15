@@ -35,6 +35,7 @@ type SendRealtimeMessageRequest struct {
 	EventType EventType `json:"event_type" validate:"required" binding:"required"`
 	Content   string    `json:"content" validate:"required" binding:"required"`
 	SenderID  uint      `json:"sender_id"`
+	MessageID uint      `json:"message_id"`
 }
 
 func (e EventType) String() string {
