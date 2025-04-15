@@ -11,6 +11,7 @@ interface ChatContext {
   messages: ChatMessage[]
   setMessages: Dispatch<SetStateAction<ChatMessage[]>>
   sendMessage: (content: string, eventType: EventType) => void
+  typingUsers: number[]
 }
 
 export const ChatContext = createContext<ChatContext>({
@@ -22,6 +23,7 @@ export const ChatContext = createContext<ChatContext>({
   messages: [],
   setMessages: () => {},
   sendMessage: () => {},
+  typingUsers: [],
 })
 
 export const useChatContext = () => {
