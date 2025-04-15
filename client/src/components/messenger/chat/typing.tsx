@@ -19,15 +19,29 @@ export const TypingMessage = ({ userIDs }: TypingProps) => {
 
   return (
     <div className={cn("group flex items-end gap-2")}>
-      <div className="relative size-7">
-        {typingUsers.map((user) => (
-          <Image
+      <div
+        className={cn(
+          "relative flex h-7",
+          typingUsers.length === 1 ? "w-7" : "w-12"
+        )}
+      >
+        {typingUsers.slice(0, 2).map((user, idx) => (
+          <div
             key={user.id}
-            src={user.profilePictureUrl || ""}
-            alt=""
-            fill
-            className="rounded-full object-cover"
-          />
+            className="absolute"
+            style={{
+              left: `${idx * 14}px`, // adjust spacing between avatars
+              zIndex: typingUsers.length - idx,
+            }}
+          >
+            <Image
+              src={user.profilePictureUrl || ""}
+              alt=""
+              width={28}
+              height={28}
+              className="rounded-full object-cover"
+            />
+          </div>
         ))}
       </div>
       <div className="flex items-center gap-2">

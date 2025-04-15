@@ -1,6 +1,13 @@
 "use client"
 
-import { FC, PropsWithChildren, useEffect, useMemo, useState } from "react"
+import {
+  FC,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 
 import { getChatMessages } from "@/actions/message/get-chat-messages"
 import { useGetMyChats } from "@/hooks/use-get-my-chats"
@@ -45,6 +52,22 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
     })()
   }, [myChats])
 
+  const sendMessage = useCallback(
+    (content: string, eventType: EventType, messageID?: number) => {
+      const payload: RealtimeMessage = {
+        event_type: eventType,
+        content,
+        sender_id: 0, // don't care
+      }
+      if (messageID) {
+        payload.message_id = messageID
+      }
+      console.log(`sendMessage`, payload)
+      wsSendMessage(JSON.stringify(payload))
+    },
+    [wsSendMessage]
+  )
+
   useEffect(() => {
     if (!lastMessage) return
     const message: RealtimeMessage = JSON.parse(lastMessage.data)
@@ -52,17 +75,52 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
 
     switch (message.event_type) {
       case "MESSAGE":
+      case "UNREAD_MESSAGE":
+        const newMessage: ChatMessage = {
+          id: message.message_id || 0,
+          chat_id: currentChat.id,
+          sender_id: message.sender_id,
+          content: message.content,
+          created_at: new Date().toDateString(),
+          last_read_users: [],
+          reactions: [],
+        }
         setMessages((prevMessages) =>
           produce(prevMessages, (draft) => {
-            const newMessage: ChatMessage = {
-              id: prevMessages.length + 1,
-              chat_id: currentChat.id,
-              sender_id: message.sender_id,
-              content: message.content,
-              created_at: new Date().toDateString(),
-              reactions: [],
-            }
             draft.push(newMessage)
+          })
+        )
+        setChats((prevChats) =>
+          produce(prevChats, (draft) => {
+            const chat = draft.find((c) => c.id === currentChat.id)
+            if (!chat) return
+            chat.last_message = newMessage
+
+            // move chat to the top
+            const chatIndex = draft.findIndex((c) => c.id === currentChat.id)
+            if (chatIndex !== -1) {
+              draft.splice(chatIndex, 1)
+              draft.unshift(chat)
+            }
+          })
+        )
+        sendMessage("<read>", "READ", message.message_id)
+        break
+      case "READ":
+        setMessages((prevMessages) =>
+          produce(prevMessages, (draft) => {
+            const prevReadMessage = draft.find((m) =>
+              m.last_read_users.includes(message.sender_id)
+            )
+            if (prevReadMessage) {
+              const index = prevReadMessage.last_read_users.indexOf(
+                message.sender_id
+              )
+              if (index !== -1) prevReadMessage.last_read_users.splice(index, 1)
+            }
+            const readMessage = draft.find((m) => m.id === message.message_id)
+            if (!readMessage) return
+            readMessage.last_read_users.push(message.sender_id)
           })
         )
         break
@@ -86,7 +144,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         )
         break
     }
-  }, [lastMessage, currentChat.id])
+  }, [lastMessage, currentChat.id, sendMessage])
 
   const addChat = (chat: Chat) => {
     setChats(
@@ -94,10 +152,6 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         draft.unshift(chat)
       })
     )
-  }
-
-  const sendMessage = (content: string, eventType: EventType) => {
-    wsSendMessage(JSON.stringify({ event_type: eventType, content }))
   }
 
   return (

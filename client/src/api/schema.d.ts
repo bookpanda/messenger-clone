@@ -573,6 +573,52 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/message/ws": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * connect to websocket
+         * @description Establish a WebSocket connection for real-time communication.
+         *     The message from a server will be in a format of "[EVENT] [MESSAGE]" which [EVENT] can be "ERROR" or "MESSAGE".
+         *     If [EVENT] is error, [MESSAGE] will be a string of error message ,otherwise it will be a dto.RealTimeMessageResponse
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Switching Protocols */
+                101: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/user": {
         parameters: {
             query?: never;
@@ -692,6 +738,7 @@ export interface components {
             content: string;
             created_at: string;
             id: number;
+            last_read_users: number[];
             reactions: components["schemas"]["dto.ReactionResponse"][];
             sender_id: number;
         };

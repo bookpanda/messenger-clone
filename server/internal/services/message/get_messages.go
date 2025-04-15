@@ -53,10 +53,29 @@ func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
 		return apperror.Forbidden("user is not a participant of the chat", errors.New("user is not a participant of the chat"))
 	}
 
+	// get only read messages (inbox is deleted)
 	var messages []model.Message
-	err = h.store.DB.Model(&model.Message{}).Preload("Reactions").Where("chat_id = ?", chatID).Find(&messages).Error
+	err = h.store.DB.Model(&model.Message{}).
+		Joins("JOIN inboxes ON inboxes.message_id = messages.id").
+		Where("messages.chat_id = ? AND (inboxes.user_id = ? AND inboxes.deleted_at IS NOT NULL)", chatID, userID).
+		Preload("Reactions").
+		Find(&messages).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to load messages from inbox")
+	}
 
-	result := dto.ToMessageResponseList(messages)
+	var userLastReads []dto.UserLastRead
+	err = h.store.DB.Raw(`
+		SELECT DISTINCT ON (user_id)
+			user_id, message_id, deleted_at 
+		FROM inboxes
+		WHERE deleted_at IS NOT NULL AND message_id IN (
+			SELECT id FROM messages WHERE chat_id = ?
+		) AND user_id <> ?
+		ORDER BY user_id, deleted_at DESC
+	`, chatID, userID).Scan(&userLastReads).Error
+
+	result := dto.ToMessageResponseList(messages, userLastReads)
 
 	return c.Status(fiber.StatusOK).JSON(dto.HttpListResponse[dto.MessageResponse]{
 		Result: result,

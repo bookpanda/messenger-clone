@@ -128,6 +128,11 @@ components:
           type: string
         id:
           type: integer
+        last_read_users:
+          items:
+            type: integer
+          type: array
+          uniqueItems: false
         reactions:
           items:
             $ref: '#/components/schemas/dto.ReactionResponse'
@@ -140,6 +145,7 @@ components:
       - content
       - created_at
       - id
+      - last_read_users
       - reactions
       - sender_id
       type: object
@@ -547,6 +553,22 @@ paths:
                 $ref: '#/components/schemas/dto.HttpError'
           description: Internal Server Error
       summary: Get messages
+      tags:
+      - message
+  /api/v1/message/ws:
+    get:
+      description: |-
+        Establish a WebSocket connection for real-time communication.
+        The message from a server will be in a format of "[EVENT] [MESSAGE]" which [EVENT] can be "ERROR" or "MESSAGE".
+        If [EVENT] is error, [MESSAGE] will be a string of error message ,otherwise it will be a dto.RealTimeMessageResponse
+      responses:
+        "101":
+          description: Switching Protocols
+        "400":
+          description: Bad Request
+      security:
+      - ApiKeyAuth: []
+      summary: connect to websocket
       tags:
       - message
   /api/v1/user:

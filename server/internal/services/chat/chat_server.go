@@ -120,10 +120,23 @@ func (s *Server) BroadcastToRoom(msgReq dto.SendRealtimeMessageRequest, chatID u
 		return nil
 	}
 
-	// if event is message, send to all other clients in the chat
+	// if event is message, send to all clients
+	// (including sender so that sender can ack read, will be easier for getting last reads) in the chat
+	if msgReq.EventType == dto.EventMessage {
+		for _, client := range s.chats[chatID] {
+			if client == nil || client.Terminate == nil {
+				// skip nil clients
+				continue
+			}
+			client.Message <- string(json)
+		}
+		return nil
+	}
+
+	// other types, send to all clients except sender
 	for _, client := range s.chats[chatID] {
-		if client == nil || client.Terminate == nil || client.UserID == msgReq.SenderID {
-			// skip nil clients or the sender
+		if client == nil || client.Terminate == nil || client.UserID == senderID {
+			// skip nil clients and sender
 			continue
 		}
 

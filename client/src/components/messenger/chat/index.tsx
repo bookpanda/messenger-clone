@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction } from "react"
 
 // import { sendMessage } from "@/actions/message/send-message"
 import { useChatContext } from "@/contexts/chat-context"
-import { ChatMessage, Profile } from "@/types"
+import { Profile } from "@/types"
 import { produce } from "immer"
 import { useSession } from "next-auth/react"
 
@@ -21,8 +21,7 @@ export const Chat = (props: ChatProps) => {
   const { profile, setOpenChatInfo } = props
   const { data: session } = useSession()
 
-  const { currentChat, messages, setMessages, setChats, sendMessage } =
-    useChatContext()
+  const { currentChat, messages, setMessages, sendMessage } = useChatContext()
   if (!messages || !currentChat) {
     return null
   }
@@ -55,31 +54,6 @@ export const Chat = (props: ChatProps) => {
   }
 
   const handleSendMessage = async (content: string) => {
-    const newMessage: ChatMessage = {
-      id: messages.length + 1,
-      chat_id: currentChat.id,
-      content,
-      created_at: new Date().toISOString(),
-      sender_id: session?.user?.userId as number,
-      reactions: [],
-    }
-    setMessages((prevMessages) => [...prevMessages, newMessage])
-    setChats((prevChats) =>
-      produce(prevChats, (draft) => {
-        const chat = draft.find((c) => c.id === currentChat.id)
-        if (!chat) return
-
-        chat.last_message = newMessage
-
-        // move chat to the top
-        const chatIndex = draft.findIndex((c) => c.id === currentChat.id)
-        if (chatIndex !== -1) {
-          draft.splice(chatIndex, 1)
-          draft.unshift(chat)
-        }
-      })
-    )
-
     sendMessage(content, "MESSAGE")
   }
 
