@@ -1,11 +1,13 @@
 "use client"
 
-import { FC, PropsWithChildren, useEffect, useState } from "react"
+import { FC, PropsWithChildren, useEffect, useMemo, useState } from "react"
 
 import { getChatMessages } from "@/actions/message/get-chat-messages"
 import { useGetMyChats } from "@/hooks/use-get-my-chats"
 import { Chat, ChatMessage } from "@/types"
 import { produce } from "immer"
+import { useSession } from "next-auth/react"
+import useWebSocket from "react-use-websocket"
 
 import { ChatContext } from "./chat-context"
 
@@ -14,6 +16,18 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
   const [currentChat, setCurrentChat] = useState<Chat>({} as Chat)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const { chats: myChats } = useGetMyChats()
+
+  const { data: session } = useSession()
+  const socketUrl = useMemo(() => {
+    if (!session?.accessToken || !currentChat?.id) return null
+    return `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/v1/message/ws?accessToken=${session.accessToken}&chatID=${currentChat.id}`
+  }, [session?.accessToken, currentChat?.id])
+
+  const { sendMessage, lastMessage } = useWebSocket(socketUrl, {
+    onOpen: () => console.log("open"),
+    onError: (event) => console.log("error", event),
+    onClose: () => console.log("close"),
+  })
 
   useEffect(() => {
     setChats(myChats)
@@ -48,6 +62,8 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         setChats,
         messages,
         setMessages,
+        sendMessage,
+        lastMessage,
       }}
     >
       {children}
