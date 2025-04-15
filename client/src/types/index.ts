@@ -32,4 +32,5 @@ export type RealtimeMessage = {
   event_type: EventType
   content: string
   sender_id: number
+  message_id?: number
 }

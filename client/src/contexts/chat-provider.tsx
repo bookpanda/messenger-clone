@@ -1,6 +1,13 @@
 "use client"
 
-import { FC, PropsWithChildren, useEffect, useMemo, useState } from "react"
+import {
+  FC,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 
 import { getChatMessages } from "@/actions/message/get-chat-messages"
 import { useGetMyChats } from "@/hooks/use-get-my-chats"
@@ -45,6 +52,22 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
     })()
   }, [myChats])
 
+  const sendMessage = useCallback(
+    (content: string, eventType: EventType, messageID?: number) => {
+      const payload: RealtimeMessage = {
+        event_type: eventType,
+        content,
+        sender_id: 0, // don't care
+      }
+      if (messageID) {
+        payload.message_id = messageID
+      }
+      console.log(`sendMessage`, payload)
+      wsSendMessage(JSON.stringify(payload))
+    },
+    [wsSendMessage]
+  )
+
   useEffect(() => {
     if (!lastMessage) return
     const message: RealtimeMessage = JSON.parse(lastMessage.data)
@@ -65,6 +88,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
             draft.push(newMessage)
           })
         )
+        sendMessage("<read>", "READ", message.message_id)
         break
       case "TYPING_START":
         setTypingUserIDs((prev) =>
@@ -86,7 +110,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         )
         break
     }
-  }, [lastMessage, currentChat.id])
+  }, [lastMessage, currentChat.id, sendMessage])
 
   const addChat = (chat: Chat) => {
     setChats(
@@ -94,10 +118,6 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         draft.unshift(chat)
       })
     )
-  }
-
-  const sendMessage = (content: string, eventType: EventType) => {
-    wsSendMessage(JSON.stringify({ event_type: eventType, content }))
   }
 
   return (
