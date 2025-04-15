@@ -21,8 +21,9 @@ export type User = components["schemas"]["dto.UserResponse"]
 export type ChatMessage = components["schemas"]["dto.MessageResponse"]
 export type Reaction = components["schemas"]["dto.ReactionResponse"]
 
+export type EventType = "MESSAGE" | "ERROR" | "TYPING" | "REACTION" | "READ"
 export type RealtimeMessage = {
-  event_type: "MESSAGE" | "ERROR"
+  event_type: EventType
   content: string
   sender_id: number
 }

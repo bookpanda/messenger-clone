@@ -4,7 +4,7 @@ import { FC, PropsWithChildren, useEffect, useMemo, useState } from "react"
 
 import { getChatMessages } from "@/actions/message/get-chat-messages"
 import { useGetMyChats } from "@/hooks/use-get-my-chats"
-import { Chat, ChatMessage, RealtimeMessage } from "@/types"
+import { Chat, ChatMessage, EventType, RealtimeMessage } from "@/types"
 import { produce } from "immer"
 import { useSession } from "next-auth/react"
 import useWebSocket from "react-use-websocket"
@@ -72,7 +72,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
     )
   }
 
-  const sendMessage = (content: string, eventType: "MESSAGE" | "ERROR") => {
+  const sendMessage = (content: string, eventType: EventType) => {
     wsSendMessage(JSON.stringify({ event_type: eventType, content }))
   }
 

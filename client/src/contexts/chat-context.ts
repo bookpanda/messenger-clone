@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, createContext, useContext } from "react"
 
-import { Chat, ChatMessage } from "@/types"
+import { Chat, ChatMessage, EventType } from "@/types"
 
 interface ChatContext {
   chats: Chat[]
@@ -10,7 +10,7 @@ interface ChatContext {
   setCurrentChat: Dispatch<SetStateAction<Chat>>
   messages: ChatMessage[]
   setMessages: Dispatch<SetStateAction<ChatMessage[]>>
-  sendMessage: (content: string, eventType: "MESSAGE" | "ERROR") => void
+  sendMessage: (content: string, eventType: EventType) => void
 }
 
 export const ChatContext = createContext<ChatContext>({
