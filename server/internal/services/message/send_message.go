@@ -103,11 +103,6 @@ func (h *Handler) sendMessageToParticipants(chatID uint, messageID uint, senderI
 
 	var inboxes []model.Inbox
 	for _, participant := range chat.Participants {
-		// skip sender
-		if participant.ID == senderID {
-			continue
-		}
-
 		inbox := model.Inbox{
 			MessageID: messageID,
 			UserID:    participant.ID,

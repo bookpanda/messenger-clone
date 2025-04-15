@@ -75,17 +75,31 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
 
     switch (message.event_type) {
       case "MESSAGE":
+        const newMessage: ChatMessage = {
+          id: messages.length + 1,
+          chat_id: currentChat.id,
+          sender_id: message.sender_id,
+          content: message.content,
+          created_at: new Date().toDateString(),
+          reactions: [],
+        }
         setMessages((prevMessages) =>
           produce(prevMessages, (draft) => {
-            const newMessage: ChatMessage = {
-              id: prevMessages.length + 1,
-              chat_id: currentChat.id,
-              sender_id: message.sender_id,
-              content: message.content,
-              created_at: new Date().toDateString(),
-              reactions: [],
-            }
             draft.push(newMessage)
+          })
+        )
+        setChats((prevChats) =>
+          produce(prevChats, (draft) => {
+            const chat = draft.find((c) => c.id === currentChat.id)
+            if (!chat) return
+            chat.last_message = newMessage
+
+            // move chat to the top
+            const chatIndex = draft.findIndex((c) => c.id === currentChat.id)
+            if (chatIndex !== -1) {
+              draft.splice(chatIndex, 1)
+              draft.unshift(chat)
+            }
           })
         )
         sendMessage("<read>", "READ", message.message_id)
@@ -110,7 +124,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
         )
         break
     }
-  }, [lastMessage, currentChat.id, sendMessage])
+  }, [lastMessage, currentChat.id, sendMessage, messages.length])
 
   const addChat = (chat: Chat) => {
     setChats(
