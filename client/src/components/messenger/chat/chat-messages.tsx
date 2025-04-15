@@ -8,6 +8,7 @@ import {
   OutgoingMessage,
   //  TimestampMessage
 } from "./messages"
+import { TypingMessage } from "./typing"
 
 interface ChatMessagesProps {
   handleAddReaction: (messageId: number, reaction: string) => void
@@ -16,7 +17,7 @@ interface ChatMessagesProps {
 export const ChatMessages = (props: ChatMessagesProps) => {
   const { handleAddReaction } = props
   const { data: session } = useSession()
-  const { messages, currentChat } = useChatContext()
+  const { messages, currentChat, typingUserIDs } = useChatContext()
 
   const endOfMessagesRef = useRef<HTMLDivElement>(null)
 
@@ -25,7 +26,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
     if (endOfMessagesRef.current) {
       endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" })
     }
-  }, [messages])
+  }, [messages, typingUserIDs])
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto p-4">
@@ -59,6 +60,9 @@ export const ChatMessages = (props: ChatMessagesProps) => {
             />
           )
         })}
+
+        {/* Typing indicator */}
+        {typingUserIDs.length > 0 && <TypingMessage userIDs={typingUserIDs} />}
         <div ref={endOfMessagesRef} />
       </div>
     </div>
