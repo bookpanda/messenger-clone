@@ -43,7 +43,7 @@ func (e EventType) String() string {
 
 func ValidateEventType(eventType string) bool {
 	switch EventType(eventType) {
-	case EventError, EventMessage:
+	case EventError, EventMessage, EventTypingStart, EventTypingEnd, EventReaction, EventRead:
 		return true
 	}
 	return false
