@@ -46,21 +46,32 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 			break
 		}
 
+		errorMsg := dto.SendRealtimeMessageRequest{
+			EventType: dto.EventError,
+			Content:   "invalid message",
+		}
+
 		var msgReq dto.SendRealtimeMessageRequest
 		if err := json.Unmarshal([]byte(msg), &msgReq); err != nil {
 			logger.Error("Failed Unmarshal json", slog.Any("error", err))
-			h.chatServer.BroadcastToRoom(chat.EventError, chatID, "invalid message", senderID)
-			return
+			h.chatServer.BroadcastToRoom(errorMsg, chatID, senderID)
+			continue
 		}
 
 		if err := h.validate.Struct(msgReq); err != nil {
 			logger.Error("Failed validate message request", slog.Any("error", err))
-			h.chatServer.BroadcastToRoom(chat.EventError, chatID, "invalid message", senderID)
-			return
+			h.chatServer.BroadcastToRoom(errorMsg, chatID, senderID)
+			continue
+		}
+
+		if !dto.ValidateEventType(msgReq.EventType.String()) {
+			logger.Error("Invalid event type", slog.Any("event_type", msgReq.EventType))
+			h.chatServer.BroadcastToRoom(errorMsg, chatID, senderID)
+			continue
 		}
 
 		if msgType == websocket.TextMessage {
-			h.chatServer.BroadcastToRoom(chat.EventMessage, chatID, msgReq.Content, senderID)
+			h.chatServer.BroadcastToRoom(msgReq, chatID, senderID)
 		}
 
 		// create Message object in database
