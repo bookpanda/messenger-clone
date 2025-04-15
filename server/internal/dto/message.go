@@ -20,6 +20,31 @@ type SendMessageRequest struct {
 	Content string `json:"content" validate:"required" binding:"required"`
 }
 
+type EventType string
+
+const (
+	EventError   EventType = "ERROR"
+	EventMessage EventType = "MESSAGE"
+)
+
+type SendRealtimeMessageRequest struct {
+	EventType EventType `json:"event_type" validate:"required" binding:"required"`
+	Content   string    `json:"content" validate:"required" binding:"required"`
+	SenderID  uint      `json:"sender_id"`
+}
+
+func (e EventType) String() string {
+	return string(e)
+}
+
+func ValidateEventType(eventType string) bool {
+	switch EventType(eventType) {
+	case EventError, EventMessage:
+		return true
+	}
+	return false
+}
+
 func ToMessageResponse(message model.Message) MessageResponse {
 	return MessageResponse{
 		ID:        message.ID,

@@ -2,21 +2,12 @@ package chat
 
 import (
 	"encoding/json"
-	"fmt"
-	"log/slog"
 	"sync"
 
 	"github.com/bookpanda/messenger-clone/internal/database"
 	"github.com/bookpanda/messenger-clone/internal/dto"
-	"github.com/bookpanda/messenger-clone/pkg/logger"
 	"github.com/go-playground/validator/v10"
-)
-
-type EventType string
-
-const (
-	EventError   EventType = "ERROR"
-	EventMessage EventType = "MESSAGE"
+	"github.com/pkg/errors"
 )
 
 type Client struct {
@@ -63,6 +54,7 @@ func (s *Server) Register(userID uint, chatID uint) *Client {
 	if s.chats[chatID] == nil {
 		s.chats[chatID] = make(map[uint]*Client)
 	}
+	// TODO: check if user is actually member of the chat
 	s.chats[chatID][userID] = client
 
 	return client
@@ -84,66 +76,37 @@ func (s *Server) Logout(userID uint, chatID uint) {
 	}
 }
 
-func (s *Server) SendRawString(chatID uint, msg string, senderID uint) {
-	var msgReq dto.SendMessageRequest
-	if err := json.Unmarshal([]byte(msg), &msgReq); err != nil {
-		logger.Error("Failed Unmarshal json", slog.Any("error", err))
-		s.broadcastToRoom(EventError, chatID, "invalid message", senderID)
-		return
-	}
-
-	if err := s.validate.Struct(msgReq); err != nil {
-		logger.Error("Failed validate message request", slog.Any("error", err))
-		s.broadcastToRoom(EventError, chatID, "invalid message", senderID)
-		return
-	}
-
-	// msgModel := dto.ToMessageModel(senderID, msgReq)
-	// if msgModel.ReceiverID == senderID {
-	// 	logger.Error("cannot send message to yourself")
-	// 	s.broadcastToRoom(EventError, chatID, "cannot send message to yourself", senderID)
-	// 	return
-	// }
-
-	// if err := c.store.DB.Create(&msgModel).Error; err != nil {
-	// 	logger.Error("failed inserting message to database", slog.Any("error", err))
-	// 	c.sendMessage(EventError, senderID, "internal error")
-	// 	return
-	// }
-
-	// json, err := json.Marshal(dto.ToRealTimeMessageResponse(msgModel))
-	// if err != nil {
-	// 	logger.Error("failed Marshal realtime message response to json", slog.Any("error", err))
-	// 	c.sendMessage(EventError, senderID, "internal error")
-	// 	return
-	// }
-
-	s.broadcastToRoom(EventMessage, chatID, msg, senderID)
-	// c.sendMessage(EventMessage, msgModel.ReceiverID, string(json))
-	// c.sendMessage(EventMessage, msgModel.SenderID, string(json))
-}
-
-func (s *Server) broadcastToRoom(event EventType, chatID uint, msg string, senderID uint) {
+func (s *Server) BroadcastToRoom(msgReq dto.SendRealtimeMessageRequest, chatID uint, senderID uint) error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	msg = fmt.Sprintf("%s %s", event, msg)
+	// assign senderID so that frontend app knows who sent the message
+	// also cannot trust the client to send senderID (identity spoofing)
+	msgReq.SenderID = senderID
 
-	if event == EventError { // if event is error, send to sender only
-		client := s.chats[chatID][senderID]
+	json, err := json.Marshal(msgReq)
+	if err != nil {
+		return errors.Wrap(err, "failed Marshal to json")
+	}
+
+	// if event is error, send to sender only
+	if msgReq.EventType == dto.EventError {
+		client := s.chats[chatID][msgReq.SenderID]
 		if client != nil {
-			client.Message <- msg
+			client.Message <- string(json)
 		}
-		return
+		return nil
 	}
 
 	// if event is message, send to all other clients in the chat
 	for _, client := range s.chats[chatID] {
-		if client == nil || client.Terminate == nil || client.UserID == senderID {
+		if client == nil || client.Terminate == nil || client.UserID == msgReq.SenderID {
 			// skip nil clients or the sender
 			continue
 		}
 
-		client.Message <- msg
+		client.Message <- string(json)
 	}
+
+	return nil
 }

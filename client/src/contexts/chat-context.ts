@@ -10,6 +10,7 @@ interface ChatContext {
   setCurrentChat: Dispatch<SetStateAction<Chat>>
   messages: ChatMessage[]
   setMessages: Dispatch<SetStateAction<ChatMessage[]>>
+  sendMessage: (content: string, eventType: "MESSAGE" | "ERROR") => void
 }
 
 export const ChatContext = createContext<ChatContext>({
@@ -20,6 +21,7 @@ export const ChatContext = createContext<ChatContext>({
   setCurrentChat: () => {},
   messages: [],
   setMessages: () => {},
+  sendMessage: () => {},
 })
 
 export const useChatContext = () => {

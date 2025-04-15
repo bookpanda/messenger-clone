@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction } from "react"
 
-import { sendMessage } from "@/actions/message/send-message"
+// import { sendMessage } from "@/actions/message/send-message"
 import { useChatContext } from "@/contexts/chat-context"
 import { ChatMessage, Profile } from "@/types"
 import { produce } from "immer"
@@ -20,7 +20,9 @@ interface ChatProps {
 export const Chat = (props: ChatProps) => {
   const { profile, setOpenChatInfo } = props
   const { data: session } = useSession()
-  const { currentChat, messages, setMessages, setChats } = useChatContext()
+
+  const { currentChat, messages, setMessages, setChats, sendMessage } =
+    useChatContext()
   if (!messages || !currentChat) {
     return null
   }
@@ -78,11 +80,7 @@ export const Chat = (props: ChatProps) => {
       })
     )
 
-    const response = await sendMessage(currentChat.id, content)
-    if (!response) {
-      // Handle error
-      return
-    }
+    sendMessage(content, "MESSAGE")
   }
 
   return (
