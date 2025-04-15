@@ -81,11 +81,13 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 		}
 
 		// create Message object in database
-		req := dto.SendMessageRequest{
-			Content: msgReq.Content,
-			ChatID:  chatID,
+		if msgReq.EventType == dto.EventMessage {
+			req := dto.SendMessageRequest{
+				Content: msgReq.Content,
+				ChatID:  chatID,
+			}
+			h.SendMessage(req, senderID)
 		}
-		h.SendMessage(req, senderID)
 	}
 }
 
