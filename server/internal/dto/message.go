@@ -23,11 +23,12 @@ type SendMessageRequest struct {
 type EventType string
 
 const (
-	EventError    EventType = "ERROR"
-	EventMessage  EventType = "MESSAGE"
-	EventTyping   EventType = "TYPING"
-	EventReaction EventType = "REACTION"
-	EventRead     EventType = "READ"
+	EventError       EventType = "ERROR"
+	EventMessage     EventType = "MESSAGE"
+	EventTypingStart EventType = "TYPING_START"
+	EventTypingEnd   EventType = "TYPING_END"
+	EventReaction    EventType = "REACTION"
+	EventRead        EventType = "READ"
 )
 
 type SendRealtimeMessageRequest struct {

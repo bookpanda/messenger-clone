@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 
 interface ChatInputProps {
   handleSendMessage: (text: string) => void
+  handleTyping: (type: "START" | "END") => void
 }
 
 export const ChatInput = (props: ChatInputProps) => {
