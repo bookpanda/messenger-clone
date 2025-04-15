@@ -7,12 +7,13 @@ import (
 )
 
 type MessageResponse struct {
-	ID        uint               `json:"id" binding:"required"`
-	Content   string             `json:"content" binding:"required"`
-	ChatID    uint               `json:"chat_id" binding:"required"`
-	SenderID  uint               `json:"sender_id" binding:"required"`
-	CreatedAt time.Time          `json:"created_at" binding:"required"`
-	Reactions []ReactionResponse `json:"reactions" binding:"required"`
+	ID            uint               `json:"id" binding:"required"`
+	Content       string             `json:"content" binding:"required"`
+	ChatID        uint               `json:"chat_id" binding:"required"`
+	SenderID      uint               `json:"sender_id" binding:"required"`
+	CreatedAt     time.Time          `json:"created_at" binding:"required"`
+	Reactions     []ReactionResponse `json:"reactions" binding:"required"`
+	LastReadUsers []uint             `json:"last_read_users" binding:"required"`
 }
 
 type SendMessageRequest struct {
@@ -39,6 +40,11 @@ type SendRealtimeMessageRequest struct {
 	MessageID uint      `json:"message_id"`
 }
 
+type UserLastRead struct {
+	UserID    uint
+	MessageID uint
+}
+
 func (e EventType) String() string {
 	return string(e)
 }
@@ -51,21 +57,31 @@ func ValidateEventType(eventType string) bool {
 	return false
 }
 
-func ToMessageResponse(message model.Message) MessageResponse {
+func ToMessageResponse(message model.Message, lastReadUsers []uint) MessageResponse {
 	return MessageResponse{
-		ID:        message.ID,
-		Content:   message.Content,
-		ChatID:    message.ChatID,
-		SenderID:  message.SenderID,
-		CreatedAt: message.CreatedAt,
-		Reactions: ToReactionResponseList(message.Reactions),
+		ID:            message.ID,
+		Content:       message.Content,
+		ChatID:        message.ChatID,
+		SenderID:      message.SenderID,
+		CreatedAt:     message.CreatedAt,
+		Reactions:     ToReactionResponseList(message.Reactions),
+		LastReadUsers: lastReadUsers,
 	}
 }
 
-func ToMessageResponseList(messages []model.Message) []MessageResponse {
+func ToMessageResponseList(messages []model.Message, userLastReads []UserLastRead) []MessageResponse {
+	messageIdToLastReadUsers := make(map[uint][]uint)
+	for _, userLastRead := range userLastReads {
+		messageIdToLastReadUsers[userLastRead.MessageID] = append(messageIdToLastReadUsers[userLastRead.MessageID], userLastRead.UserID)
+	}
+
 	messageResponses := make([]MessageResponse, len(messages))
 	for i, message := range messages {
-		messageResponses[i] = ToMessageResponse(message)
+		if lastReadUsers, ok := messageIdToLastReadUsers[message.ID]; ok {
+			messageResponses[i] = ToMessageResponse(message, lastReadUsers)
+		} else {
+			messageResponses[i] = ToMessageResponse(message, []uint{})
+		}
 	}
 	return messageResponses
 }
