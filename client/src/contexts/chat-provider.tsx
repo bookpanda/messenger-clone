@@ -81,6 +81,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
           sender_id: message.sender_id,
           content: message.content,
           created_at: new Date().toDateString(),
+          last_read_users: [],
           reactions: [],
         }
         setMessages((prevMessages) =>
