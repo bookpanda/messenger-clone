@@ -23,6 +23,7 @@ export type Reaction = components["schemas"]["dto.ReactionResponse"]
 
 export type EventType =
   | "MESSAGE"
+  | "UNREAD_MESSAGE"
   | "ERROR"
   | "TYPING_START"
   | "TYPING_END"
