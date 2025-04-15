@@ -8,6 +8,7 @@ import {
   OutgoingMessage,
   //  TimestampMessage
 } from "./messages"
+import { ReadBubbles } from "./read-bubble"
 import { TypingMessage } from "./typing"
 
 interface ChatMessagesProps {
@@ -41,24 +42,33 @@ export const ChatMessages = (props: ChatMessagesProps) => {
             return null
           }
 
-          return message.sender_id !== session?.user?.userId ? (
-            <IncomingMessage
-              key={idx}
-              message={message}
-              sender={sender}
-              handleAddReaction={(reaction: string) =>
-                handleAddReaction(message.id, reaction)
-              }
-            />
-          ) : (
-            <OutgoingMessage
-              key={idx}
-              message={message}
-              sender={sender}
-              handleAddReaction={(reaction: string) =>
-                handleAddReaction(message.id, reaction)
-              }
-            />
+          const lastReadUsers = currentChat?.participants.filter((user) =>
+            message.last_read_users.includes(user.id || 0)
+          )
+
+          return (
+            <>
+              {message.sender_id !== session?.user?.userId ? (
+                <IncomingMessage
+                  key={idx}
+                  message={message}
+                  sender={sender}
+                  handleAddReaction={(reaction: string) =>
+                    handleAddReaction(message.id, reaction)
+                  }
+                />
+              ) : (
+                <OutgoingMessage
+                  key={idx}
+                  message={message}
+                  sender={sender}
+                  handleAddReaction={(reaction: string) =>
+                    handleAddReaction(message.id, reaction)
+                  }
+                />
+              )}
+              <ReadBubbles users={lastReadUsers} />
+            </>
           )
         })}
 
