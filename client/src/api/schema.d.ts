@@ -696,13 +696,13 @@ export interface components {
             error?: string;
         };
         "dto.HttpListResponse-dto_ChatResponse": {
-            result?: components["schemas"]["dto.ChatResponse"][];
+            result: components["schemas"]["dto.ChatResponse"][];
         };
         "dto.HttpListResponse-dto_MessageResponse": {
-            result?: components["schemas"]["dto.MessageResponse"][];
+            result: components["schemas"]["dto.MessageResponse"][];
         };
         "dto.HttpListResponse-dto_UserResponse": {
-            result?: components["schemas"]["dto.UserResponse"][];
+            result: components["schemas"]["dto.UserResponse"][];
         };
         "dto.HttpResponse-dto_ChatResponse": {
             result?: components["schemas"]["dto.ChatResponse"];

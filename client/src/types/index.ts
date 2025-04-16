@@ -27,3 +27,5 @@ export type RealtimeMessage = {
   sender_id: number
   message_id?: number
 }
+
+export type SidebarTab = "inbox" | "people"

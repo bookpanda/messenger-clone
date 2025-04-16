@@ -1,18 +1,16 @@
 import { useState } from "react"
 
-import { useGetAllUsers } from "@/hooks/use-get-all-users"
-import { useSession } from "next-auth/react"
+import { usePeopleQuery } from "@/hooks/use-people"
 
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { PeopleCard } from "./card/people-card"
 
 export const PeopleTab = () => {
-  const { users, loading } = useGetAllUsers()
-  const { data: session } = useSession()
+  const { data: users, isLoading } = usePeopleQuery()
   const [currentPerson, setCurrentPerson] = useState<number | null>(null)
 
-  if (loading) {
+  if (isLoading || !users) {
     return (
       <div className="flex flex-col gap-2">
         {Array.from({ length: 10 }).map((_, idx) => (
