@@ -35,6 +35,10 @@ func ValidateParticipantAction(participantAction string) bool {
 	return false
 }
 
+type GetChatRequest struct {
+	ID uint `params:"id" validate:"required" binding:"required"`
+}
+
 type ModifyParticipantRequest struct {
 	Action       string   `json:"action" validate:"required" binding:"required"`
 	Participants []string `json:"participants" validate:"required" binding:"required"`

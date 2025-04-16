@@ -1,71 +1,36 @@
-import { getChatMessages } from "@/actions/message/get-chat-messages"
-import { useChatContext } from "@/contexts/chat-context"
-import { Chat } from "@/types"
-import { useSession } from "next-auth/react"
+import { LastMessage } from "@/types"
 import Image from "next/image"
 
 import { BaseCard } from "."
 
 interface ChatCardProps {
-  chat: Chat
+  name: string
   image: string
   isActive: boolean
+  lastMessage: LastMessage | null
 }
 
 export const ChatCard = (props: ChatCardProps) => {
-  const { chat, image, isActive } = props
-  const { name, is_direct } = chat
-  const lastMessage = chat.last_message
-
-  const { data: session } = useSession()
-  const { setMessages, setCurrentChat } = useChatContext()
-
-  const isLastMessageFromMe = lastMessage?.sender_id === session?.user?.userId
-  const lastMessageDate = new Date(lastMessage?.created_at || "")
-
-  let chatName = name
-  let chatImage = image
-  if (is_direct) {
-    const participants = chat.participants.filter(
-      (participant) => participant.id !== session?.user?.userId
-    )
-    chatName = participants[0]?.name || ""
-    chatImage = participants[0]?.profilePictureUrl || ""
-  }
-
-  const handleMessages = async (chatID: number) => {
-    const messages = await getChatMessages(chatID)
-
-    if (!messages) {
-      return
-    }
-    setMessages(messages)
-    setCurrentChat(chat)
-  }
+  const { name, image, isActive, lastMessage } = props
 
   return (
-    <BaseCard isActive={isActive} onClick={() => handleMessages(chat.id)}>
+    <BaseCard isActive={isActive}>
       <div className="relative size-14">
-        <Image
-          src={chatImage}
-          alt=""
-          fill
-          className="rounded-full object-cover"
-        />
+        <Image src={image} alt="" fill className="rounded-full object-cover" />
       </div>
       <div className="space-y-1">
-        <h2>{chatName}</h2>
+        <h2>{name}</h2>
         <div className="text-secondary-text flex items-center gap-1 text-xs">
-          {lastMessage?.content && (
+          {lastMessage && (
             <>
               <p>
-                {isLastMessageFromMe
-                  ? `You: ${lastMessage?.content}`
-                  : lastMessage.content}
+                {lastMessage.type === "outgoing"
+                  ? `You: ${lastMessage.message}`
+                  : lastMessage.message}
               </p>
               <p>&#8226;</p>
               <p>
-                {lastMessageDate.toLocaleTimeString("en-US", {
+                {lastMessage.date.toLocaleTimeString("en-US", {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}

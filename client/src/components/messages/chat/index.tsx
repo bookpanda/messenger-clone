@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction } from "react"
 
 // import { sendMessage } from "@/actions/message/send-message"
 import { useChatContext } from "@/contexts/chat-context"
-import { Profile } from "@/types"
+import { ChatInfo, ChatMessage, EventType, User } from "@/types"
 import { produce } from "immer"
 import { useSession } from "next-auth/react"
 
@@ -13,15 +13,30 @@ import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
 
 interface ChatProps {
-  profile: Profile
+  chatInfo: ChatInfo
+  user: User
+  messages: ChatMessage[]
   setOpenChatInfo: Dispatch<SetStateAction<boolean>>
+  sendMessage: (
+    content: string,
+    eventType: EventType,
+    messageID?: number
+  ) => void
+  typingUserIDs: number[]
 }
 
-export const Chat = (props: ChatProps) => {
-  const { profile, setOpenChatInfo } = props
+export const ChatBox = (props: ChatProps) => {
+  const {
+    chatInfo,
+    user,
+    messages,
+    setOpenChatInfo,
+    sendMessage,
+    typingUserIDs,
+  } = props
   const { data: session } = useSession()
 
-  const { currentChat, messages, setMessages, sendMessage } = useChatContext()
+  const { currentChat, setMessages } = useChatContext()
   if (!messages || !currentChat) {
     return null
   }
@@ -65,11 +80,18 @@ export const Chat = (props: ChatProps) => {
   return (
     <div className="bg-primary-background text-primary-foreground flex h-full flex-1 flex-col overflow-hidden rounded-md">
       <ChatHeader
-        image={profile.image}
-        lastActive={profile.lastActive}
+        name={chatInfo.name}
+        image={chatInfo.image}
+        lastActive={new Date()} // TODO: Check Last Active
         setOpenChatInfo={setOpenChatInfo}
       />
-      <ChatMessages handleAddReaction={handleAddReaction} />
+      <ChatMessages
+        participants={chatInfo.participants}
+        user={user}
+        messages={messages}
+        handleAddReaction={handleAddReaction}
+        typingUserIDs={typingUserIDs}
+      />
       <ChatInput
         handleSendMessage={handleSendMessage}
         handleTyping={handleTyping}

@@ -31,6 +31,7 @@ const (
 	EventTypingEnd     EventType = "TYPING_END"
 	EventReaction      EventType = "REACTION"
 	EventRead          EventType = "READ"
+	EventStillActive   EventType = "STILL_ACTIVE"
 )
 
 type SendRealtimeMessageRequest struct {
@@ -51,7 +52,7 @@ func (e EventType) String() string {
 
 func ValidateEventType(eventType string) bool {
 	switch EventType(eventType) {
-	case EventError, EventMessage, EventTypingStart, EventTypingEnd, EventReaction, EventRead:
+	case EventError, EventMessage, EventTypingStart, EventTypingEnd, EventReaction, EventRead, EventStillActive:
 		return true
 	}
 	return false

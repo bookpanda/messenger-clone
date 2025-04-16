@@ -1,5 +1,6 @@
 import { useChatsQuery } from "@/hooks/use-chats"
 import { useChatStore } from "@/stores/chat"
+import Link from "next/link"
 
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -30,12 +31,14 @@ export const InboxTab = () => {
   return (
     <div className="flex flex-col gap-2">
       {data.map((chat, idx) => (
-        <ChatCard
-          key={chat.id + "_" + idx}
-          chat={chat}
-          image="/thumbnail.jpg"
-          isActive={chat.id === currentChat?.chat.id}
-        />
+        <Link key={`${chat.id}_${idx}`} href={`/messages/${chat.id}`}>
+          <ChatCard
+            name={chat.name}
+            image={chat.image}
+            isActive={chat.id === currentChat?.chat.id}
+            lastMessage={chat.lastMessage}
+          />
+        </Link>
       ))}
     </div>
   )

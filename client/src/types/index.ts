@@ -8,6 +8,12 @@ export type Profile = {
   lastActive: Date
 }
 
+export type LastMessage = {
+  type: MessageType
+  message: string
+  date: Date
+}
+
 export type Chat = components["schemas"]["dto.ChatResponse"]
 export type User = components["schemas"]["dto.UserResponse"]
 export type ChatMessage = components["schemas"]["dto.MessageResponse"]
@@ -18,6 +24,14 @@ export type ChatWithProfile = {
   profile: Profile
 }
 
+export type ChatInfo = {
+  id: number
+  name: string
+  image: string
+  lastMessage: LastMessage | null
+  participants: User[]
+}
+
 export type EventType =
   | "MESSAGE"
   | "UNREAD_MESSAGE"
@@ -26,6 +40,7 @@ export type EventType =
   | "TYPING_END"
   | "REACTION"
   | "READ"
+  | "STILL_ACTIVE"
 export type RealtimeMessage = {
   event_type: EventType
   content: string

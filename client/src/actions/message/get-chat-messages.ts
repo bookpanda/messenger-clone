@@ -1,18 +1,20 @@
 "use server"
 
 import { client } from "@/api/client"
+import { ChatMessage } from "@/types"
 
-export async function getChatMessages(chatID: number) {
+export async function getChatMessages(chatId: number) {
   const { response, data } = await client.GET("/api/v1/message/chat/{id}", {
     params: {
       path: {
-        id: chatID,
+        id: chatId,
       },
     },
   })
   if (response.status !== 200 || !data) {
-    return null
+    throw new Error("Failed to fetch chat messages")
   }
 
-  return data.result
+  const res: ChatMessage[] = data.result
+  return res
 }

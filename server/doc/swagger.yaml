@@ -434,6 +434,46 @@ paths:
       summary: Create chat
       tags:
       - chat
+  /api/v1/chat/{id}:
+    get:
+      description: Get Chat Information
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpResponse-dto_ChatResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Unauthorized
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get Chat by Id
+      tags:
+      - chat
   /api/v1/chat/{id}/participants:
     patch:
       description: Add/remove participants to/from chat
