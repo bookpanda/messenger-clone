@@ -1,11 +1,11 @@
 package user
 
 import (
-	"github.com/bookpanda/messenger-clone/pkg/apperror"
 	"github.com/cockroachdb/errors"
 
 	"github.com/bookpanda/messenger-clone/internal/dto"
 	"github.com/bookpanda/messenger-clone/internal/model"
+	"github.com/bookpanda/messenger-clone/pkg/apperror"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -25,10 +25,26 @@ func (h *Handler) HandleGetPeople(c *fiber.Ctx) error {
 		return errors.Wrap(err, "failed to get user id from context")
 	}
 
-	var users []model.User
-	err = h.store.DB.Model(&model.User{}).Where("id != ?", userID).Find(&users).Error
+	var connectedUserIDs []uint
+	err = h.store.DB.
+		Table("chat_participants as cp1").
+		Select("DISTINCT cp2.user_id").
+		Joins("JOIN chat_participants as cp2 ON cp1.chat_id = cp2.chat_id").
+		Where("cp1.user_id = ?", userID).
+		Where("cp2.user_id != ?", userID).
+		Pluck("cp2.user_id", &connectedUserIDs).Error
 	if err != nil {
-		return apperror.Internal("failed to get user", err)
+		return apperror.Internal("failed to get connected users", err)
+	}
+
+	var users []model.User
+	query := h.store.DB.Model(&model.User{}).Where("id != ?", userID)
+	if len(connectedUserIDs) > 0 {
+		query = query.Where("id NOT IN ?", connectedUserIDs)
+	}
+	err = query.Find(&users).Error
+	if err != nil {
+		return apperror.Internal("failed to get users", err)
 	}
 
 	response := dto.ToUserResponseList(users)

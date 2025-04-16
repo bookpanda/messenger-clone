@@ -38,7 +38,7 @@ export const PeopleCard = ({ user }: PeopleCardProps) => {
   }
 
   return (
-    <div className="item-center flex gap-2 rounded-md p-2">
+    <div className="item-center flex gap-4 rounded-md p-2">
       <div className="relative size-14">
         <Image
           src={user.profilePictureUrl || ""}
