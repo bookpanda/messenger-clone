@@ -1,4 +1,4 @@
-FROM golang:1.23.8-alpine3.21
+FROM golang:1.23.8-alpine3.21 AS builder
 WORKDIR /app
 
 COPY go.mod go.sum ./
@@ -12,7 +12,5 @@ WORKDIR /app
 
 COPY --from=builder /app/server ./
 ENV GO_ENV production
-
-EXPOSE 3000
 
 CMD ["./server"]
