@@ -16,6 +16,12 @@ seed:
 seed-messages:
 	go run cmd/main.go seed messages
 
+pull-latest-mac:
+	docker pull --platform linux/x86_64 ghcr.io/bookpanda/messenger-clone:latest
+
+pull-latest-windows:
+	docker pull ghcr.io/bookpanda/messenger-clone:latest
+	
 qa:
 	docker-compose -f docker-compose.qa.yml up
 
