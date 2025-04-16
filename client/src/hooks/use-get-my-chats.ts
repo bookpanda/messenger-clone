@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 
-import { getMyChats } from "@/actions/chat/get-my-chats"
+import { getMyChatsAction } from "@/actions/chat/get-my-chats"
 import { Chat } from "@/types"
 
 export const useGetMyChats = () => {
@@ -9,7 +9,7 @@ export const useGetMyChats = () => {
 
   useEffect(() => {
     ;(async () => {
-      const res = await getMyChats()
+      const res = await getMyChatsAction()
       if (!res) {
         return
       }

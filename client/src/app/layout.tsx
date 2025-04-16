@@ -2,6 +2,8 @@ import TanstackProvider from "@/providers/tanstack-provider"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 
+import { Toaster } from "@/components/ui/sonner"
+
 import Providers from "../providers/providers"
 import "./globals.css"
 
@@ -33,6 +35,7 @@ export default function RootLayout({
         <TanstackProvider>
           <Providers>{children}</Providers>
         </TanstackProvider>
+        <Toaster />
       </body>
     </html>
   )

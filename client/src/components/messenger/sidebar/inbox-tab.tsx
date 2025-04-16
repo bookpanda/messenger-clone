@@ -1,13 +1,28 @@
 import { useChatContext } from "@/contexts/chat-context"
+import { useChatsQuery } from "@/hooks/use-chats"
+import { useChatStore } from "@/stores/chat"
+
+import { Skeleton } from "@/components/ui/skeleton"
 
 import { ChatCard } from "./card/chat-card"
 
 export const InboxTab = () => {
-  const { chats, currentChat } = useChatContext()
+  const { currentChat } = useChatStore()
+  const { data, isLoading } = useChatsQuery()
+
+  if (isLoading || !data) {
+    return (
+      <div className="flex flex-col gap-2">
+        {Array.from({ length: 10 }).map((_, idx) => (
+          <Skeleton key={idx} className="bg-muted-foreground/30 h-18 w-full" />
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-2">
-      {chats.map((chat, idx) => (
+      {data.map((chat, idx) => (
         <ChatCard
           key={chat.id + "_" + idx}
           chat={chat}

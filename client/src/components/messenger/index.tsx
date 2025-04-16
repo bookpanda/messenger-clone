@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 
+import { useChatStore } from "@/stores/chat"
 import { Profile } from "@/types"
 import { useSession } from "next-auth/react"
 
@@ -21,6 +22,8 @@ export const Messenger = () => {
   const [openChatInfo, setOpenChatInfo] = useState(true)
   const { status } = useSession()
 
+  const { currentChat } = useChatStore()
+
   if (status === "loading") {
     return <LoadingScreen />
   }
@@ -35,8 +38,12 @@ export const Messenger = () => {
 
         {/* Body */}
         <div className="flex min-h-0 flex-1 gap-4 p-4">
-          <Chat profile={profile} setOpenChatInfo={setOpenChatInfo} />
-          {openChatInfo && <ChatInfo />}
+          {currentChat && (
+            <>
+              <Chat profile={profile} setOpenChatInfo={setOpenChatInfo} />
+              {openChatInfo && <ChatInfo />}
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -41,6 +41,8 @@ components:
       properties:
         error:
           type: string
+      required:
+      - error
       type: object
     dto.HttpListResponse-dto_ChatResponse:
       properties:
@@ -76,31 +78,43 @@ components:
       properties:
         result:
           $ref: '#/components/schemas/dto.ChatResponse'
+      required:
+      - result
       type: object
     dto.HttpResponse-dto_LoginResponse:
       properties:
         result:
           $ref: '#/components/schemas/dto.LoginResponse'
+      required:
+      - result
       type: object
     dto.HttpResponse-dto_MessageResponse:
       properties:
         result:
           $ref: '#/components/schemas/dto.MessageResponse'
+      required:
+      - result
       type: object
     dto.HttpResponse-dto_ModifyParticipantResponse:
       properties:
         result:
           $ref: '#/components/schemas/dto.ModifyParticipantResponse'
+      required:
+      - result
       type: object
     dto.HttpResponse-dto_TokenResponse:
       properties:
         result:
           $ref: '#/components/schemas/dto.TokenResponse'
+      required:
+      - result
       type: object
     dto.HttpResponse-dto_UserResponse:
       properties:
         result:
           $ref: '#/components/schemas/dto.UserResponse'
+      required:
+      - result
       type: object
     dto.LoginRequest:
       properties:

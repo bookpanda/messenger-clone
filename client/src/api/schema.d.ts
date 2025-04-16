@@ -759,7 +759,7 @@ export interface components {
             participants: string[];
         };
         "dto.HttpError": {
-            error?: string;
+            error: string;
         };
         "dto.HttpListResponse-dto_ChatResponse": {
             result: components["schemas"]["dto.ChatResponse"][];
@@ -771,22 +771,22 @@ export interface components {
             result: components["schemas"]["dto.UserResponse"][];
         };
         "dto.HttpResponse-dto_ChatResponse": {
-            result?: components["schemas"]["dto.ChatResponse"];
+            result: components["schemas"]["dto.ChatResponse"];
         };
         "dto.HttpResponse-dto_LoginResponse": {
-            result?: components["schemas"]["dto.LoginResponse"];
+            result: components["schemas"]["dto.LoginResponse"];
         };
         "dto.HttpResponse-dto_MessageResponse": {
-            result?: components["schemas"]["dto.MessageResponse"];
+            result: components["schemas"]["dto.MessageResponse"];
         };
         "dto.HttpResponse-dto_ModifyParticipantResponse": {
-            result?: components["schemas"]["dto.ModifyParticipantResponse"];
+            result: components["schemas"]["dto.ModifyParticipantResponse"];
         };
         "dto.HttpResponse-dto_TokenResponse": {
-            result?: components["schemas"]["dto.TokenResponse"];
+            result: components["schemas"]["dto.TokenResponse"];
         };
         "dto.HttpResponse-dto_UserResponse": {
-            result?: components["schemas"]["dto.UserResponse"];
+            result: components["schemas"]["dto.UserResponse"];
         };
         "dto.LoginRequest": {
             idToken: string;

@@ -5,9 +5,7 @@ import { redirect } from "next/navigation"
 import { Messenger } from "@/components/messenger"
 
 export default async function Home() {
-  const session: Session | null | undefined = await auth()
-
-  console.log("session", session)
+  const session = await auth()
 
   if (!session) {
     redirect("/login")

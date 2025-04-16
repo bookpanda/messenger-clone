@@ -7,10 +7,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { PeopleCard } from "./card/people-card"
 
 export const PeopleTab = () => {
-  const { data: users, isLoading } = usePeopleQuery()
-  const [currentPerson, setCurrentPerson] = useState<number | null>(null)
+  const { data, isLoading } = usePeopleQuery()
 
-  if (isLoading || !users) {
+  if (isLoading || !data) {
     return (
       <div className="flex flex-col gap-2">
         {Array.from({ length: 10 }).map((_, idx) => (
@@ -22,12 +21,8 @@ export const PeopleTab = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      {users.map((user, i) => {
-        return (
-          <div key={`${user.id}_${i}`} onClick={() => setCurrentPerson(i)}>
-            <PeopleCard isActive={currentPerson === i} user={user} />
-          </div>
-        )
+      {data.map((user, i) => {
+        return <PeopleCard key={`${user.id}_${i}`} user={user} />
       })}
     </div>
   )
