@@ -7,9 +7,9 @@ export const InboxTab = () => {
 
   return (
     <div>
-      {chats.map((chat) => (
+      {chats.map((chat, idx) => (
         <ChatCard
-          key={chat.id}
+          key={chat.id + "_" + idx}
           chat={chat}
           image="/thumbnail.jpg"
           isActive={chat.id === currentChat?.id}
