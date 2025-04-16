@@ -6,8 +6,10 @@ interface ReadBubblesProps {
 }
 
 export const ReadBubbles = ({ users }: ReadBubblesProps) => {
+  if (!users || users.length === 0) return null
+
   return (
-    <div className="flex justify-end gap-x-0.5">
+    <div className="mt-1.5 flex justify-end gap-x-0.5">
       {users.map((user) => (
         <Image
           key={user.id}
