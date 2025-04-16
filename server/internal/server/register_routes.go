@@ -52,4 +52,5 @@ func (s *Server) RegisterRoutes(
 	// spawns a read and write goroutines for each client
 	// this endpoints interacts with chatServer
 	message.Get("/ws", websocket.New(messageHandler.HandleRealTimeMessages))
+	message.Post("/:id/react", authMiddleware.Auth, messageHandler.HandleToggleReaction)
 }

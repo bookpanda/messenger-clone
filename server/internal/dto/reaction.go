@@ -14,6 +14,10 @@ type ReactionResponse struct {
 	CreatedAt time.Time `json:"created_at" binding:"required"`
 }
 
+type ReactionRequest struct {
+	Emoji string `json:"emoji" binding:"required"`
+}
+
 func ToReactionResponse(reaction model.Reaction) ReactionResponse {
 	return ReactionResponse{
 		ID:        reaction.ID,
