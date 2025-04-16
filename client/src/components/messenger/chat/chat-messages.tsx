@@ -47,10 +47,9 @@ export const ChatMessages = (props: ChatMessagesProps) => {
           )
 
           return (
-            <>
+            <div key={idx}>
               {message.sender_id !== session?.user?.userId ? (
                 <IncomingMessage
-                  key={idx}
                   message={message}
                   sender={sender}
                   handleAddReaction={(reaction: string) =>
@@ -59,7 +58,6 @@ export const ChatMessages = (props: ChatMessagesProps) => {
                 />
               ) : (
                 <OutgoingMessage
-                  key={idx}
                   message={message}
                   sender={sender}
                   handleAddReaction={(reaction: string) =>
@@ -68,7 +66,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
                 />
               )}
               <ReadBubbles users={lastReadUsers} />
-            </>
+            </div>
           )
         })}
 

@@ -1,0 +1,71 @@
+version: '3.9'
+
+services:
+  backend:
+    image: ghcr.io/bookpanda/messenger-clone:latest
+    container_name: messenger-api
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    environment:
+      - SERVER_NAME=messenger-api
+      - SERVER_PORT=3001
+      - SERVER_MAX_BODY_LIMIT=40 # MB
+
+      - LOGGER_DEBUG=true
+      - LOGGER_OUTPUT=text
+
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DBNAME=messenger_db
+      - POSTGRES_PORT=5432
+      - POSTGRES_SSLMODE=disable
+
+      - REDIS_URL=redis://redis:6379
+
+      - CORS_ALLOWED_ORIGINS=*
+      - CORS_ALLOWED_METHODS=GET, POST, PATCH, DELETE
+      - CORS_ALLOWED_HEADERS=Content-Type, Authorization
+      - CORS_ALLOW_CREDENTIALS=false
+
+      - JWT_ACCESS_TOKEN_SECRET=access_token_secret
+      - JWT_REFRESH_TOKEN_SECRET=refresh_token_secret
+      - JWT_ACCESS_TOKEN_EXPIRE=604800
+      - JWT_REFRESH_TOKEN_EXPIRE=2592000
+      - JWT_AUTO_LOGOUT=2592000
+    ports:
+      - '3001:3001'
+    networks:
+      - messenger
+
+  postgres:
+    image: postgres:17-alpine3.21
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: messenger_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - messenger
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    networks:
+      - messenger
+
+networks:
+  messenger:
+
+volumes:
+  postgres_data:
