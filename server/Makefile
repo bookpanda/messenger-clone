@@ -16,5 +16,8 @@ seed:
 seed-messages:
 	go run cmd/main.go seed messages
 
+qa:
+	docker-compose -f docker-compose.qa.yml up
+
 .PHONY:
 	server swagger start

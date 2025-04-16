@@ -66,3 +66,6 @@ services:
 
 networks:
   messenger:
+
+volumes:
+  postgres_data:
