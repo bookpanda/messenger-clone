@@ -13,6 +13,11 @@ export type User = components["schemas"]["dto.UserResponse"]
 export type ChatMessage = components["schemas"]["dto.MessageResponse"]
 export type Reaction = components["schemas"]["dto.ReactionResponse"]
 
+export type ChatWithProfile = {
+  chat: Chat
+  profile: Profile
+}
+
 export type EventType =
   | "MESSAGE"
   | "UNREAD_MESSAGE"

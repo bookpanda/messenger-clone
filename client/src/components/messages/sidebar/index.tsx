@@ -1,7 +1,6 @@
-import { useState } from "react"
+"use client"
 
 import { useChatStore } from "@/stores/chat"
-import { SidebarTab } from "@/types"
 
 import { InboxTab } from "./inbox-tab"
 import { PeopleTab } from "./people-tab"

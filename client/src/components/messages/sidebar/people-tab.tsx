@@ -1,5 +1,3 @@
-import { useState } from "react"
-
 import { usePeopleQuery } from "@/hooks/use-people"
 
 import { Skeleton } from "@/components/ui/skeleton"

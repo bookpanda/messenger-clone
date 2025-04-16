@@ -1,4 +1,3 @@
-import { useChatContext } from "@/contexts/chat-context"
 import { useChatsQuery } from "@/hooks/use-chats"
 import { useChatStore } from "@/stores/chat"
 
@@ -35,7 +34,7 @@ export const InboxTab = () => {
           key={chat.id + "_" + idx}
           chat={chat}
           image="/thumbnail.jpg"
-          isActive={chat.id === currentChat?.id}
+          isActive={chat.id === currentChat?.chat.id}
         />
       ))}
     </div>
