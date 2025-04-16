@@ -32,6 +32,7 @@ func (s *Server) RegisterRoutes(
 	// user
 	user := v1.Group("/user")
 	user.Get("/", authMiddleware.Auth, userHandler.HandleGetAllUsers)
+	user.Get("/people", authMiddleware.Auth, userHandler.HandleGetPeople)
 
 	// chat
 	chat := v1.Group("/chat")
