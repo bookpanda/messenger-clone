@@ -3,7 +3,7 @@ version: '3.9'
 services:
   backend:
     image: ghcr.io/bookpanda/messenger-clone:latest
-    container_name: messenger
+    container_name: messenger-api
     depends_on:
       - postgres
       - redis
