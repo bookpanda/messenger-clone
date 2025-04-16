@@ -1,9 +1,9 @@
 package dto
 
 type TokenResponse struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
-	Exp          int64  `json:"exp"`
+	AccessToken  string `json:"accessToken" validate:"required"`
+	RefreshToken string `json:"refreshToken" validate:"required"`
+	Exp          int64  `json:"exp" validate:"required"`
 }
 
 type RegisterRequest struct {
@@ -27,7 +27,7 @@ type LoginRequest struct {
 
 type LoginResponse struct {
 	TokenResponse
-	User UserResponse `json:"user"`
+	User UserResponse `json:"user" validate:"required"`
 }
 
 type GetGoogleLoginUrlResponse struct {

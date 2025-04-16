@@ -14,7 +14,7 @@ export const PeopleTab = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         {Array.from({ length: 10 }).map((_, idx) => (
           <Skeleton key={idx} className="bg-muted-foreground/30 h-18 w-full" />
         ))}
@@ -23,18 +23,10 @@ export const PeopleTab = () => {
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       {users.map((user, i) => {
-        if (
-          !user.id ||
-          !user.name ||
-          !user.profilePictureUrl ||
-          user.email === session?.user?.email
-        ) {
-          return null
-        }
         return (
-          <div key={user.id} onClick={() => setCurrentPerson(i)}>
+          <div key={`${user.id}_${i}`} onClick={() => setCurrentPerson(i)}>
             <PeopleCard isActive={currentPerson === i} user={user} />
           </div>
         )

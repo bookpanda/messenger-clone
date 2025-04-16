@@ -6,7 +6,7 @@ export const InboxTab = () => {
   const { chats, currentChat } = useChatContext()
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       {chats.map((chat, idx) => (
         <ChatCard
           key={chat.id + "_" + idx}

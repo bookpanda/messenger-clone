@@ -728,10 +728,10 @@ export interface components {
             provider: string;
         };
         "dto.LoginResponse": {
-            accessToken?: string;
-            exp?: number;
-            refreshToken?: string;
-            user?: components["schemas"]["dto.UserResponse"];
+            accessToken: string;
+            exp: number;
+            refreshToken: string;
+            user: components["schemas"]["dto.UserResponse"];
         };
         "dto.MessageResponse": {
             chat_id: number;
@@ -764,19 +764,19 @@ export interface components {
             content: string;
         };
         "dto.TokenResponse": {
-            accessToken?: string;
-            exp?: number;
-            refreshToken?: string;
+            accessToken: string;
+            exp: number;
+            refreshToken: string;
         };
         "dto.UserResponse": {
-            email?: string;
-            id?: number;
-            name?: string;
-            profilePictureUrl?: string;
+            email: string;
+            id: number;
+            name: string;
+            profilePictureUrl: string;
         };
         "dto.UserUpdateRequest": {
-            name?: string;
-            profilePictureUrl?: string;
+            name: string;
+            profilePictureUrl: string;
         };
     };
     responses: never;
