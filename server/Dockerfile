@@ -13,6 +13,4 @@ WORKDIR /app
 COPY --from=builder /app/server ./
 ENV GO_ENV production
 
-EXPOSE 3000
-
 CMD ["./server"]

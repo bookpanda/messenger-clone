@@ -16,7 +16,7 @@ services:
       - LOGGER_DEBUG=true
       - LOGGER_OUTPUT=text
 
-      - POSTGRES_HOST=localhost
+      - POSTGRES_HOST=postgres
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=password
       - POSTGRES_DBNAME=messenger_db
