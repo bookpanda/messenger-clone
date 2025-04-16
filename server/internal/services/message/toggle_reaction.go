@@ -24,10 +24,10 @@ func (h *Handler) HandleToggleReaction(c *fiber.Ctx) error {
 
 	userID, err := h.authMiddleware.GetUserIDFromContext(ctx)
 	if err != nil {
-		return apperror.Internal("failed to get user ID from context", err)
+		return apperror.Internal("failed to get userID from context", err)
 	}
 
-	req := new(dto.ReactionRequest)
+	req := new(dto.ToggleReactionRequest)
 	if err := c.BodyParser(&req); err != nil {
 		return apperror.BadRequest("invalid request body", err)
 	}
@@ -40,18 +40,24 @@ func (h *Handler) HandleToggleReaction(c *fiber.Ctx) error {
 		return apperror.Internal("failed to toggle reaction", err)
 	}
 
-	result := dto.ToReactionResponse(*reaction)
+	if reaction == nil {
+		return c.Status(fiber.StatusOK).JSON(dto.ToggleReactionResponse{
+			Action: "removed",
+		})
+	}
 
-	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.ReactionResponse]{
-		Result: result,
+	result := dto.ToReactionResponse(*reaction)
+	return c.Status(fiber.StatusOK).JSON(dto.ToggleReactionResponse{
+		Action:   "created",
+		Reaction: &result,
 	})
 }
 
-func (h *Handler) ToggleReaction(messageID uint, userID uint, emoji string) (*model.Reaction, error) {
+func (h *Handler) ToggleReaction(messageID uint, senderID uint, emoji string) (*model.Reaction, error) {
 	var reaction model.Reaction
 
 	err := h.store.DB.
-		Where("message_id = ? AND sender_id = ? AND emoji = ?", messageID, userID, emoji).
+		Where("message_id = ? AND sender_id = ? AND emoji = ?", messageID, senderID, emoji).
 		First(&reaction).Error
 
 	if err == nil {
@@ -66,7 +72,7 @@ func (h *Handler) ToggleReaction(messageID uint, userID uint, emoji string) (*mo
 		// Not found → create it
 		reaction := model.Reaction{
 			MessageID: messageID,
-			SenderID:  userID,
+			SenderID:  senderID,
 			Emoji:     emoji,
 		}
 		if err := h.store.DB.Create(&reaction).Error; err != nil {

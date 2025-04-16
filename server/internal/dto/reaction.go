@@ -14,8 +14,13 @@ type ReactionResponse struct {
 	CreatedAt time.Time `json:"created_at" binding:"required"`
 }
 
-type ReactionRequest struct {
+type ToggleReactionRequest struct {
 	Emoji string `json:"emoji" binding:"required"`
+}
+
+type ToggleReactionResponse struct {
+	Action   string            `json:"action"`             // "created" or "removed"
+	Reaction *ReactionResponse `json:"reaction,omitempty"` // nil if removed
 }
 
 func ToReactionResponse(reaction model.Reaction) ReactionResponse {
