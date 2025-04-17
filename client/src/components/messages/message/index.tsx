@@ -34,6 +34,7 @@ export const Message = ({
   } = useSocket({ accessToken })
 
   const [messages, setMessages] = useState<ChatMessage[]>(chatHistory)
+  const [participants, setParticipants] = useState<User[]>([])
   const [typingUserIDs, setTypingUserIDs] = useState<number[]>([])
 
   useEffect(() => {
@@ -50,6 +51,10 @@ export const Message = ({
       case "ONLINE_USERS":
         const onlineUsers: User[] = JSON.parse(message.content)
         setOnlineUsers(onlineUsers)
+        break
+      case "CHAT_PARTICIPANTS":
+        const users: User[] = JSON.parse(message.content)
+        setParticipants(users)
         break
       case "MESSAGE_UPDATE":
         // Add Chat to sidebar if not exists and update current chat message
@@ -129,6 +134,7 @@ export const Message = ({
         user={user}
         chatInfo={chatInfo}
         messages={messages}
+        participants={participants}
         handleSendMessage={(message: string) =>
           handleSendMessage(chatInfo.id, message)
         }
