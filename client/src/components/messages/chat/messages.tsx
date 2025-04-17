@@ -18,7 +18,7 @@ interface MessageProps {
   message: ChatMessage
   user: User
   sender: User
-  handleAddReaction: (reaction: string) => void
+  handleToggleReaction: (reaction: string) => void
 }
 
 interface EmojiMap {
@@ -31,7 +31,7 @@ interface EmojiMap {
 const reactionEmojis = ["🥰", "😢", "😂", "😡", "👍"]
 
 export const IncomingMessage = (props: MessageProps) => {
-  const { message, user, sender, handleAddReaction } = props
+  const { message, user, sender, handleToggleReaction } = props
   const { content, reactions } = message
 
   const [isHover, setHover] = useState(false)
@@ -134,7 +134,7 @@ export const IncomingMessage = (props: MessageProps) => {
                     ]?.senders.includes(user.id),
                   })}
                   onClick={() => {
-                    handleAddReaction(emoji)
+                    handleToggleReaction(emoji)
                     setReactionOpen(false)
                   }}
                 >
@@ -157,7 +157,7 @@ export const IncomingMessage = (props: MessageProps) => {
 }
 
 export const OutgoingMessage = (props: MessageProps) => {
-  const { message, user, handleAddReaction } = props
+  const { message, user, handleToggleReaction } = props
   const { content, reactions } = message
 
   const [isHover, setHover] = useState(false)
@@ -237,7 +237,7 @@ export const OutgoingMessage = (props: MessageProps) => {
                     ]?.senders.includes(user.id),
                   })}
                   onClick={() => {
-                    handleAddReaction(emoji)
+                    handleToggleReaction(emoji)
                     setReactionOpen(false)
                   }}
                 >

@@ -2,6 +2,7 @@
 
 import { Dispatch, SetStateAction } from "react"
 
+import { toggleMessageReaction } from "@/actions/message/toggle-reaction"
 // import { sendMessage } from "@/actions/message/send-message"
 import { useChatContext } from "@/contexts/chat-context"
 import { ChatInfo, ChatMessage, EventType, User } from "@/types"
@@ -41,31 +42,13 @@ export const ChatBox = (props: ChatProps) => {
     return null
   }
 
-  const handleAddReaction = (messageId: number, emoji: string) => {
-    setMessages((prevMessages) =>
-      produce(prevMessages, (draft) => {
-        const message = draft.find((m) => m.id === messageId)
-        if (!message) return
-
-        const existingIndex = message.reactions.findIndex(
-          (r) => r.sender_id === session?.user?.userId && r.emoji === emoji
-        )
-
-        if (existingIndex !== -1) {
-          // remove the reaction if it already exists
-          message.reactions.splice(existingIndex, 1)
-        } else {
-          // add new reaction
-          message.reactions.push({
-            id: message.reactions.length + 1,
-            message_id: messageId,
-            sender_id: session?.user?.userId || 0,
-            emoji,
-            created_at: new Date().toDateString(),
-          })
-        }
-      })
-    )
+  const handleToggleReaction = async (messageId: number, emoji: string) => {
+    try {
+      const result = await toggleMessageReaction(messageId, emoji)
+      console.log("reaction result:", result)
+    } catch (error) {
+      console.error("Failed to toggle reaction", error)
+    }
   }
 
   const handleSendMessage = async (content: string) => {
@@ -89,7 +72,7 @@ export const ChatBox = (props: ChatProps) => {
         participants={chatInfo.participants}
         user={user}
         messages={messages}
-        handleAddReaction={handleAddReaction}
+        handleToggleReaction={handleToggleReaction}
         typingUserIDs={typingUserIDs}
       />
       <ChatInput

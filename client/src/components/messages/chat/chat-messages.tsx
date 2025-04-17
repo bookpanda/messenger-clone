@@ -12,12 +12,12 @@ interface ChatMessagesProps {
   user: User
   messages: ChatMessage[]
   typingUserIDs: number[]
-  handleAddReaction: (messageId: number, reaction: string) => void
+  handleToggleReaction: (messageId: number, reaction: string) => void
 }
 
 // TODO: Refactor send isMe with participants
 export const ChatMessages = (props: ChatMessagesProps) => {
-  const { participants, user, messages, typingUserIDs, handleAddReaction } =
+  const { participants, user, messages, typingUserIDs, handleToggleReaction } =
     props
 
   const endOfMessagesRef = useRef<HTMLDivElement>(null)
@@ -53,8 +53,8 @@ export const ChatMessages = (props: ChatMessagesProps) => {
                   message={message}
                   user={user}
                   sender={sender}
-                  handleAddReaction={(reaction: string) =>
-                    handleAddReaction(message.id, reaction)
+                  handleToggleReaction={(reaction: string) =>
+                    handleToggleReaction(message.id, reaction)
                   }
                 />
               ) : (
@@ -62,8 +62,8 @@ export const ChatMessages = (props: ChatMessagesProps) => {
                   message={message}
                   user={user}
                   sender={sender}
-                  handleAddReaction={(reaction: string) =>
-                    handleAddReaction(message.id, reaction)
+                  handleToggleReaction={(reaction: string) =>
+                    handleToggleReaction(message.id, reaction)
                   }
                 />
               )}
