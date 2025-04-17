@@ -7,6 +7,8 @@ import { useChatStore } from "@/stores/chat"
 import { LastMessage, RealtimeMessage, User } from "@/types"
 import useWebSocket from "react-use-websocket"
 
+import { useSocket } from "./hooks/use-socket"
+
 export const Messages = ({
   accessToken,
   user,
@@ -14,15 +16,8 @@ export const Messages = ({
   accessToken: string
   user: User
 }) => {
-  const { chatList, updateChatLastMessage, clearChatUnread, setChatList } =
-    useChatStore()
-
-  const socketUrl = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/v1/message/ws?accessToken=${accessToken}`
-  const { sendMessage: wsSendMessage, lastMessage } = useWebSocket(socketUrl, {
-    onOpen: () => console.log("open"),
-    onError: (event) => console.log("error", event),
-    onClose: () => console.log("close"),
-  })
+  const { chatList, updateChatLastMessage, setChatList } = useChatStore()
+  const { wsLastMessage } = useSocket({ accessToken })
 
   // Duplicate
   const handleNewMessage = async (message: RealtimeMessage) => {
@@ -40,15 +35,15 @@ export const Messages = ({
   }
 
   useEffect(() => {
-    if (!lastMessage) return
-    const message: RealtimeMessage = JSON.parse(lastMessage.data)
+    if (!wsLastMessage) return
+    const message: RealtimeMessage = JSON.parse(wsLastMessage.data)
 
     switch (message.event_type) {
       case "MESSAGE_UPDATE":
         handleNewMessage(message)
         break
     }
-  }, [lastMessage])
+  }, [wsLastMessage])
 
   return <div></div>
 }

@@ -13,11 +13,8 @@ interface ChatProps {
   user: User
   messages: ChatMessage[]
   setOpenChatInfo: Dispatch<SetStateAction<boolean>>
-  sendMessage: (
-    content: string,
-    eventType: EventType,
-    messageID?: number
-  ) => void
+  handleSendMessage: (message: string) => void
+  handleTyping: (type: "START" | "END") => void
   typingUserIDs: number[]
 }
 
@@ -27,7 +24,8 @@ export const ChatBox = (props: ChatProps) => {
     user,
     messages,
     setOpenChatInfo,
-    sendMessage,
+    handleSendMessage,
+    handleTyping,
     typingUserIDs,
   } = props
 
@@ -59,15 +57,6 @@ export const ChatBox = (props: ChatProps) => {
     //     }
     //   })
     // )
-  }
-
-  const handleSendMessage = async (content: string) => {
-    sendMessage(content, "MESSAGE")
-  }
-
-  const handleTyping = (type: "START" | "END") => {
-    if (type === "START") sendMessage("<placeholder>", "TYPING_START")
-    else sendMessage("<placeholder>", "TYPING_END")
   }
 
   return (
