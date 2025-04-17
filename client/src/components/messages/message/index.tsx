@@ -2,14 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react"
 
+import { useChatStore } from "@/stores/chat"
 import {
   ChatInfo,
   ChatMessage,
   EventType,
+  LastMessage,
   RealtimeMessage,
   User,
 } from "@/types"
-import { useQueryClient } from "@tanstack/react-query"
 import { produce } from "immer"
 import useWebSocket from "react-use-websocket"
 
@@ -27,6 +28,7 @@ export const Message = ({
   chatInfo: ChatInfo
   chatHistory: ChatMessage[]
 }) => {
+  const { updateChatLastMessage, clearChatUnread } = useChatStore()
   const [openChatInfo, setOpenChatInfo] = useState(true)
 
   const socketUrl = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/v1/message/ws?accessToken=${accessToken}`
@@ -69,13 +71,6 @@ export const Message = ({
     [chatInfo.id, user.id, wsSendMessage]
   )
 
-  const queryClient = useQueryClient()
-  const revalidateChatList = async () => {
-    await queryClient.invalidateQueries({
-      queryKey: ["chats"],
-    })
-  }
-
   useEffect(() => {
     // send a connect message when the component mounts
     const payload: RealtimeMessage = {
@@ -86,7 +81,7 @@ export const Message = ({
     }
     wsSendMessage(JSON.stringify(payload))
 
-    revalidateChatList()
+    clearChatUnread(chatInfo.id)
   }, [])
 
   useEffect(() => {
@@ -96,6 +91,18 @@ export const Message = ({
 
     switch (message.event_type) {
       case "MESSAGE_UPDATE":
+        const lastMessage: LastMessage = {
+          type: message.sender_id === user.id ? "outgoing" : "incoming",
+          message: message.content,
+          date: new Date(),
+        }
+        updateChatLastMessage(
+          message.chat_id,
+          lastMessage,
+          message.chat_id !== chatInfo.id // If the message is not from the current chat, mark it as unread
+        )
+
+        // Current Chat's message arrived
         if (message.chat_id === chatInfo.id) {
           const newMessage: ChatMessage = {
             id: message.message_id || 0,

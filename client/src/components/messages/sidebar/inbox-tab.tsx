@@ -1,6 +1,9 @@
 "use client"
 
+import { useEffect } from "react"
+
 import { useChatsQuery } from "@/hooks/use-chats"
+import { useChatStore } from "@/stores/chat"
 import { ChatInfo } from "@/types"
 import Link from "next/link"
 import { useParams } from "next/navigation"
@@ -10,18 +13,13 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { ChatCard } from "./card/chat-card"
 
 export const InboxTab = ({ chatList }: { chatList: ChatInfo[] }) => {
-  const { data, isLoading } = useChatsQuery({ initialData: chatList })
+  // const { data, isLoading } = useChatsQuery({ initialData: chatList })
   const { id } = useParams<{ id: string }>()
+  const { chatList: data, setChatList } = useChatStore()
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col gap-2">
-        {Array.from({ length: 10 }).map((_, idx) => (
-          <Skeleton key={idx} className="bg-muted-foreground/30 h-18 w-full" />
-        ))}
-      </div>
-    )
-  }
+  useEffect(() => {
+    setChatList(chatList)
+  }, [chatList])
 
   if (!data || data.length === 0) {
     return (
