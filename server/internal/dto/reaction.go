@@ -19,8 +19,8 @@ type ToggleReactionRequest struct {
 }
 
 type ToggleReactionResponse struct {
-	Action   string            `json:"action"`             // "created" or "removed"
-	Reaction *ReactionResponse `json:"reaction,omitempty"` // nil if removed
+	Action   string            `json:"action" binding:"required"` // "created" or "removed"
+	Reaction *ReactionResponse `json:"reaction,omitempty"`        // nil if removed
 }
 
 func ToReactionResponse(reaction model.Reaction) ReactionResponse {

@@ -13,6 +13,15 @@ import (
 	"gorm.io/gorm"
 )
 
+// @Summary			Toggle reaction
+// @Description		Add or remove a reaction (emoji) to a specific message
+// @Tags			message
+// @Router			/api/v1/message/{id}/react [POST]
+// @Param			id				path	uint							true	"Message ID"
+// @Param 			RequestBody 	body 	dto.ToggleReactionRequest 		true 	"request request"
+// @Success			200	{object}	dto.ToggleReactionResponse
+// @Failure			400	{object}	dto.HttpError
+// @Failure			500	{object}	dto.HttpError
 func (h *Handler) HandleToggleReaction(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(c.UserContext(), 5*time.Second)
 	defer cancel()
