@@ -22,7 +22,11 @@ export const Message = ({
   chatInfo: ChatInfo
   chatHistory: ChatMessage[]
 }) => {
-  const { clearChatUnread, handleUpdateChatList } = useChatList()
+  const {
+    clearChatUnread,
+    handleUpdateChatList,
+    handleReactionPreviewChatList,
+  } = useChatList()
   const [openChatInfo, setOpenChatInfo] = useState(true)
 
   const {
@@ -117,10 +121,9 @@ export const Message = ({
         }
         break
       case "REACTION":
+        handleReactionPreviewChatList(message, user.name)
         if (message.chat_id !== chatInfo.id) return
-        // if (message.message_id !== undefined) {
-        //   toggleMessageReaction(message.message_id, message.content)
-        // }
+
         setMessages((prevMessages) =>
           produce(prevMessages, (draft) => {
             const msg = draft.find((m) => m.id === message.message_id)

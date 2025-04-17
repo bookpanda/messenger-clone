@@ -50,6 +50,10 @@ export const IncomingMessage = (props: MessageProps) => {
       groupedReactions[r.emoji].senders.push(r.sender_id)
     }
   }
+  const totalReactions = Object.values(groupedReactions).reduce(
+    (sum, r) => sum + r.count,
+    0
+  )
 
   useEffect(() => {
     if (!isHover) {
@@ -86,7 +90,7 @@ export const IncomingMessage = (props: MessageProps) => {
                       {emoji}
                     </span>
                   ))}
-                {Object.keys(groupedReactions).length > 1 && (
+                {totalReactions > 1 && (
                   <span className="font-sm mr-1 ml-1 text-xs text-gray-300">
                     {Object.values(groupedReactions).reduce(
                       (sum, r) => sum + r.count,
@@ -178,6 +182,10 @@ export const OutgoingMessage = (props: MessageProps) => {
       groupedReactions[r.emoji].senders.push(r.sender_id)
     }
   }
+  const totalReactions = Object.values(groupedReactions).reduce(
+    (sum, r) => sum + r.count,
+    0
+  )
 
   useEffect(() => {
     if (!isHover) {
@@ -259,7 +267,7 @@ export const OutgoingMessage = (props: MessageProps) => {
                       {emoji}
                     </span>
                   ))}
-                {Object.keys(groupedReactions).length > 1 && (
+                {totalReactions > 1 && (
                   <span className="font-sm mr-1 ml-1 text-xs text-gray-300">
                     {Object.values(groupedReactions).reduce(
                       (sum, r) => sum + r.count,

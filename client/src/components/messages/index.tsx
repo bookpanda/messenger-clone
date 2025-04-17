@@ -14,7 +14,7 @@ export const Messages = ({
   accessToken: string
   user: User
 }) => {
-  const { handleUpdateChatList } = useChatList()
+  const { handleUpdateChatList, handleReactionPreviewChatList } = useChatList()
   const { wsLastMessage } = useSocket({ accessToken })
 
   useEffect(() => {
@@ -24,6 +24,9 @@ export const Messages = ({
     switch (message.event_type) {
       case "MESSAGE_UPDATE":
         handleUpdateChatList(message, true)
+        break
+      case "REACTION":
+        handleReactionPreviewChatList(message, user.name, true)
         break
     }
   }, [wsLastMessage])

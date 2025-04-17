@@ -38,6 +38,30 @@ export const useChatList = () => {
     [chatList, data?.user?.userId]
   )
 
+  const handleReactionPreviewChatList = useCallback(
+    async (message: RealtimeMessage, username: string, isUnread?: boolean) => {
+      const chatExists = chatList.find((chat) => chat.id === message.chat_id)
+
+      if (!chatExists) {
+        const chatList = await getMyChatsAction()
+        setChatList(chatList)
+      } else {
+        const isSenderMe = message.sender_id === data?.user?.userId
+
+        const displayName = isSenderMe ? "You" : username || "Someone"
+        const previewContent = `${displayName} reacted "${message.content}" to a message`
+
+        const lastMessage: LastMessage = {
+          type: isSenderMe ? "outgoing" : "incoming",
+          message: previewContent,
+          date: new Date(),
+        }
+        updateChatLastMessage(message.chat_id, lastMessage, isUnread)
+      }
+    },
+    [chatList, data?.user?.userId]
+  )
+
   return {
     chatList,
     updateChatLastMessage,
@@ -45,5 +69,6 @@ export const useChatList = () => {
     clearChatUnread,
     handleUpdateChatList,
     revalidateChatList,
+    handleReactionPreviewChatList,
   }
 }
