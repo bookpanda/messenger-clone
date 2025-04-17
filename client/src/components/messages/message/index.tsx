@@ -92,19 +92,22 @@ export const Message = ({
         }
         break
       case "READ":
-        if (message.chat_id === chatInfo.id) {
+        if (message.chat_id === chatInfo.id && message.sender_id !== user.id) {
           setMessages((prevMessages) =>
             produce(prevMessages, (draft) => {
-              const prevReadMessage = draft.find((m) =>
-                m.read_by.includes(message.sender_id)
-              )
-              if (prevReadMessage) {
-                const index = prevReadMessage.read_by.indexOf(message.sender_id)
-                if (index !== -1) prevReadMessage.read_by.splice(index, 1)
+              // Remove sender_id from all messages
+              for (const m of draft) {
+                const index = m.read_by.indexOf(message.sender_id)
+                if (index !== -1) {
+                  m.read_by.splice(index, 1)
+                }
               }
-              const readMessage = draft.find((m) => m.id === message.message_id)
-              if (!readMessage) return
-              readMessage.read_by.push(message.sender_id)
+
+              // Add sender_id only to the read message
+              const target = draft.find((m) => m.id === message.message_id)
+              if (target && !target.read_by.includes(message.sender_id)) {
+                target.read_by.push(message.sender_id)
+              }
             })
           )
         }
