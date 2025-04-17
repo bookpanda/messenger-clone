@@ -1,4 +1,4 @@
-import { ChatInfo, LastMessage, SidebarTab } from "@/types"
+import { ChatInfo, LastMessage, SidebarTab, User } from "@/types"
 import { create } from "zustand"
 
 interface ChatStore {
@@ -13,6 +13,9 @@ interface ChatStore {
     isUnread?: boolean
   ) => void
   clearChatUnread: (chatId: number) => void
+
+  onlineUsers: User[]
+  setOnlineUsers: (users: User[]) => void
 }
 
 const useChatStore = create<ChatStore>((set) => ({
@@ -44,6 +47,9 @@ const useChatStore = create<ChatStore>((set) => ({
           : chat
       ),
     })),
+
+  onlineUsers: [],
+  setOnlineUsers: (users) => set({ onlineUsers: users }),
 }))
 
 export { useChatStore }

@@ -83,7 +83,8 @@ func (s *Server) BroadcastOnlineUsers() {
 		return
 	}
 
-	jsonPayload, err := json.Marshal(users)
+	userList := dto.ToUserResponseList(users)
+	jsonPayload, err := json.Marshal(userList)
 	if err != nil {
 		logger.Error("failed to marshal online user list", err)
 		return

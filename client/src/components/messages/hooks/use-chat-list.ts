@@ -6,12 +6,13 @@ import { LastMessage, RealtimeMessage } from "@/types"
 import { useSession } from "next-auth/react"
 
 export const useChatList = () => {
-  const chatList = useChatStore((state) => state.chatList)
-  const updateChatLastMessage = useChatStore(
-    (state) => state.updateChatLastMessage
-  )
-  const setChatList = useChatStore((state) => state.setChatList)
-  const clearChatUnread = useChatStore((state) => state.clearChatUnread)
+  const {
+    chatList,
+    updateChatLastMessage,
+    setChatList,
+    clearChatUnread,
+    setOnlineUsers,
+  } = useChatStore()
 
   const { data } = useSession()
 
@@ -45,5 +46,6 @@ export const useChatList = () => {
     clearChatUnread,
     handleUpdateChatList,
     revalidateChatList,
+    setOnlineUsers,
   }
 }
