@@ -26,7 +26,7 @@ export const Sidebar = ({ chatList }: { chatList: ChatInfo[] }) => {
 
       {/* Tab Content */}
       <div>
-        {tab === "inbox" && <InboxTab chatList={chatList} />}
+        {tab === "inbox" && <InboxTab initialData={chatList} />}
         {tab === "people" && <PeopleTab />}
       </div>
     </div>

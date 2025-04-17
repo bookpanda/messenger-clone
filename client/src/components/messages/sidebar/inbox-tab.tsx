@@ -2,24 +2,20 @@
 
 import { useEffect } from "react"
 
-import { useChatsQuery } from "@/hooks/use-chats"
 import { useChatStore } from "@/stores/chat"
 import { ChatInfo } from "@/types"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 
-import { Skeleton } from "@/components/ui/skeleton"
-
 import { ChatCard } from "./card/chat-card"
 
-export const InboxTab = ({ chatList }: { chatList: ChatInfo[] }) => {
-  // const { data, isLoading } = useChatsQuery({ initialData: chatList })
+export const InboxTab = ({ initialData }: { initialData: ChatInfo[] }) => {
   const { id } = useParams<{ id: string }>()
   const { chatList: data, setChatList } = useChatStore()
 
   useEffect(() => {
-    setChatList(chatList)
-  }, [chatList])
+    setChatList(initialData)
+  }, [initialData])
 
   if (!data || data.length === 0) {
     return (
