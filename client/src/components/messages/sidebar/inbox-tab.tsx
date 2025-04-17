@@ -1,14 +1,16 @@
+"use client"
+
 import { useChatsQuery } from "@/hooks/use-chats"
-import { useChatStore } from "@/stores/chat"
 import Link from "next/link"
+import { useParams } from "next/navigation"
 
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { ChatCard } from "./card/chat-card"
 
 export const InboxTab = () => {
-  const { currentChat } = useChatStore()
   const { data, isLoading } = useChatsQuery()
+  const { id } = useParams<{ id: string }>()
 
   if (isLoading) {
     return (
@@ -35,7 +37,7 @@ export const InboxTab = () => {
           <ChatCard
             name={chat.name}
             image={chat.image}
-            isActive={chat.id === currentChat?.chat.id}
+            isActive={chat.id === parseInt(id)}
             lastMessage={chat.lastMessage}
           />
         </Link>

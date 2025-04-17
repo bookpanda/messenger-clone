@@ -2,7 +2,6 @@ package message
 
 import (
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"sync"
 
@@ -22,8 +21,7 @@ func (h *Handler) HandleRealTimeMessages(c *websocket.Conn) {
 	}
 	userID := jwtEntity.ID
 
-	chatID := uint(c.Locals(chatIDKey).(uint64))
-	client := h.chatServer.Register(userID, chatID)
+	client := h.chatServer.Register(userID)
 	if client == nil {
 		logger.Error("failed to register client")
 		c.Close()
@@ -34,56 +32,56 @@ func (h *Handler) HandleRealTimeMessages(c *websocket.Conn) {
 	wg.Add(2)
 
 	// server receives from client
-	go h.receiveRealtimeMessage(&wg, c, userID, chatID)
+	go h.receiveRealtimeMessage(&wg, c, userID)
 	// server sends to client
-	go h.sendRealtimeMessage(&wg, c, userID, chatID, client)
+	go h.sendRealtimeMessage(&wg, c, userID, client)
 
 	// sending unread messages
-	var unreadMessages []model.Message
-	err := h.store.DB.Model(&model.Message{}).
-		Joins("JOIN inboxes ON inboxes.message_id = messages.id").
-		Where("messages.chat_id = ? AND inboxes.user_id = ? AND inboxes.deleted_at IS NULL", chatID, userID).
-		Preload("Reactions").
-		Find(&unreadMessages).Error
-	if err != nil {
-		logger.Error("failed to load unread messages", err)
-		return
-	}
+	// var unreadMessages []model.Message
+	// err := h.store.DB.Model(&model.Message{}).
+	// 	Joins("JOIN inboxes ON inboxes.message_id = messages.id").
+	// 	Where("messages.chat_id = ? AND inboxes.user_id = ? AND inboxes.deleted_at IS NULL", chatID, userID).
+	// 	Preload("Reactions").
+	// 	Find(&unreadMessages).Error
+	// if err != nil {
+	// 	logger.Error("failed to load unread messages", err)
+	// 	return
+	// }
 
-	logger.Info(fmt.Sprintf("User %d has %d unread messages", userID, len(unreadMessages)))
-	var messageIDs []uint
-	for _, message := range unreadMessages {
-		msgReq := dto.SendRealtimeMessageRequest{
-			EventType: dto.EventUnreadMessage,
-			Content:   message.Content,
-			MessageID: message.ID,
-			SenderID:  message.SenderID,
-		}
-		json, err := json.Marshal(msgReq)
-		if err != nil {
-			return
-		}
-		logger.Info(fmt.Sprintf("Sending unread message %d to user %d", message.ID, userID))
-		client.Message <- string(json)
-		messageIDs = append(messageIDs, message.ID)
-	}
+	// logger.Info(fmt.Sprintf("User %d has %d unread messages", userID, len(unreadMessages)))
+	// var messageIDs []uint
+	// for _, message := range unreadMessages {
+	// 	msgReq := dto.SendRealtimeMessageRequest{
+	// 		EventType: dto.EventUnreadMessage,
+	// 		Content:   message.Content,
+	// 		MessageID: message.ID,
+	// 		SenderID:  message.SenderID,
+	// 	}
+	// 	json, err := json.Marshal(msgReq)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// 	logger.Info(fmt.Sprintf("Sending unread message %d to user %d", message.ID, userID))
+	// 	client.Message <- string(json)
+	// 	messageIDs = append(messageIDs, message.ID)
+	// }
 
 	// delete inboxes (mark as deleted)
-	if len(messageIDs) > 0 {
-		err := h.store.DB.
-			Where("user_id = ? AND message_id IN ?", userID, messageIDs).
-			Delete(&model.Inbox{}).Error
-		if err != nil {
-			logger.Error("failed to delete inbox entries", err)
-			return
-		}
-	}
+	// if len(messageIDs) > 0 {
+	// 	err := h.store.DB.
+	// 		Where("user_id = ? AND message_id IN ?", userID, messageIDs).
+	// 		Delete(&model.Inbox{}).Error
+	// 	if err != nil {
+	// 		logger.Error("failed to delete inbox entries", err)
+	// 		return
+	// 	}
+	// }
 
 	wg.Wait()
 	c.Close()
 }
 
-func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, senderID uint, chatID uint) {
+func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, senderID uint) {
 	defer wg.Done()
 
 	for {
@@ -91,7 +89,7 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 		if err != nil {
 			logger.Error("failed receiving message", slog.Any("error", err))
 			logger.Info("closing connection...")
-			h.chatServer.Logout(senderID, chatID)
+			h.chatServer.Logout(senderID)
 			break
 		}
 
@@ -103,19 +101,19 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 		var msgReq dto.SendRealtimeMessageRequest
 		if err := json.Unmarshal([]byte(msg), &msgReq); err != nil {
 			logger.Error("Failed Unmarshal json", slog.Any("error", err))
-			h.chatServer.BroadcastToRoom(errorMsg, chatID, senderID)
+			h.chatServer.BroadcastToRoom(errorMsg, msgReq.ChatID, senderID)
 			continue
 		}
 
 		if err := h.validate.Struct(msgReq); err != nil {
 			logger.Error("Failed validate message request", slog.Any("error", err))
-			h.chatServer.BroadcastToRoom(errorMsg, chatID, senderID)
+			h.chatServer.BroadcastToRoom(errorMsg, msgReq.ChatID, senderID)
 			continue
 		}
 
 		if !dto.ValidateEventType(msgReq.EventType.String()) {
 			logger.Error("Invalid event type", slog.Any("event_type", msgReq.EventType))
-			h.chatServer.BroadcastToRoom(errorMsg, chatID, senderID)
+			h.chatServer.BroadcastToRoom(errorMsg, msgReq.ChatID, senderID)
 			continue
 		}
 
@@ -125,19 +123,19 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 		if msgReq.EventType == dto.EventMessage {
 			req := dto.SendMessageRequest{
 				Content: msgReq.Content,
-				ChatID:  chatID,
+				ChatID:  msgReq.ChatID,
 			}
 			message, err := h.SendMessage(req, senderID)
 			if err != nil {
 				logger.Error("failed to send message", slog.Any("error", err))
-				h.chatServer.BroadcastToRoom(errorMsg, chatID, senderID)
+				h.chatServer.BroadcastToRoom(errorMsg, msgReq.ChatID, senderID)
 				continue
 			}
 
 			msgReq.MessageID = message.ID
 			// msgType is from lib, not same as our EventType
 			if msgType == websocket.TextMessage {
-				h.chatServer.BroadcastToRoom(msgReq, chatID, senderID)
+				h.chatServer.BroadcastToRoom(msgReq, msgReq.ChatID, senderID)
 			}
 
 			continue
@@ -150,25 +148,25 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 				Delete(&model.Inbox{}).Error
 			if err != nil {
 				logger.Error("failed to delete inbox", slog.Any("error", err))
-				h.chatServer.BroadcastToRoom(errorMsg, chatID, senderID)
+				h.chatServer.BroadcastToRoom(errorMsg, msgReq.ChatID, senderID)
 			}
-			h.chatServer.BroadcastToRoom(msgReq, chatID, senderID)
+			h.chatServer.BroadcastToRoom(msgReq, msgReq.ChatID, senderID)
 			continue
 		}
 
 		if msgReq.EventType == dto.EventStillActive {
-			h.chatServer.BroadcastToRoom(msgReq, chatID, senderID)
+			h.chatServer.BroadcastToRoom(msgReq, msgReq.ChatID, senderID)
 			continue
 		}
 
 		// for other events, just send to all clients
 		if msgType == websocket.TextMessage {
-			h.chatServer.BroadcastToRoom(msgReq, chatID, senderID)
+			h.chatServer.BroadcastToRoom(msgReq, msgReq.ChatID, senderID)
 		}
 	}
 }
 
-func (h *Handler) sendRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, receiverID uint, chatID uint, client *chat.Client) {
+func (h *Handler) sendRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, receiverID uint, client *chat.Client) {
 	defer wg.Done()
 
 	for {
@@ -179,7 +177,7 @@ func (h *Handler) sendRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, rec
 			if err := c.WriteMessage(websocket.TextMessage, []byte(msg)); err != nil {
 				logger.Error("failed sending message", slog.Any("error", err))
 				logger.Info("closing connection...")
-				h.chatServer.Logout(receiverID, chatID)
+				h.chatServer.Logout(receiverID)
 				return
 			}
 		}

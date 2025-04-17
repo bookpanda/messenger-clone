@@ -28,7 +28,7 @@ export const Message = ({
 }) => {
   const [openChatInfo, setOpenChatInfo] = useState(true)
 
-  const socketUrl = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/v1/message/ws?accessToken=${accessToken}&chatID=${chatInfo.id}`
+  const socketUrl = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/v1/message/ws?accessToken=${accessToken}`
   const { sendMessage: wsSendMessage, lastMessage } = useWebSocket(socketUrl, {
     onOpen: () => console.log("open"),
     onError: (event) => console.log("error", event),
@@ -43,6 +43,7 @@ export const Message = ({
       const payload: RealtimeMessage = {
         event_type: eventType,
         content,
+        chat_id: chatInfo.id,
         sender_id: 0, // don't care
       }
       if (messageID) {
@@ -151,23 +152,27 @@ export const Message = ({
         )
         break
       case "TYPING_START":
-        setTypingUserIDs((prev) =>
-          produce(prev, (draft) => {
-            if (!draft.includes(message.sender_id)) {
-              draft.push(message.sender_id)
-            }
-          })
-        )
+        if (message.chat_id === chatInfo.id) {
+          setTypingUserIDs((prev) =>
+            produce(prev, (draft) => {
+              if (!draft.includes(message.sender_id)) {
+                draft.push(message.sender_id)
+              }
+            })
+          )
+        }
         break
       case "TYPING_END":
-        setTypingUserIDs((prev) =>
-          produce(prev, (draft) => {
-            const index = draft.indexOf(message.sender_id)
-            if (index !== -1) {
-              draft.splice(index, 1)
-            }
-          })
-        )
+        if (message.chat_id === chatInfo.id) {
+          setTypingUserIDs((prev) =>
+            produce(prev, (draft) => {
+              const index = draft.indexOf(message.sender_id)
+              if (index !== -1) {
+                draft.splice(index, 1)
+              }
+            })
+          )
+        }
         break
     }
   }, [lastMessage, sendMessage])
