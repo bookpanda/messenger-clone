@@ -30,21 +30,25 @@ export type ChatInfo = {
   image: string
   lastMessage: LastMessage | null
   participants: User[]
+  unreadCount: number
 }
 
 export type EventType =
-  | "MESSAGE"
-  | "UNREAD_MESSAGE"
   | "ERROR"
+  | "CONNECT"
+  | "MESSAGE"
+  | "MESSAGE_UPDATE"
+  | "ACK_READ"
+  | "READ"
+  | "UNREAD_MESSAGE"
   | "TYPING_START"
   | "TYPING_END"
   | "REACTION"
-  | "READ"
-  | "STILL_ACTIVE"
 export type RealtimeMessage = {
   event_type: EventType
   content: string
   sender_id: number
+  chat_id: number
   message_id?: number
 }
 

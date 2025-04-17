@@ -15,11 +15,14 @@ components:
             $ref: '#/components/schemas/dto.UserResponse'
           type: array
           uniqueItems: false
+        unread_count:
+          type: integer
       required:
       - id
       - is_direct
       - name
       - participants
+      - unread_count
       type: object
     dto.CreateChatRequest:
       properties:
@@ -153,14 +156,14 @@ components:
           type: string
         id:
           type: integer
-        last_read_users:
-          items:
-            type: integer
-          type: array
-          uniqueItems: false
         reactions:
           items:
             $ref: '#/components/schemas/dto.ReactionResponse'
+          type: array
+          uniqueItems: false
+        read_by:
+          items:
+            type: integer
           type: array
           uniqueItems: false
         sender_id:
@@ -170,8 +173,8 @@ components:
       - content
       - created_at
       - id
-      - last_read_users
       - reactions
+      - read_by
       - sender_id
       type: object
     dto.ModifyParticipantRequest:

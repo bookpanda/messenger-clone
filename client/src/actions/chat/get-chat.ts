@@ -1,6 +1,7 @@
 import { client } from "@/api/client"
 import { auth } from "@/auth"
 import { ChatInfo, LastMessage } from "@/types"
+import { redirect } from "next/navigation"
 
 export const getChatAction = async (id: number): Promise<ChatInfo> => {
   const session = await auth()
@@ -14,7 +15,7 @@ export const getChatAction = async (id: number): Promise<ChatInfo> => {
     },
   })
   if (response.status !== 200 || !data) {
-    throw new Error("Failed to fetch chat messages")
+    redirect("/messages")
   }
 
   const chat = data.result
@@ -38,6 +39,7 @@ export const getChatAction = async (id: number): Promise<ChatInfo> => {
       image: friend?.profilePictureUrl || "/thumbnail.jpg",
       lastMessage,
       participants: chat.participants,
+      unreadCount: chat.unread_count,
     }
   }
 
@@ -47,5 +49,6 @@ export const getChatAction = async (id: number): Promise<ChatInfo> => {
     image: "/thumbnail.jpg", // TODO: Group Image
     lastMessage,
     participants: chat.participants,
+    unreadCount: chat.unread_count,
   }
 }

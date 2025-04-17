@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 
-import { useChatContext } from "@/contexts/chat-context"
-import { ChatInfo, ChatMessage, User } from "@/types"
+import { ChatMessage, User } from "@/types"
 
 import { IncomingMessage, OutgoingMessage } from "./messages"
 import { ReadBubbles } from "./read-bubble"
@@ -43,7 +42,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
           }
 
           const lastReadUsers = participants.filter((user) =>
-            message.last_read_users.includes(user.id || 0)
+            message.read_by.includes(user.id || 0)
           )
 
           return (

@@ -3,11 +3,7 @@
 import { Dispatch, SetStateAction } from "react"
 
 import { toggleMessageReaction } from "@/actions/message/toggle-reaction"
-// import { sendMessage } from "@/actions/message/send-message"
-import { useChatContext } from "@/contexts/chat-context"
-import { ChatInfo, ChatMessage, EventType, User } from "@/types"
-import { produce } from "immer"
-import { useSession } from "next-auth/react"
+import { ChatInfo, ChatMessage, User } from "@/types"
 
 import { ChatHeader } from "./chat-header"
 import { ChatInput } from "./chat-input"
@@ -18,11 +14,8 @@ interface ChatProps {
   user: User
   messages: ChatMessage[]
   setOpenChatInfo: Dispatch<SetStateAction<boolean>>
-  sendMessage: (
-    content: string,
-    eventType: EventType,
-    messageID?: number
-  ) => void
+  handleSendMessage: (message: string) => void
+  handleTyping: (type: "START" | "END") => void
   typingUserIDs: number[]
 }
 
@@ -32,13 +25,12 @@ export const ChatBox = (props: ChatProps) => {
     user,
     messages,
     setOpenChatInfo,
-    sendMessage,
+    handleSendMessage,
+    handleTyping,
     typingUserIDs,
   } = props
-  const { data: session } = useSession()
 
-  const { currentChat, setMessages } = useChatContext()
-  if (!messages || !currentChat) {
+  if (!messages) {
     return null
   }
 
@@ -49,15 +41,6 @@ export const ChatBox = (props: ChatProps) => {
     } catch (error) {
       console.error("Failed to toggle reaction", error)
     }
-  }
-
-  const handleSendMessage = async (content: string) => {
-    sendMessage(content, "MESSAGE")
-  }
-
-  const handleTyping = (type: "START" | "END") => {
-    if (type === "START") sendMessage("<placeholder>", "TYPING_START")
-    else sendMessage("<placeholder>", "TYPING_END")
   }
 
   return (

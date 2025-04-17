@@ -65,11 +65,6 @@ func (h *Handler) SendMessage(req dto.SendMessageRequest, senderID uint) (*model
 			return errors.Wrap(err, "failed to create chat")
 		}
 
-		err = h.sendMessageToParticipants(req.ChatID, message.ID, senderID)
-		if err != nil {
-			return errors.Wrap(err, "failed to send message to participants")
-		}
-
 		return nil
 	}); err != nil {
 		return nil, apperror.Internal("failed to create chat", err)
@@ -90,31 +85,4 @@ func (h *Handler) createMessage(chatID uint, content string, senderID uint) (*mo
 	}
 
 	return message, nil
-}
-
-func (h *Handler) sendMessageToParticipants(chatID uint, messageID uint, senderID uint) error {
-	var chat model.Chat
-	err := h.store.DB.Model(&model.Chat{}).
-		Where("id = ?", chatID).
-		Preload("Participants").First(&chat).Error
-	if err != nil {
-		return errors.Wrap(err, "failed to find chat")
-	}
-
-	var inboxes []model.Inbox
-	for _, participant := range chat.Participants {
-		inbox := model.Inbox{
-			MessageID: messageID,
-			UserID:    participant.ID,
-		}
-		inboxes = append(inboxes, inbox)
-	}
-
-	if len(inboxes) > 0 {
-		if err := h.store.DB.Create(&inboxes).Error; err != nil {
-			return errors.Wrap(err, "failed to create inbox entries")
-		}
-	}
-
-	return nil
 }

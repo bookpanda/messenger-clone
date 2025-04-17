@@ -2,13 +2,11 @@ package chat
 
 import (
 	"encoding/json"
-	"fmt"
 	"sync"
 
 	"github.com/bookpanda/messenger-clone/internal/database"
 	"github.com/bookpanda/messenger-clone/internal/dto"
 	"github.com/bookpanda/messenger-clone/internal/model"
-	"github.com/bookpanda/messenger-clone/pkg/logger"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 )
@@ -20,7 +18,7 @@ type Client struct {
 }
 
 type Server struct {
-	chats    map[uint]map[uint]*Client
+	users    map[uint]*Client // userID -> Client
 	store    *database.Store
 	validate *validator.Validate
 	mu       sync.RWMutex
@@ -34,9 +32,9 @@ var (
 func NewServer(store *database.Store, validate *validator.Validate) *Server {
 	once.Do(func() {
 		instance = &Server{
+			users:    make(map[uint]*Client),
 			store:    store,
 			validate: validate,
-			chats:    make(map[uint]map[uint]*Client),
 			mu:       sync.RWMutex{},
 		}
 	})
@@ -44,9 +42,13 @@ func NewServer(store *database.Store, validate *validator.Validate) *Server {
 	return instance
 }
 
-func (s *Server) Register(userID uint, chatID uint) *Client {
+func (s *Server) Register(userID uint) *Client {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
+	if _, exists := s.users[userID]; exists {
+		return nil
+	}
 
 	client := &Client{
 		Message:   make(chan string),
@@ -54,93 +56,69 @@ func (s *Server) Register(userID uint, chatID uint) *Client {
 		UserID:    userID,
 	}
 
-	// create chat map if it doesn't exist
-	if s.chats[chatID] == nil {
-		s.chats[chatID] = make(map[uint]*Client)
-	}
-
-	// check if user is actually member of the chat
-	var user model.User
-	err := s.store.DB.Model(&model.User{}).Preload("Chats").Where("id = ?", userID).First(&user).Error
-	if err != nil {
-		return nil
-	}
-
-	isInChat := false
-	for _, chat := range user.Chats {
-		if chat.ID == chatID {
-			isInChat = true
-			break
-		}
-	}
-	if !isInChat {
-		logger.Error(fmt.Sprintf("User %d is not in chat %d", userID, chatID))
-		return nil
-	}
-
-	s.chats[chatID][userID] = client
+	s.users[userID] = client
 	return client
 }
 
-func (s *Server) Logout(userID uint, chatID uint) {
+func (s *Server) Logout(userID uint) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if clients, ok := s.chats[chatID]; ok {
-		if client, exists := clients[userID]; exists {
-			client.Terminate <- true
-			delete(clients, userID) // remove client from chat
-
-			if len(clients) == 0 {
-				delete(s.chats, chatID) // clean up empty chat
-			}
-		}
+	if client, exists := s.users[userID]; exists {
+		client.Terminate <- true
+		delete(s.users, userID)
 	}
 }
 
-func (s *Server) BroadcastToRoom(msgReq dto.SendRealtimeMessageRequest, chatID uint, senderID uint) error {
+func (s *Server) BroadcastToRoom(eventType dto.EventType, chatID uint, senderID uint, messageID *uint, content string) error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	// assign senderID so that frontend app knows who sent the message
-	// also cannot trust the client to send senderID (identity spoofing)
-	msgReq.SenderID = senderID
+	broadcastMessage := dto.SendRealtimeMessageRequest{
+		EventType: eventType,
+		Content:   content,
+		SenderID:  senderID,
+		ChatID:    chatID,
+	}
 
-	json, err := json.Marshal(msgReq)
+	if messageID != nil {
+		broadcastMessage.MessageID = *messageID
+	}
+
+	// Marshal message to JSON
+	jsonMsg, err := json.Marshal(broadcastMessage)
 	if err != nil {
-		return errors.Wrap(err, "failed Marshal to json")
+		return errors.Wrap(err, "failed to marshal message to JSON")
 	}
 
-	// if event is error, send to sender only
-	if msgReq.EventType == dto.EventError {
-		client := s.chats[chatID][msgReq.SenderID]
-		if client != nil {
-			client.Message <- string(json)
+	// If it's an error event, send to sender only
+	if eventType == dto.EventError {
+		if client, ok := s.users[senderID]; ok && client != nil {
+			client.Message <- string(jsonMsg)
 		}
 		return nil
 	}
 
-	// if event is message, send to all clients
-	// (including sender so that sender can ack read, will be easier for getting last reads) in the chat
-	if msgReq.EventType == dto.EventMessage {
-		for _, client := range s.chats[chatID] {
-			if client == nil || client.Terminate == nil {
-				// skip nil clients
-				continue
-			}
-			client.Message <- string(json)
-		}
-		return nil
+	// Fetch chat participants
+	var chat model.Chat
+	err = s.store.DB.Preload("Participants").First(&chat, chatID).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to load chat participants")
 	}
 
-	// other types, send to all clients except sender
-	for _, client := range s.chats[chatID] {
-		if client == nil || client.Terminate == nil || client.UserID == senderID {
-			// skip nil clients and sender
+	// Send to participants (either all or exclude sender depending on event type)
+	for _, participant := range chat.Participants {
+		client, ok := s.users[participant.ID]
+		if !ok || client == nil {
 			continue
 		}
 
-		client.Message <- string(json)
+		// For certain events, skip sender
+		// if (eventType == dto.EventStillActive || eventType == dto.EventRead) && participant.ID == senderID {
+		// 	continue
+		// }
+
+		client.Message <- string(jsonMsg)
 	}
 
 	return nil

@@ -28,6 +28,8 @@ type Message struct {
 	ReplyToMessage   *Message `gorm:"foreignKey:ReplyToMessageID"` // self-reference
 
 	Reactions []Reaction `gorm:"foreignKey:MessageID"`
+
+	ReadBy []User `gorm:"many2many:message_reads;"`
 }
 
 func ValidateMessageType(msgType string) bool {
