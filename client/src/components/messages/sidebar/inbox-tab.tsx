@@ -26,7 +26,7 @@ export const InboxTab = ({ initialData }: { initialData: ChatInfo[] }) => {
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
       {data.map((chat, idx) => (
         <Link key={`${chat.id}_${idx}`} href={`/messages/${chat.id}`}>
           <ChatCard

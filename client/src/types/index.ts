@@ -33,6 +33,16 @@ export type ChatInfo = {
   unreadCount: number
 }
 
+export type CommunityInfo = {
+  lastMessage: LastMessage | null
+  unreadCount: number
+  id: number
+  name: string
+  image: string
+  participants: User[]
+  isMember: boolean
+}
+
 export type EventType =
   | "ERROR"
   | "CONNECT"
@@ -53,4 +63,4 @@ export type RealtimeMessage = {
   message_id?: number
 }
 
-export type SidebarTab = "inbox" | "people"
+export type SidebarTab = "inbox" | "people" | "communities"

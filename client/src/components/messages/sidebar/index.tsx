@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react"
-
 import { useChatStore } from "@/stores/chat"
-import { ChatInfo, User } from "@/types"
+import { ChatInfo, CommunityInfo, User } from "@/types"
 import Image from "next/image"
 
+import { CommunitiesTab } from "./communities-tab"
 import { CreateGroup } from "./create-group"
 import { InboxTab } from "./inbox-tab"
 import { PeopleTab } from "./people-tab"
@@ -13,9 +12,11 @@ import { TabButton } from "./tab-button"
 
 export const Sidebar = ({
   chatList,
+  groupChats,
   allUsers,
 }: {
   chatList: ChatInfo[]
+  groupChats: CommunityInfo[]
   allUsers: User[]
 }) => {
   const { tab, setTab } = useChatStore()
@@ -23,7 +24,7 @@ export const Sidebar = ({
   const onlineUsers = useChatStore((state) => state.onlineUsers)
 
   return (
-    <div className="bg-primary-background text-primary-foreground w-90 flex-initial space-y-6 p-4">
+    <div className="bg-primary-background text-primary-foreground flex w-90 flex-initial flex-col space-y-6 p-4">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">Chats</h1>
         <CreateGroup allUsers={allUsers} />
@@ -55,12 +56,19 @@ export const Sidebar = ({
         <TabButton onClick={() => setTab("people")} isActive={tab === "people"}>
           People
         </TabButton>
+        <TabButton
+          onClick={() => setTab("communities")}
+          isActive={tab === "communities"}
+        >
+          Communities
+        </TabButton>
       </div>
 
       {/* Tab Content */}
-      <div>
+      <div className="flex flex-1 flex-col overflow-hidden">
         {tab === "inbox" && <InboxTab initialData={chatList} />}
         {tab === "people" && <PeopleTab />}
+        {tab === "communities" && <CommunitiesTab initialData={groupChats} />}
       </div>
     </div>
   )

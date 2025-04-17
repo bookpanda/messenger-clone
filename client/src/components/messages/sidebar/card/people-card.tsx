@@ -9,13 +9,15 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 
+import { useChatList } from "../../hooks/use-chat-list"
+
 interface PeopleCardProps {
   friend: User
 }
 
 export const PeopleCard = ({ friend }: PeopleCardProps) => {
   const { setTab } = useChatStore()
-  const { setChatList } = useChatStore()
+  const { revalidateChatList } = useChatList()
 
   const queryClient = useQueryClient()
 
@@ -30,8 +32,7 @@ export const PeopleCard = ({ friend }: PeopleCardProps) => {
 
       setTab("inbox")
 
-      const chatList = await getMyChatsAction()
-      setChatList(chatList)
+      revalidateChatList()
 
       toast.success("Chat created successfully")
     } catch {

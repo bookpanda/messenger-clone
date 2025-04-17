@@ -38,7 +38,9 @@ func (s *Server) RegisterRoutes(
 	chat := v1.Group("/chat")
 	chat.Post("/", authMiddleware.Auth, chatHandler.HandleCreateChat)
 	chat.Get("/", authMiddleware.Auth, chatHandler.HandleGetMyChats)
+	chat.Get("/group", authMiddleware.Auth, chatHandler.HandleGetGroupChats)
 	chat.Get("/:id", authMiddleware.Auth, chatHandler.HandleGetChat)
+	chat.Post("/:id/join", authMiddleware.Auth, chatHandler.HandleJoinChat)
 	chat.Patch("/:id/participants", authMiddleware.Auth, chatHandler.HandleModifyParticipants)
 
 	// message
