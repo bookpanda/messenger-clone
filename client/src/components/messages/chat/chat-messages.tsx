@@ -1,24 +1,24 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { useChatContext } from "@/contexts/chat-context"
-import { useSession } from "next-auth/react"
+import { ChatInfo, ChatMessage, User } from "@/types"
 
-import {
-  IncomingMessage,
-  OutgoingMessage,
-  //  TimestampMessage
-} from "./messages"
+import { IncomingMessage, OutgoingMessage } from "./messages"
 import { ReadBubbles } from "./read-bubble"
 import { TypingMessage } from "./typing"
 
 interface ChatMessagesProps {
+  participants: User[]
+  user: User
+  messages: ChatMessage[]
+  typingUserIDs: number[]
   handleAddReaction: (messageId: number, reaction: string) => void
 }
 
+// TODO: Refactor send isMe with participants
 export const ChatMessages = (props: ChatMessagesProps) => {
-  const { handleAddReaction } = props
-  const { data: session } = useSession()
-  const { messages, currentChat, typingUserIDs } = useChatContext()
+  const { participants, user, messages, typingUserIDs, handleAddReaction } =
+    props
 
   const endOfMessagesRef = useRef<HTMLDivElement>(null)
 
@@ -35,20 +35,20 @@ export const ChatMessages = (props: ChatMessagesProps) => {
       <div className="space-y-2">
         {/* Chat messages go here */}
         {messages.map((message, idx) => {
-          const sender = currentChat?.participants.find(
+          const sender = participants.find(
             (participant) => participant.id === message.sender_id
           )
           if (!sender) {
             return null
           }
 
-          const lastReadUsers = currentChat?.participants.filter((user) =>
+          const lastReadUsers = participants.filter((user) =>
             message.last_read_users.includes(user.id || 0)
           )
 
           return (
             <div key={idx}>
-              {message.sender_id !== session?.user?.userId ? (
+              {message.sender_id !== user.id ? (
                 <IncomingMessage
                   message={message}
                   sender={sender}
@@ -71,7 +71,9 @@ export const ChatMessages = (props: ChatMessagesProps) => {
         })}
 
         {/* Typing indicator */}
-        {typingUserIDs.length > 0 && <TypingMessage userIDs={typingUserIDs} />}
+        {typingUserIDs.length > 0 && (
+          <TypingMessage userIDs={typingUserIDs} participants={participants} />
+        )}
         <div ref={endOfMessagesRef} />
       </div>
     </div>

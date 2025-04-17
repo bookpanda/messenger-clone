@@ -1,11 +1,13 @@
-import { useState } from "react"
+"use client"
+
+import { useChatStore } from "@/stores/chat"
 
 import { InboxTab } from "./inbox-tab"
 import { PeopleTab } from "./people-tab"
 import { TabButton } from "./tab-button"
 
 export const Sidebar = () => {
-  const [activeTab, setActiveTab] = useState<"inbox" | "people">("inbox")
+  const { tab, setTab } = useChatStore()
 
   return (
     <div className="bg-primary-background text-primary-foreground w-90 flex-initial space-y-4 p-4">
@@ -13,24 +15,18 @@ export const Sidebar = () => {
 
       {/* Tab Buttons */}
       <div className="flex space-x-2">
-        <TabButton
-          onClick={() => setActiveTab("inbox")}
-          isActive={activeTab === "inbox"}
-        >
+        <TabButton onClick={() => setTab("inbox")} isActive={tab === "inbox"}>
           Inbox
         </TabButton>
-        <TabButton
-          onClick={() => setActiveTab("people")}
-          isActive={activeTab === "people"}
-        >
+        <TabButton onClick={() => setTab("people")} isActive={tab === "people"}>
           People
         </TabButton>
       </div>
 
       {/* Tab Content */}
       <div>
-        {activeTab === "inbox" && <InboxTab />}
-        {activeTab === "people" && <PeopleTab />}
+        {tab === "inbox" && <InboxTab />}
+        {tab === "people" && <PeopleTab />}
       </div>
     </div>
   )

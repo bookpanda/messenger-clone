@@ -7,11 +7,11 @@ import (
 )
 
 type ReactionResponse struct {
-	ID        uint      `json:"id" binding:"required"`
-	Emoji     string    `json:"emoji" binding:"required"`
-	MessageID uint      `json:"message_id" binding:"required"`
-	SenderID  uint      `json:"sender_id" binding:"required"`
-	CreatedAt time.Time `json:"created_at" binding:"required"`
+	ID        uint      `json:"id" binding:"required" validate:"required"`
+	Emoji     string    `json:"emoji" binding:"required" validate:"required"`
+	MessageID uint      `json:"message_id" binding:"required" validate:"required"`
+	SenderID  uint      `json:"sender_id" binding:"required" validate:"required"`
+	CreatedAt time.Time `json:"created_at" binding:"required" validate:"required"`
 }
 
 type ToggleReactionRequest struct {

@@ -13,30 +13,14 @@ import { Button } from "@/components/ui/button"
 dayjs.extend(relativeTime)
 
 interface ChatHeaderProps {
+  name: string
   image: string
   lastActive: Date
   setOpenChatInfo: Dispatch<SetStateAction<boolean>>
 }
 
 export const ChatHeader = (props: ChatHeaderProps) => {
-  const { image, lastActive, setOpenChatInfo } = props
-
-  const { data: session } = useSession()
-  const { currentChat } = useChatContext()
-  if (!currentChat) {
-    return null
-  }
-  const { is_direct, participants } = currentChat
-
-  let chatName = currentChat.name
-  let chatImage = image
-  if (is_direct) {
-    const members = participants.filter(
-      (participant) => participant.id !== session?.user?.userId
-    )
-    chatName = members[0]?.name || ""
-    chatImage = members[0]?.profilePictureUrl || ""
-  }
+  const { name, image, lastActive, setOpenChatInfo } = props
 
   const lastActiveTime = dayjs(lastActive).from(dayjs())
 
@@ -45,14 +29,14 @@ export const ChatHeader = (props: ChatHeaderProps) => {
       <div className="flex items-center gap-2">
         <div className="relative size-10">
           <Image
-            src={chatImage}
+            src={image}
             alt=""
             fill
             className="rounded-full object-cover"
           />
         </div>
         <div>
-          <h2>{chatName}</h2>
+          <h2>{name}</h2>
           <p className="text-secondary-text text-xs">Active {lastActiveTime}</p>
         </div>
       </div>

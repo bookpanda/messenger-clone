@@ -41,6 +41,8 @@ components:
       properties:
         error:
           type: string
+      required:
+      - error
       type: object
     dto.HttpListResponse-dto_ChatResponse:
       properties:
@@ -49,6 +51,8 @@ components:
             $ref: '#/components/schemas/dto.ChatResponse'
           type: array
           uniqueItems: false
+      required:
+      - result
       type: object
     dto.HttpListResponse-dto_MessageResponse:
       properties:
@@ -57,6 +61,8 @@ components:
             $ref: '#/components/schemas/dto.MessageResponse'
           type: array
           uniqueItems: false
+      required:
+      - result
       type: object
     dto.HttpListResponse-dto_UserResponse:
       properties:
@@ -65,36 +71,50 @@ components:
             $ref: '#/components/schemas/dto.UserResponse'
           type: array
           uniqueItems: false
+      required:
+      - result
       type: object
     dto.HttpResponse-dto_ChatResponse:
       properties:
         result:
           $ref: '#/components/schemas/dto.ChatResponse'
+      required:
+      - result
       type: object
     dto.HttpResponse-dto_LoginResponse:
       properties:
         result:
           $ref: '#/components/schemas/dto.LoginResponse'
+      required:
+      - result
       type: object
     dto.HttpResponse-dto_MessageResponse:
       properties:
         result:
           $ref: '#/components/schemas/dto.MessageResponse'
+      required:
+      - result
       type: object
     dto.HttpResponse-dto_ModifyParticipantResponse:
       properties:
         result:
           $ref: '#/components/schemas/dto.ModifyParticipantResponse'
+      required:
+      - result
       type: object
     dto.HttpResponse-dto_TokenResponse:
       properties:
         result:
           $ref: '#/components/schemas/dto.TokenResponse'
+      required:
+      - result
       type: object
     dto.HttpResponse-dto_UserResponse:
       properties:
         result:
           $ref: '#/components/schemas/dto.UserResponse'
+      required:
+      - result
       type: object
     dto.LoginRequest:
       properties:
@@ -117,6 +137,11 @@ components:
           type: string
         user:
           $ref: '#/components/schemas/dto.UserResponse'
+      required:
+      - accessToken
+      - exp
+      - refreshToken
+      - user
       type: object
     dto.MessageResponse:
       properties:
@@ -216,6 +241,10 @@ components:
           type: integer
         refreshToken:
           type: string
+      required:
+      - accessToken
+      - exp
+      - refreshToken
       type: object
     dto.UserResponse:
       properties:
@@ -227,6 +256,11 @@ components:
           type: string
         profilePictureUrl:
           type: string
+      required:
+      - email
+      - id
+      - name
+      - profilePictureUrl
       type: object
     dto.UserUpdateRequest:
       properties:
@@ -234,6 +268,9 @@ components:
           type: string
         profilePictureUrl:
           type: string
+      required:
+      - name
+      - profilePictureUrl
       type: object
   securitySchemes:
     ApiKeyAuth:
@@ -395,6 +432,46 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Create chat
+      tags:
+      - chat
+  /api/v1/chat/{id}:
+    get:
+      description: Get Chat Information
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpResponse-dto_ChatResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Unauthorized
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get Chat by Id
       tags:
       - chat
   /api/v1/chat/{id}/participants:
@@ -596,5 +673,38 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get all users
+      tags:
+      - user
+  /api/v1/user/people:
+    get:
+      description: Get all users except me
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpListResponse-dto_UserResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Unauthorized
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get people
       tags:
       - user

@@ -2,18 +2,17 @@
 
 import { useChatContext } from "@/contexts/chat-context"
 import { cn } from "@/lib/utils"
+import { User } from "@/types"
 import { Icon } from "@iconify/react/dist/iconify.js"
 import Image from "next/image"
 
 interface TypingProps {
   userIDs: number[]
+  participants: User[]
 }
 
-export const TypingMessage = ({ userIDs }: TypingProps) => {
-  const { currentChat } = useChatContext()
-  if (!currentChat || !currentChat.participants) return null
-
-  const typingUsers = currentChat.participants.filter((user) =>
+export const TypingMessage = ({ userIDs, participants }: TypingProps) => {
+  const typingUsers = participants.filter((user) =>
     userIDs.includes(user.id || 0)
   )
 

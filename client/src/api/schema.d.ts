@@ -286,6 +286,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/chat/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Chat by Id
+         * @description Get Chat Information
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Chat ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpResponse-dto_ChatResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/chat/{id}/participants": {
         parameters: {
             query?: never;
@@ -676,6 +745,72 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/user/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get people
+         * @description Get all users except me
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpListResponse-dto_UserResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -693,34 +828,34 @@ export interface components {
             participants: string[];
         };
         "dto.HttpError": {
-            error?: string;
+            error: string;
         };
         "dto.HttpListResponse-dto_ChatResponse": {
-            result?: components["schemas"]["dto.ChatResponse"][];
+            result: components["schemas"]["dto.ChatResponse"][];
         };
         "dto.HttpListResponse-dto_MessageResponse": {
-            result?: components["schemas"]["dto.MessageResponse"][];
+            result: components["schemas"]["dto.MessageResponse"][];
         };
         "dto.HttpListResponse-dto_UserResponse": {
-            result?: components["schemas"]["dto.UserResponse"][];
+            result: components["schemas"]["dto.UserResponse"][];
         };
         "dto.HttpResponse-dto_ChatResponse": {
-            result?: components["schemas"]["dto.ChatResponse"];
+            result: components["schemas"]["dto.ChatResponse"];
         };
         "dto.HttpResponse-dto_LoginResponse": {
-            result?: components["schemas"]["dto.LoginResponse"];
+            result: components["schemas"]["dto.LoginResponse"];
         };
         "dto.HttpResponse-dto_MessageResponse": {
-            result?: components["schemas"]["dto.MessageResponse"];
+            result: components["schemas"]["dto.MessageResponse"];
         };
         "dto.HttpResponse-dto_ModifyParticipantResponse": {
-            result?: components["schemas"]["dto.ModifyParticipantResponse"];
+            result: components["schemas"]["dto.ModifyParticipantResponse"];
         };
         "dto.HttpResponse-dto_TokenResponse": {
-            result?: components["schemas"]["dto.TokenResponse"];
+            result: components["schemas"]["dto.TokenResponse"];
         };
         "dto.HttpResponse-dto_UserResponse": {
-            result?: components["schemas"]["dto.UserResponse"];
+            result: components["schemas"]["dto.UserResponse"];
         };
         "dto.LoginRequest": {
             idToken: string;
@@ -728,10 +863,10 @@ export interface components {
             provider: string;
         };
         "dto.LoginResponse": {
-            accessToken?: string;
-            exp?: number;
-            refreshToken?: string;
-            user?: components["schemas"]["dto.UserResponse"];
+            accessToken: string;
+            exp: number;
+            refreshToken: string;
+            user: components["schemas"]["dto.UserResponse"];
         };
         "dto.MessageResponse": {
             chat_id: number;
@@ -764,19 +899,19 @@ export interface components {
             content: string;
         };
         "dto.TokenResponse": {
-            accessToken?: string;
-            exp?: number;
-            refreshToken?: string;
+            accessToken: string;
+            exp: number;
+            refreshToken: string;
         };
         "dto.UserResponse": {
-            email?: string;
-            id?: number;
-            name?: string;
-            profilePictureUrl?: string;
+            email: string;
+            id: number;
+            name: string;
+            profilePictureUrl: string;
         };
         "dto.UserUpdateRequest": {
-            name?: string;
-            profilePictureUrl?: string;
+            name: string;
+            profilePictureUrl: string;
         };
     };
     responses: never;

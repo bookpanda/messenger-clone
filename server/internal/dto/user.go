@@ -3,15 +3,15 @@ package dto
 import "github.com/bookpanda/messenger-clone/internal/model"
 
 type UserUpdateRequest struct {
-	Name              string `json:"name"`
-	ProfilePictureURL string `json:"profilePictureUrl"`
+	Name              string `json:"name" validate:"required"`
+	ProfilePictureURL string `json:"profilePictureUrl" validate:"required"`
 }
 
 type UserResponse struct {
-	ID                uint   `json:"id"`
-	Name              string `json:"name"`
-	Email             string `json:"email"`
-	ProfilePictureURL string `json:"profilePictureUrl"`
+	ID                uint   `json:"id" validate:"required"`
+	Name              string `json:"name" validate:"required"`
+	Email             string `json:"email" validate:"required"`
+	ProfilePictureURL string `json:"profilePictureUrl" validate:"required"`
 }
 
 func ToUserResponse(user model.User) UserResponse {

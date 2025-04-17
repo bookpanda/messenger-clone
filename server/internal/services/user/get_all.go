@@ -17,7 +17,6 @@ import (
 // @Failure			400	{object}	dto.HttpError
 // @Failure			500	{object}	dto.HttpError
 func (h *Handler) HandleGetAllUsers(c *fiber.Ctx) error {
-
 	var users []model.User
 	err := h.store.DB.Model(&model.User{}).Find(&users).Error
 	if err != nil {

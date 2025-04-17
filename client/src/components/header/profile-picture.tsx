@@ -16,7 +16,7 @@ export const ProfilePicture = ({ onClick }: ProfilePictureProps) => {
       <div className="relative cursor-pointer">
         <Image
           alt="profile-pic"
-          src={session?.user?.image || ""}
+          src={session?.user?.image || "/thumbnail.jpg"}
           height={40}
           width={40}
           className="rounded-full"

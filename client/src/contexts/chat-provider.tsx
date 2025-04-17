@@ -10,7 +10,6 @@ import {
 } from "react"
 
 import { getChatMessages } from "@/actions/message/get-chat-messages"
-import { useGetMyChats } from "@/hooks/use-get-my-chats"
 import { Chat, ChatMessage, EventType, RealtimeMessage } from "@/types"
 import { produce } from "immer"
 import { useSession } from "next-auth/react"
@@ -23,7 +22,7 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
   const [currentChat, setCurrentChat] = useState<Chat>({} as Chat)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [typingUserIDs, setTypingUserIDs] = useState<number[]>([])
-  const { chats: myChats } = useGetMyChats()
+  // const { chats: myChats } = useGetMyChats()
 
   const { data: session } = useSession()
   const socketUrl = useMemo(() => {
@@ -37,20 +36,20 @@ export const ChatProvider: FC<PropsWithChildren> = ({ children }) => {
     onClose: () => console.log("close"),
   })
 
-  useEffect(() => {
-    setChats(myChats)
-    if (!myChats[0]) {
-      return
-    }
+  // useEffect(() => {
+  //   setChats(myChats)
+  //   if (!myChats[0]) {
+  //     return
+  //   }
 
-    const sortedChats = sortChats(myChats)
-    setChats(sortedChats)
-    setCurrentChat(sortedChats[0])
-    ;(async () => {
-      const res = await getChatMessages(sortedChats[0].id)
-      if (res) setMessages(res)
-    })()
-  }, [myChats])
+  //   const sortedChats = sortChats(myChats)
+  //   setChats(sortedChats)
+  //   setCurrentChat(sortedChats[0])
+  //   ;(async () => {
+  //     const res = await getChatMessages(sortedChats[0].id)
+  //     if (res) setMessages(res)
+  //   })()
+  // }, [myChats])
 
   const sendMessage = useCallback(
     (content: string, eventType: EventType, messageID?: number) => {

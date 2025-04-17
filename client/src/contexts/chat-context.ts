@@ -1,3 +1,5 @@
+"use client"
+
 import { Dispatch, SetStateAction, createContext, useContext } from "react"
 
 import { Chat, ChatMessage, EventType } from "@/types"

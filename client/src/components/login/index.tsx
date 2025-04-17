@@ -1,5 +1,6 @@
 "use client"
 
+import { Icon } from "@iconify/react/dist/iconify.js"
 import { signIn } from "next-auth/react"
 
 import { Button } from "../ui/button"
@@ -13,8 +14,21 @@ export default function LoginPageComponent() {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center">
-      <Button onClick={handleLogin}>Login with Google</Button>
+    <div className="bg-primary-background flex min-h-screen flex-1 flex-col items-center justify-between py-32">
+      <div className="flex flex-col items-center gap-6">
+        <Icon icon="logos:messenger" className="size-16" />
+        <div className="space-y-1 text-center">
+          <h1 className="text-2xl font-bold text-white">
+            Welcome to Messenger
+          </h1>
+          <p className="font-medium text-gray-600">
+            The simple way to text, call and video chat right from your desktop
+          </p>
+        </div>
+      </div>
+      <Button onClick={handleLogin} className="bg-messenger-primary min-w-64">
+        Log in with Google
+      </Button>
     </div>
   )
 }

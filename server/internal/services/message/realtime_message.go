@@ -156,6 +156,11 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 			continue
 		}
 
+		if msgReq.EventType == dto.EventStillActive {
+			h.chatServer.BroadcastToRoom(msgReq, chatID, senderID)
+			continue
+		}
+
 		// for other events, just send to all clients
 		if msgType == websocket.TextMessage {
 			h.chatServer.BroadcastToRoom(msgReq, chatID, senderID)

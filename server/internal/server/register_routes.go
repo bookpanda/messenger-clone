@@ -32,11 +32,13 @@ func (s *Server) RegisterRoutes(
 	// user
 	user := v1.Group("/user")
 	user.Get("/", authMiddleware.Auth, userHandler.HandleGetAllUsers)
+	user.Get("/people", authMiddleware.Auth, userHandler.HandleGetPeople)
 
 	// chat
 	chat := v1.Group("/chat")
 	chat.Post("/", authMiddleware.Auth, chatHandler.HandleCreateChat)
 	chat.Get("/", authMiddleware.Auth, chatHandler.HandleGetMyChats)
+	chat.Get("/:id", authMiddleware.Auth, chatHandler.HandleGetChat)
 	chat.Patch("/:id/participants", authMiddleware.Auth, chatHandler.HandleModifyParticipants)
 
 	// message
