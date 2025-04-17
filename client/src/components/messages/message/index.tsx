@@ -69,6 +69,17 @@ export const Message = ({
   )
 
   useEffect(() => {
+    // send a connect message when the component mounts
+    const payload: RealtimeMessage = {
+      event_type: "CONNECT",
+      content: "<connect>",
+      chat_id: chatInfo.id,
+      sender_id: user.id,
+    }
+    wsSendMessage(JSON.stringify(payload))
+  }, [])
+
+  useEffect(() => {
     if (!lastMessage) return
     const message: RealtimeMessage = JSON.parse(lastMessage.data)
     console.log("message", message)
@@ -148,7 +159,7 @@ export const Message = ({
         break
 
       case "TYPING_START":
-        if (message.chat_id === chatInfo.id) {
+        if (message.chat_id === chatInfo.id && message.sender_id !== user.id) {
           setTypingUserIDs((prev) =>
             produce(prev, (draft) => {
               if (!draft.includes(message.sender_id)) {
@@ -159,7 +170,7 @@ export const Message = ({
         }
         break
       case "TYPING_END":
-        if (message.chat_id === chatInfo.id) {
+        if (message.chat_id === chatInfo.id && message.sender_id !== user.id) {
           setTypingUserIDs((prev) =>
             produce(prev, (draft) => {
               const index = draft.indexOf(message.sender_id)

@@ -34,6 +34,7 @@ export type ChatInfo = {
 
 export type EventType =
   | "ERROR"
+  | "CONNECT"
   | "MESSAGE"
   | "MESSAGE_UPDATE"
   | "ACK_READ"
@@ -42,7 +43,6 @@ export type EventType =
   | "TYPING_START"
   | "TYPING_END"
   | "REACTION"
-  | "STILL_ACTIVE"
 export type RealtimeMessage = {
   event_type: EventType
   content: string

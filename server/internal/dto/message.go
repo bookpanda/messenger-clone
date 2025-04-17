@@ -25,16 +25,16 @@ type EventType string
 
 const (
 	EventError         EventType = "ERROR"
+	EventConnect       EventType = "CONNECT"        // Incoming message to server
 	EventMessage       EventType = "MESSAGE"        // Incoming message to server
 	EventMessageUpdate EventType = "MESSAGE_UPDATE" // Outgoing message from server
 	EventAckRead       EventType = "ACK_READ"       // Incoming message to server
 	EventRead          EventType = "READ"           // Outgoing message from server
+	EventTypingStart   EventType = "TYPING_START"   // Incoming message to server
+	EventTypingEnd     EventType = "TYPING_END"     // Incoming message to server
 
 	EventUnreadMessage EventType = "UNREAD_MESSAGE"
-	EventTypingStart   EventType = "TYPING_START"
-	EventTypingEnd     EventType = "TYPING_END"
 	EventReaction      EventType = "REACTION"
-	EventStillActive   EventType = "STILL_ACTIVE"
 )
 
 type SendRealtimeMessageRequest struct {
@@ -56,7 +56,7 @@ func (e EventType) String() string {
 
 func ValidateEventType(eventType string) bool {
 	switch EventType(eventType) {
-	case EventError, EventMessage, EventMessageUpdate, EventAckRead, EventRead, EventTypingStart, EventTypingEnd, EventReaction, EventStillActive:
+	case EventError, EventConnect, EventMessage, EventMessageUpdate, EventAckRead, EventRead, EventTypingStart, EventTypingEnd, EventReaction:
 		return true
 	}
 	return false
