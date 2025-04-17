@@ -1,7 +1,6 @@
+import { cn } from "@/lib/utils"
 import { LastMessage } from "@/types"
 import Image from "next/image"
-
-import { BaseCard } from "."
 
 interface ChatCardProps {
   name: string
@@ -15,7 +14,15 @@ export const ChatCard = (props: ChatCardProps) => {
   const { name, image, isActive, lastMessage, unreadCount } = props
 
   return (
-    <BaseCard isActive={isActive}>
+    <div
+      className={cn(
+        "flex cursor-pointer items-center gap-4 rounded-md p-2 transition-colors hover:bg-white/10",
+        {
+          "bg-card-selected-background/20 hover:bg-card-selected-background/20":
+            isActive,
+        }
+      )}
+    >
       <div className="relative size-14">
         <Image src={image} alt="" fill className="rounded-full object-cover" />
       </div>
@@ -47,6 +54,6 @@ export const ChatCard = (props: ChatCardProps) => {
           </div>
         </div>
       ) : null}
-    </BaseCard>
+    </div>
   )
 }

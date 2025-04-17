@@ -1,5 +1,4 @@
 import { createChatAction } from "@/actions/chat/create-chat"
-import { getMyChatsAction } from "@/actions/chat/get-my-chats"
 import { useChatStore } from "@/stores/chat"
 import { User } from "@/types"
 import { useQueryClient } from "@tanstack/react-query"
@@ -9,13 +8,14 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 
+import { useChatList } from "../../hooks/use-chat-list"
+
 interface PeopleCardProps {
   friend: User
 }
 
 export const PeopleCard = ({ friend }: PeopleCardProps) => {
   const { setTab } = useChatStore()
-  const { setChatList } = useChatStore()
 
   const queryClient = useQueryClient()
 
@@ -29,9 +29,6 @@ export const PeopleCard = ({ friend }: PeopleCardProps) => {
       })
 
       setTab("inbox")
-
-      const chatList = await getMyChatsAction()
-      setChatList(chatList)
 
       toast.success("Chat created successfully")
     } catch {

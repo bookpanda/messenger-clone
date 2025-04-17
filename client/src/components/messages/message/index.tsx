@@ -21,7 +21,8 @@ export const Message = ({
   chatInfo: ChatInfo
   chatHistory: ChatMessage[]
 }) => {
-  const { clearChatUnread, handleUpdateChatList } = useChatList()
+  const { clearChatUnread, handleUpdateChatList, setOnlineUsers } =
+    useChatList()
   const [openChatInfo, setOpenChatInfo] = useState(true)
 
   const {
@@ -46,6 +47,10 @@ export const Message = ({
     console.log("message", message)
 
     switch (message.event_type) {
+      case "ONLINE_USERS":
+        const onlineUsers: User[] = JSON.parse(message.content)
+        setOnlineUsers(onlineUsers)
+        break
       case "MESSAGE_UPDATE":
         // Add Chat to sidebar if not exists and update current chat message
         handleUpdateChatList(message, message.chat_id !== chatInfo.id)
