@@ -39,6 +39,7 @@ export const InboxTab = () => {
             image={chat.image}
             isActive={chat.id === parseInt(id)}
             lastMessage={chat.lastMessage}
+            unreadCount={chat.unreadCount}
           />
         </Link>
       ))}

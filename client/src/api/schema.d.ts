@@ -821,6 +821,7 @@ export interface components {
             last_message?: components["schemas"]["dto.MessageResponse"];
             name: string;
             participants: components["schemas"]["dto.UserResponse"][];
+            unread_count: number;
         };
         "dto.CreateChatRequest": {
             is_direct: boolean;

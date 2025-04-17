@@ -7,6 +7,7 @@ type ChatResponse struct {
 	Name         string           `json:"name" binding:"required"`
 	IsDirect     bool             `json:"is_direct" binding:"required"`
 	Participants []UserResponse   `json:"participants" binding:"required"`
+	UnreadCount  uint             `json:"unread_count" binding:"required"`
 	LastMessage  *MessageResponse `json:"last_message,omitempty"`
 }
 
@@ -48,7 +49,7 @@ type ModifyParticipantResponse struct {
 	Participants []UserResponse `json:"participants" binding:"required"`
 }
 
-func ToChatResponse(chat model.Chat, lastMessage *model.Message) ChatResponse {
+func ToChatResponse(chat model.Chat, lastMessage *model.Message, unreadCount uint) ChatResponse {
 	var lastMsg *MessageResponse
 	if lastMessage != nil {
 		msg := ToMessageResponse(*lastMessage)
@@ -61,10 +62,11 @@ func ToChatResponse(chat model.Chat, lastMessage *model.Message) ChatResponse {
 		IsDirect:     chat.IsDirect,
 		Participants: ToUserResponseList(chat.Participants),
 		LastMessage:  lastMsg,
+		UnreadCount:  unreadCount,
 	}
 }
 
-func ToChatResponseList(chats []model.Chat, lastMessages []model.Message) []ChatResponse {
+func ToChatResponseList(chats []model.Chat, lastMessages []model.Message, unreadCount map[uint]uint) []ChatResponse {
 	lastMessageMap := make(map[uint]*model.Message)
 	for i := range lastMessages {
 		msg := lastMessages[i] // get reference for pointer
@@ -74,7 +76,7 @@ func ToChatResponseList(chats []model.Chat, lastMessages []model.Message) []Chat
 	chatResponses := make([]ChatResponse, len(chats))
 	for i, chat := range chats {
 		lastMsg := lastMessageMap[chat.ID]
-		chatResponses[i] = ToChatResponse(chat, lastMsg)
+		chatResponses[i] = ToChatResponse(chat, lastMsg, unreadCount[chat.ID])
 	}
 	return chatResponses
 }

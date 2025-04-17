@@ -15,11 +15,14 @@ components:
             $ref: '#/components/schemas/dto.UserResponse'
           type: array
           uniqueItems: false
+        unread_count:
+          type: integer
       required:
       - id
       - is_direct
       - name
       - participants
+      - unread_count
       type: object
     dto.CreateChatRequest:
       properties:

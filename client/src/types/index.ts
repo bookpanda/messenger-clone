@@ -30,6 +30,7 @@ export type ChatInfo = {
   image: string
   lastMessage: LastMessage | null
   participants: User[]
+  unreadCount: number
 }
 
 export type EventType =

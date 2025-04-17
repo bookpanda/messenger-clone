@@ -13,6 +13,8 @@ export async function getMyChatsAction() {
     return null
   }
 
+  console.log(data.result)
+
   const chats: ChatInfo[] = data.result.map((chat) => {
     const lastMessage: LastMessage | null = chat.last_message
       ? {
@@ -34,6 +36,7 @@ export async function getMyChatsAction() {
         image: friend?.profilePictureUrl || "/thumbnail.jpg",
         lastMessage,
         participants: chat.participants,
+        unreadCount: chat.unread_count,
       }
     }
 
@@ -43,6 +46,7 @@ export async function getMyChatsAction() {
       image: "/thumbnail.jpg", // TODO: Group Image
       lastMessage,
       participants: chat.participants,
+      unreadCount: chat.unread_count,
     }
   })
 
