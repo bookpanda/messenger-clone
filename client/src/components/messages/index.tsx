@@ -14,14 +14,19 @@ export const Messages = ({
   accessToken: string
   user: User
 }) => {
-  const { handleUpdateChatList } = useChatList()
+  const { handleUpdateChatList, setOnlineUsers } = useChatList()
   const { wsLastMessage } = useSocket({ accessToken })
 
+  // Duplicate
   useEffect(() => {
     if (!wsLastMessage) return
     const message: RealtimeMessage = JSON.parse(wsLastMessage.data)
 
     switch (message.event_type) {
+      case "ONLINE_USERS":
+        const onlineUsers: User[] = JSON.parse(message.content)
+        setOnlineUsers(onlineUsers)
+        break
       case "MESSAGE_UPDATE":
         handleUpdateChatList(message, true)
         break

@@ -18,8 +18,8 @@ export const Sidebar = ({ chatList }: { chatList: ChatInfo[] }) => {
       <h1 className="text-xl font-bold">Chats</h1>
       <div className="flex gap-4 overflow-x-auto">
         {onlineUsers.map((user) => (
-          <div key={user.id}>
-            <div className="relative size-20">
+          <div key={user.id} className="flex w-20 flex-col items-center gap-2">
+            <div className="relative size-16">
               <Image
                 src={user.profilePictureUrl || "/thumbnail.jpg"}
                 fill
@@ -28,6 +28,9 @@ export const Sidebar = ({ chatList }: { chatList: ChatInfo[] }) => {
               />
               <div className="border-primary-background absolute right-0 bottom-0 z-10 size-5 rounded-full border-4 bg-green-500"></div>
             </div>
+            <p className="line-clamp-1 text-center text-sm">
+              {user.name.split(" ")[0]}
+            </p>
           </div>
         ))}
       </div>
