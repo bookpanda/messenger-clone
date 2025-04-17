@@ -10,10 +10,8 @@ export async function getMyChatsAction() {
 
   const { response, data } = await client.GET("/api/v1/chat")
   if (response.status !== 200 || !data) {
-    return null
+    return []
   }
-
-  console.log(data.result)
 
   const chats: ChatInfo[] = data.result.map((chat) => {
     const lastMessage: LastMessage | null = chat.last_message

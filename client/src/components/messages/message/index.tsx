@@ -9,6 +9,7 @@ import {
   RealtimeMessage,
   User,
 } from "@/types"
+import { useQueryClient } from "@tanstack/react-query"
 import { produce } from "immer"
 import useWebSocket from "react-use-websocket"
 
@@ -68,6 +69,13 @@ export const Message = ({
     [chatInfo.id, user.id, wsSendMessage]
   )
 
+  const queryClient = useQueryClient()
+  const revalidateChatList = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ["chats"],
+    })
+  }
+
   useEffect(() => {
     // send a connect message when the component mounts
     const payload: RealtimeMessage = {
@@ -77,6 +85,8 @@ export const Message = ({
       sender_id: user.id,
     }
     wsSendMessage(JSON.stringify(payload))
+
+    revalidateChatList()
   }, [])
 
   useEffect(() => {

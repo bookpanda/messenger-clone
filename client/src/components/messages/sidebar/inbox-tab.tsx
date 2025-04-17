@@ -1,6 +1,7 @@
 "use client"
 
 import { useChatsQuery } from "@/hooks/use-chats"
+import { ChatInfo } from "@/types"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 
@@ -8,8 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 import { ChatCard } from "./card/chat-card"
 
-export const InboxTab = () => {
-  const { data, isLoading } = useChatsQuery()
+export const InboxTab = ({ chatList }: { chatList: ChatInfo[] }) => {
+  const { data, isLoading } = useChatsQuery({ initialData: chatList })
   const { id } = useParams<{ id: string }>()
 
   if (isLoading) {
