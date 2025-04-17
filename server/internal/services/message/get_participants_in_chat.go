@@ -9,12 +9,16 @@ func (h *Handler) getCurrentParticipantsInChat(chatID uint) ([]model.User, error
 	var chat model.Chat
 
 	err := h.store.DB.
-		Model(&model.Chat{}).
-		Preload("Participants").
+		Preload("Participants.User").
 		First(&chat, chatID).Error
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load chat participants")
 	}
 
-	return chat.Participants, nil
+	users := make([]model.User, len(chat.Participants))
+	for i, p := range chat.Participants {
+		users[i] = p.User
+	}
+
+	return users, nil
 }

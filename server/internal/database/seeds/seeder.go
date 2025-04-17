@@ -64,7 +64,7 @@ func toInterfaceSlice[T any](items []T) []interface{} {
 
 func seedMessages(db *gorm.DB) error {
 	var chats []model.Chat
-	err := db.Preload("Participants").Find(&chats).Error
+	err := db.Preload("Participants.User").Find(&chats).Error
 	if err != nil {
 		return err
 	}
@@ -80,12 +80,12 @@ func seedMessages(db *gorm.DB) error {
 	for _, message := range messages {
 		var inboxes []model.Inbox
 		for _, participant := range message.Chat.Participants {
-			if participant.ID == message.SenderID {
+			if participant.UserID == message.SenderID {
 				continue
 			}
 			inbox := model.Inbox{
 				MessageID: message.ID,
-				UserID:    participant.ID,
+				UserID:    participant.UserID,
 			}
 			inboxes = append(inboxes, inbox)
 		}

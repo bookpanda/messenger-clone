@@ -55,6 +55,7 @@ func (s *Store) migrate() {
 		&model.Message{},
 		&model.Reaction{},
 		&model.Inbox{},
+		&model.ChatParticipant{},
 	); err != nil {
 		logger.Panic("failed to migrate database", slog.Any("error", err))
 	}

@@ -78,14 +78,12 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 			if err != nil {
 				logger.Error("failed to get last message", slog.Any("error", err))
 			}
-			// No message in chat
-			if message == nil {
-				continue
-			}
 
 			// 2. Broadcast Read Event to all clients
-			if err := h.chatServer.BroadcastToRoom(dto.EventRead, msgReq.ChatID, senderID, &message.ID, "read"); err != nil {
-				logger.Error("failed to broadcast message", slog.Any("error", err))
+			if message != nil {
+				if err := h.chatServer.BroadcastToRoom(dto.EventRead, msgReq.ChatID, senderID, &message.ID, "read"); err != nil {
+					logger.Error("failed to broadcast message", slog.Any("error", err))
+				}
 			}
 
 			// 3. Broadcast current participants to all clients

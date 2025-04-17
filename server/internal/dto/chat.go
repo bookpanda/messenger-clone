@@ -56,11 +56,17 @@ func ToChatResponse(chat model.Chat, lastMessage *model.Message, unreadCount uin
 		lastMsg = &msg
 	}
 
+	// Extract []User from []ChatParticipant
+	var users []model.User
+	for _, cp := range chat.Participants {
+		users = append(users, cp.User)
+	}
+
 	return ChatResponse{
 		ID:           chat.ID,
 		Name:         chat.Name,
 		IsDirect:     chat.IsDirect,
-		Participants: ToUserResponseList(chat.Participants),
+		Participants: ToUserResponseList(users),
 		LastMessage:  lastMsg,
 		UnreadCount:  unreadCount,
 	}
