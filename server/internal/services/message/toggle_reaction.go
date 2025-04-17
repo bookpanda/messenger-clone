@@ -44,25 +44,25 @@ func (h *Handler) HandleToggleReaction(c *fiber.Ctx) error {
 		return apperror.BadRequest("emoji is required", nil)
 	}
 
-	reaction, err := h.ToggleReaction(uint(messageID), userID, req.Emoji)
+	reaction, emojiAction, err := h.ToggleReaction(uint(messageID), userID, req.Emoji)
 	if err != nil {
 		return apperror.Internal("failed to toggle reaction", err)
 	}
 
 	if reaction == nil {
 		return c.Status(fiber.StatusOK).JSON(dto.ToggleReactionResponse{
-			Action: "removed",
+			Action: emojiAction,
 		})
 	}
 
 	result := dto.ToReactionResponse(*reaction)
 	return c.Status(fiber.StatusOK).JSON(dto.ToggleReactionResponse{
-		Action:   "created",
+		Action:   emojiAction,
 		Reaction: &result,
 	})
 }
 
-func (h *Handler) ToggleReaction(messageID uint, senderID uint, emoji string) (*model.Reaction, error) {
+func (h *Handler) ToggleReaction(messageID uint, senderID uint, emoji string) (*model.Reaction, string, error) {
 	var reaction model.Reaction
 
 	err := h.store.DB.
@@ -72,9 +72,9 @@ func (h *Handler) ToggleReaction(messageID uint, senderID uint, emoji string) (*
 	if err == nil {
 		// Found → delete it
 		if err := h.store.DB.Delete(&reaction).Error; err != nil {
-			return nil, errors.Wrap(err, "failed to delete existing reaction")
+			return nil, "", errors.Wrap(err, "failed to delete existing reaction")
 		}
-		return nil, nil
+		return nil, "removed", nil
 	}
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -85,10 +85,10 @@ func (h *Handler) ToggleReaction(messageID uint, senderID uint, emoji string) (*
 			Emoji:     emoji,
 		}
 		if err := h.store.DB.Create(&reaction).Error; err != nil {
-			return nil, errors.Wrap(err, "failed to create new reaction")
+			return nil, "", errors.Wrap(err, "failed to create new reaction")
 		}
-		return &reaction, nil
+		return &reaction, "created", nil
 	}
 
-	return nil, errors.Wrap(err, "failed to toggle reaction")
+	return nil, "", errors.Wrap(err, "failed to toggle reaction")
 }
