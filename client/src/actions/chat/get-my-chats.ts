@@ -10,7 +10,7 @@ export async function getMyChatsAction() {
 
   const { response, data } = await client.GET("/api/v1/chat")
   if (response.status !== 200 || !data) {
-    return null
+    return []
   }
 
   const chats: ChatInfo[] = data.result.map((chat) => {
@@ -34,6 +34,7 @@ export async function getMyChatsAction() {
         image: friend?.profilePictureUrl || "/thumbnail.jpg",
         lastMessage,
         participants: chat.participants,
+        unreadCount: chat.unread_count,
       }
     }
 
@@ -43,6 +44,7 @@ export async function getMyChatsAction() {
       image: "/thumbnail.jpg", // TODO: Group Image
       lastMessage,
       participants: chat.participants,
+      unreadCount: chat.unread_count,
     }
   })
 

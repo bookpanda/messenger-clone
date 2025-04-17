@@ -1,12 +1,13 @@
 "use client"
 
 import { useChatStore } from "@/stores/chat"
+import { ChatInfo } from "@/types"
 
 import { InboxTab } from "./inbox-tab"
 import { PeopleTab } from "./people-tab"
 import { TabButton } from "./tab-button"
 
-export const Sidebar = () => {
+export const Sidebar = ({ chatList }: { chatList: ChatInfo[] }) => {
   const { tab, setTab } = useChatStore()
 
   return (
@@ -25,7 +26,7 @@ export const Sidebar = () => {
 
       {/* Tab Content */}
       <div>
-        {tab === "inbox" && <InboxTab />}
+        {tab === "inbox" && <InboxTab chatList={chatList} />}
         {tab === "people" && <PeopleTab />}
       </div>
     </div>

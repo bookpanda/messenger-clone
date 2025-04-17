@@ -7,13 +7,13 @@ import (
 )
 
 type MessageResponse struct {
-	ID            uint               `json:"id" binding:"required"`
-	Content       string             `json:"content" binding:"required"`
-	ChatID        uint               `json:"chat_id" binding:"required"`
-	SenderID      uint               `json:"sender_id" binding:"required"`
-	CreatedAt     time.Time          `json:"created_at" binding:"required"`
-	Reactions     []ReactionResponse `json:"reactions" binding:"required"`
-	LastReadUsers []uint             `json:"last_read_users" binding:"required"`
+	ID        uint               `json:"id" binding:"required"`
+	Content   string             `json:"content" binding:"required"`
+	ChatID    uint               `json:"chat_id" binding:"required"`
+	SenderID  uint               `json:"sender_id" binding:"required"`
+	CreatedAt time.Time          `json:"created_at" binding:"required"`
+	Reactions []ReactionResponse `json:"reactions" binding:"required"`
+	ReadBy    []uint             `json:"read_by" binding:"required"`
 }
 
 type SendMessageRequest struct {
@@ -25,19 +25,23 @@ type EventType string
 
 const (
 	EventError         EventType = "ERROR"
-	EventMessage       EventType = "MESSAGE"
+	EventConnect       EventType = "CONNECT"        // Incoming message to server
+	EventMessage       EventType = "MESSAGE"        // Incoming message to server
+	EventMessageUpdate EventType = "MESSAGE_UPDATE" // Outgoing message from server
+	EventAckRead       EventType = "ACK_READ"       // Incoming message to server
+	EventRead          EventType = "READ"           // Outgoing message from server
+	EventTypingStart   EventType = "TYPING_START"   // Incoming message to server
+	EventTypingEnd     EventType = "TYPING_END"     // Incoming message to server
+
 	EventUnreadMessage EventType = "UNREAD_MESSAGE"
-	EventTypingStart   EventType = "TYPING_START"
-	EventTypingEnd     EventType = "TYPING_END"
 	EventReaction      EventType = "REACTION"
-	EventRead          EventType = "READ"
-	EventStillActive   EventType = "STILL_ACTIVE"
 )
 
 type SendRealtimeMessageRequest struct {
 	EventType EventType `json:"event_type" validate:"required" binding:"required"`
 	Content   string    `json:"content" validate:"required" binding:"required"`
 	SenderID  uint      `json:"sender_id"`
+	ChatID    uint      `json:"chat_id"`
 	MessageID uint      `json:"message_id"`
 }
 
@@ -52,37 +56,32 @@ func (e EventType) String() string {
 
 func ValidateEventType(eventType string) bool {
 	switch EventType(eventType) {
-	case EventError, EventMessage, EventTypingStart, EventTypingEnd, EventReaction, EventRead, EventStillActive:
+	case EventError, EventConnect, EventMessage, EventMessageUpdate, EventAckRead, EventRead, EventTypingStart, EventTypingEnd, EventReaction:
 		return true
 	}
 	return false
 }
 
-func ToMessageResponse(message model.Message, lastReadUsers []uint) MessageResponse {
+func ToMessageResponse(message model.Message) MessageResponse {
+	readers := make([]uint, 0)
+	for _, u := range message.ReadBy {
+		readers = append(readers, u.ID)
+	}
 	return MessageResponse{
-		ID:            message.ID,
-		Content:       message.Content,
-		ChatID:        message.ChatID,
-		SenderID:      message.SenderID,
-		CreatedAt:     message.CreatedAt,
-		Reactions:     ToReactionResponseList(message.Reactions),
-		LastReadUsers: lastReadUsers,
+		ID:        message.ID,
+		Content:   message.Content,
+		ChatID:    message.ChatID,
+		SenderID:  message.SenderID,
+		CreatedAt: message.CreatedAt,
+		Reactions: ToReactionResponseList(message.Reactions),
+		ReadBy:    readers,
 	}
 }
 
-func ToMessageResponseList(messages []model.Message, userLastReads []UserLastRead) []MessageResponse {
-	messageIdToLastReadUsers := make(map[uint][]uint)
-	for _, userLastRead := range userLastReads {
-		messageIdToLastReadUsers[userLastRead.MessageID] = append(messageIdToLastReadUsers[userLastRead.MessageID], userLastRead.UserID)
-	}
-
+func ToMessageResponseList(messages []model.Message) []MessageResponse {
 	messageResponses := make([]MessageResponse, len(messages))
 	for i, message := range messages {
-		if lastReadUsers, ok := messageIdToLastReadUsers[message.ID]; ok {
-			messageResponses[i] = ToMessageResponse(message, lastReadUsers)
-		} else {
-			messageResponses[i] = ToMessageResponse(message, []uint{})
-		}
+		messageResponses[i] = ToMessageResponse(message)
 	}
 	return messageResponses
 }

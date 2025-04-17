@@ -1,10 +1,8 @@
 import { Dispatch, SetStateAction } from "react"
 
-import { useChatContext } from "@/contexts/chat-context"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import { Info, Phone, Video } from "lucide-react"
-import { useSession } from "next-auth/react"
 import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
