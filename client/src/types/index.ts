@@ -53,6 +53,7 @@ export type EventType =
   | "TYPING_START"
   | "TYPING_END"
   | "ONLINE_USERS"
+  | "CHAT_PARTICIPANTS"
   | "UNREAD_MESSAGE"
   | "REACTION"
 export type RealtimeMessage = {

@@ -24,15 +24,16 @@ type SendMessageRequest struct {
 type EventType string
 
 const (
-	EventError         EventType = "ERROR"
-	EventConnect       EventType = "CONNECT"        // Incoming message to server
-	EventMessage       EventType = "MESSAGE"        // Incoming message to server
-	EventMessageUpdate EventType = "MESSAGE_UPDATE" // Outgoing message from server
-	EventAckRead       EventType = "ACK_READ"       // Incoming message to server
-	EventRead          EventType = "READ"           // Outgoing message from server
-	EventTypingStart   EventType = "TYPING_START"   // Incoming message to server
-	EventTypingEnd     EventType = "TYPING_END"     // Incoming message to server
-	EventOnlineUsers   EventType = "ONLINE_USERS"   // Outgoing message from server
+	EventError            EventType = "ERROR"
+	EventConnect          EventType = "CONNECT"           // Incoming message to server
+	EventMessage          EventType = "MESSAGE"           // Incoming message to server
+	EventMessageUpdate    EventType = "MESSAGE_UPDATE"    // Outgoing message from server
+	EventAckRead          EventType = "ACK_READ"          // Incoming message to server
+	EventRead             EventType = "READ"              // Outgoing message from server
+	EventTypingStart      EventType = "TYPING_START"      // Incoming message to server
+	EventTypingEnd        EventType = "TYPING_END"        // Incoming message to server
+	EventOnlineUsers      EventType = "ONLINE_USERS"      // Outgoing message from server
+	EventChatParticipants EventType = "CHAT_PARTICIPANTS" // Outgoing message from server
 
 	EventUnreadMessage EventType = "UNREAD_MESSAGE"
 	EventReaction      EventType = "REACTION"
