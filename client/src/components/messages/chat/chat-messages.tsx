@@ -43,7 +43,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
           }
 
           const lastReadUsers = participants.filter((user) =>
-            message.last_read_users.includes(user.id || 0)
+            message.read_by.includes(user.id || 0)
           )
 
           return (

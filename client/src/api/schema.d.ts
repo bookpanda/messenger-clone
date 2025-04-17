@@ -873,8 +873,8 @@ export interface components {
             content: string;
             created_at: string;
             id: number;
-            last_read_users: number[];
             reactions: components["schemas"]["dto.ReactionResponse"][];
+            read_by: number[];
             sender_id: number;
         };
         "dto.ModifyParticipantRequest": {

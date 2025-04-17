@@ -33,13 +33,15 @@ export type ChatInfo = {
 }
 
 export type EventType =
-  | "MESSAGE"
-  | "UNREAD_MESSAGE"
   | "ERROR"
+  | "MESSAGE"
+  | "MESSAGE_UPDATE"
+  | "ACK_READ"
+  | "READ"
+  | "UNREAD_MESSAGE"
   | "TYPING_START"
   | "TYPING_END"
   | "REACTION"
-  | "READ"
   | "STILL_ACTIVE"
 export type RealtimeMessage = {
   event_type: EventType

@@ -70,21 +70,29 @@ func (s *Server) Logout(userID uint) {
 	}
 }
 
-func (s *Server) BroadcastToRoom(msgReq dto.SendRealtimeMessageRequest, chatID uint, senderID uint) error {
+func (s *Server) BroadcastToRoom(eventType dto.EventType, chatID uint, senderID uint, messageID *uint, content string) error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	// Force assign senderID to avoid client-side spoofing
-	msgReq.SenderID = senderID
+	broadcastMessage := dto.SendRealtimeMessageRequest{
+		EventType: eventType,
+		Content:   content,
+		SenderID:  senderID,
+		ChatID:    chatID,
+	}
+
+	if messageID != nil {
+		broadcastMessage.MessageID = *messageID
+	}
 
 	// Marshal message to JSON
-	jsonMsg, err := json.Marshal(msgReq)
+	jsonMsg, err := json.Marshal(broadcastMessage)
 	if err != nil {
 		return errors.Wrap(err, "failed to marshal message to JSON")
 	}
 
 	// If it's an error event, send to sender only
-	if msgReq.EventType == dto.EventError {
+	if eventType == dto.EventError {
 		if client, ok := s.users[senderID]; ok && client != nil {
 			client.Message <- string(jsonMsg)
 		}
@@ -106,9 +114,9 @@ func (s *Server) BroadcastToRoom(msgReq dto.SendRealtimeMessageRequest, chatID u
 		}
 
 		// For certain events, skip sender
-		if (msgReq.EventType == dto.EventStillActive || msgReq.EventType == dto.EventRead) && participant.ID == senderID {
-			continue
-		}
+		// if (eventType == dto.EventStillActive || eventType == dto.EventRead) && participant.ID == senderID {
+		// 	continue
+		// }
 
 		client.Message <- string(jsonMsg)
 	}

@@ -49,19 +49,20 @@ export const Message = ({
       if (messageID) {
         payload.message_id = messageID
       }
-      // console.log(`sendMessage`, payload)
       wsSendMessage(JSON.stringify(payload))
     },
     [wsSendMessage]
   )
 
-  useEffect(() => {
-    // send interval 3 sec that I'm still active
-    const interval = setInterval(() => {
-      sendMessage("<still_active>", "STILL_ACTIVE")
-    }, 3000)
-
-    return () => clearInterval(interval)
+  const ackRead = useCallback((messageId: number) => {
+    const payload: RealtimeMessage = {
+      event_type: "ACK_READ",
+      content: "<read>",
+      chat_id: chatInfo.id,
+      sender_id: user.id,
+      message_id: messageId,
+    }
+    wsSendMessage(JSON.stringify(payload))
   }, [])
 
   useEffect(() => {
@@ -70,37 +71,43 @@ export const Message = ({
     console.log("message", message)
 
     switch (message.event_type) {
-      case "MESSAGE":
-        const newMessage: ChatMessage = {
-          id: message.message_id || 0,
-          chat_id: chatInfo.id,
-          sender_id: message.sender_id,
-          content: message.content,
-          created_at: new Date().toDateString(),
-          last_read_users: [],
-          reactions: [],
+      case "MESSAGE_UPDATE":
+        if (message.chat_id === chatInfo.id) {
+          const newMessage: ChatMessage = {
+            id: message.message_id || 0,
+            chat_id: chatInfo.id,
+            sender_id: message.sender_id,
+            content: message.content,
+            created_at: new Date().toDateString(),
+            read_by: [],
+            reactions: [],
+          }
+          setMessages((prevMessages) =>
+            produce(prevMessages, (draft) => {
+              draft.push(newMessage)
+            })
+          )
+
+          if (message.message_id) ackRead(message.message_id)
         }
-        setMessages((prevMessages) =>
-          produce(prevMessages, (draft) => {
-            draft.push(newMessage)
-          })
-        )
         break
-      case "STILL_ACTIVE":
-        setMessages((prevMessages) =>
-          produce(prevMessages, (draft) => {
-            const lastIndex = draft.length - 1
-            if (lastIndex < 0) return
-
-            // 1. Clear old last_read_users
-            for (let i = 0; i < lastIndex; i++) {
-              draft[i].last_read_users = []
-            }
-
-            // 2. Set last message's last_read_users to [99]
-            draft[lastIndex].last_read_users = [message.sender_id]
-          })
-        )
+      case "READ":
+        if (message.chat_id === chatInfo.id) {
+          setMessages((prevMessages) =>
+            produce(prevMessages, (draft) => {
+              const prevReadMessage = draft.find((m) =>
+                m.read_by.includes(message.sender_id)
+              )
+              if (prevReadMessage) {
+                const index = prevReadMessage.read_by.indexOf(message.sender_id)
+                if (index !== -1) prevReadMessage.read_by.splice(index, 1)
+              }
+              const readMessage = draft.find((m) => m.id === message.message_id)
+              if (!readMessage) return
+              readMessage.read_by.push(message.sender_id)
+            })
+          )
+        }
         break
       case "UNREAD_MESSAGE":
         //   const newMessage: ChatMessage = {
@@ -133,24 +140,7 @@ export const Message = ({
         //   )
         // sendMessage("<read>", "READ", message.message_id)
         break
-      case "READ":
-        setMessages((prevMessages) =>
-          produce(prevMessages, (draft) => {
-            const prevReadMessage = draft.find((m) =>
-              m.last_read_users.includes(message.sender_id)
-            )
-            if (prevReadMessage) {
-              const index = prevReadMessage.last_read_users.indexOf(
-                message.sender_id
-              )
-              if (index !== -1) prevReadMessage.last_read_users.splice(index, 1)
-            }
-            const readMessage = draft.find((m) => m.id === message.message_id)
-            if (!readMessage) return
-            readMessage.last_read_users.push(message.sender_id)
-          })
-        )
-        break
+
       case "TYPING_START":
         if (message.chat_id === chatInfo.id) {
           setTypingUserIDs((prev) =>

@@ -7,7 +7,6 @@ import (
 
 	"github.com/bookpanda/messenger-clone/internal/dto"
 	"github.com/bookpanda/messenger-clone/internal/jwt"
-	"github.com/bookpanda/messenger-clone/internal/model"
 	"github.com/bookpanda/messenger-clone/internal/services/chat"
 	"github.com/bookpanda/messenger-clone/pkg/logger"
 	"github.com/gofiber/contrib/websocket"
@@ -85,7 +84,7 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 	defer wg.Done()
 
 	for {
-		msgType, msg, err := c.ReadMessage()
+		_, msg, err := c.ReadMessage()
 		if err != nil {
 			logger.Error("failed receiving message", slog.Any("error", err))
 			logger.Info("closing connection...")
@@ -93,34 +92,31 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 			break
 		}
 
-		errorMsg := dto.SendRealtimeMessageRequest{
-			EventType: dto.EventError,
-			Content:   "invalid message",
-		}
-
 		var msgReq dto.SendRealtimeMessageRequest
 		if err := json.Unmarshal([]byte(msg), &msgReq); err != nil {
 			logger.Error("Failed Unmarshal json", slog.Any("error", err))
-			h.chatServer.BroadcastToRoom(errorMsg, msgReq.ChatID, senderID)
+			h.chatServer.BroadcastToRoom(dto.EventError, msgReq.ChatID, senderID, nil, "invalid message")
 			continue
 		}
 
 		if err := h.validate.Struct(msgReq); err != nil {
 			logger.Error("Failed validate message request", slog.Any("error", err))
-			h.chatServer.BroadcastToRoom(errorMsg, msgReq.ChatID, senderID)
+			h.chatServer.BroadcastToRoom(dto.EventError, msgReq.ChatID, senderID, nil, "invalid message")
 			continue
 		}
 
 		if !dto.ValidateEventType(msgReq.EventType.String()) {
 			logger.Error("Invalid event type", slog.Any("event_type", msgReq.EventType))
-			h.chatServer.BroadcastToRoom(errorMsg, msgReq.ChatID, senderID)
+			h.chatServer.BroadcastToRoom(dto.EventError, msgReq.ChatID, senderID, nil, "invalid message")
 			continue
 		}
 
-		// logger.Info("receive message", msgReq)
+		// All of this considered messages from SenderID
 
-		// create Message object in database, then send to all clients
+		// Case I : When user sent message in chat
+		// field: EventType, Content, ChatID
 		if msgReq.EventType == dto.EventMessage {
+			// 1. Store Message in database
 			req := dto.SendMessageRequest{
 				Content: msgReq.Content,
 				ChatID:  msgReq.ChatID,
@@ -128,41 +124,68 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 			message, err := h.SendMessage(req, senderID)
 			if err != nil {
 				logger.Error("failed to send message", slog.Any("error", err))
-				h.chatServer.BroadcastToRoom(errorMsg, msgReq.ChatID, senderID)
+				h.chatServer.BroadcastToRoom(dto.EventError, msgReq.ChatID, senderID, nil, "failed to store message in database")
 				continue
 			}
 
-			msgReq.MessageID = message.ID
-			// msgType is from lib, not same as our EventType
-			if msgType == websocket.TextMessage {
-				h.chatServer.BroadcastToRoom(msgReq, msgReq.ChatID, senderID)
+			// 2. Broadcast to all clients
+			if err := h.chatServer.BroadcastToRoom(dto.EventMessageUpdate, msgReq.ChatID, senderID, &message.ID, msgReq.Content); err != nil {
+				logger.Error("failed to broadcast message", slog.Any("error", err))
 			}
+
+			// msgType is from lib, not same as our EventType
+			// if msgType == websocket.TextMessage {
+			// 	h.chatServer.BroadcastToRoom(dto.EventError, msgReq.ChatID, senderID, nil, "invalid operation on EventMessage")
+			// }
+
+			continue
+		}
+
+		// Case II : When user (client) receive message then tell server that I'm read
+		// field: EventType, ChatID, MessageID
+		if msgReq.EventType == dto.EventAckRead {
+			// 1. Store in database that read by me
+			if err := h.markAsRead(msgReq.MessageID, msgReq.SenderID); err != nil {
+				logger.Error("failed to mark message as read", slog.Any("error", err))
+				h.chatServer.BroadcastToRoom(dto.EventError, msgReq.ChatID, senderID, nil, "failed to mark message as read")
+				continue
+			}
+
+			// 2. Broadcast to all clients
+			if err := h.chatServer.BroadcastToRoom(dto.EventRead, msgReq.ChatID, senderID, &msgReq.MessageID, "read"); err != nil {
+				logger.Error("failed to broadcast message", slog.Any("error", err))
+			}
+
+			// msgType is from lib, not same as our EventType
+			// if msgType == websocket.TextMessage {
+			// 	h.chatServer.BroadcastToRoom(dto.EventError, msgReq.ChatID, senderID, nil, "invalid message")
+			// }
 
 			continue
 		}
 
 		// sender (receiver of message) has read
-		if msgReq.EventType == dto.EventRead {
-			err := h.store.DB.
-				Where("message_id = ? AND user_id = ?", msgReq.MessageID, senderID).
-				Delete(&model.Inbox{}).Error
-			if err != nil {
-				logger.Error("failed to delete inbox", slog.Any("error", err))
-				h.chatServer.BroadcastToRoom(errorMsg, msgReq.ChatID, senderID)
-			}
-			h.chatServer.BroadcastToRoom(msgReq, msgReq.ChatID, senderID)
-			continue
-		}
+		// if msgReq.EventType == dto.EventRead {
+		// 	err := h.store.DB.
+		// 		Where("message_id = ? AND user_id = ?", msgReq.MessageID, senderID).
+		// 		Delete(&model.Inbox{}).Error
+		// 	if err != nil {
+		// 		logger.Error("failed to delete inbox", slog.Any("error", err))
+		// 		h.chatServer.BroadcastToRoom(errorMsg, msgReq.ChatID, senderID)
+		// 	}
+		// 	h.chatServer.BroadcastToRoom(msgReq, msgReq.ChatID, senderID)
+		// 	continue
+		// }
 
-		if msgReq.EventType == dto.EventStillActive {
-			h.chatServer.BroadcastToRoom(msgReq, msgReq.ChatID, senderID)
-			continue
-		}
+		// if msgReq.EventType == dto.EventStillActive {
+		// 	h.chatServer.BroadcastToRoom(msgReq, msgReq.ChatID, senderID)
+		// 	continue
+		// }
 
 		// for other events, just send to all clients
-		if msgType == websocket.TextMessage {
-			h.chatServer.BroadcastToRoom(msgReq, msgReq.ChatID, senderID)
-		}
+		// if msgType == websocket.TextMessage {
+		// 	h.chatServer.BroadcastToRoom(msgReq, msgReq.ChatID, senderID)
+		// }
 	}
 }
 

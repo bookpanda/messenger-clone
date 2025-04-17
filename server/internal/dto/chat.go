@@ -51,7 +51,7 @@ type ModifyParticipantResponse struct {
 func ToChatResponse(chat model.Chat, lastMessage *model.Message) ChatResponse {
 	var lastMsg *MessageResponse
 	if lastMessage != nil {
-		msg := ToMessageResponse(*lastMessage, []uint{})
+		msg := ToMessageResponse(*lastMessage)
 		lastMsg = &msg
 	}
 
