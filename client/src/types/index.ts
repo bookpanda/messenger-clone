@@ -40,9 +40,10 @@ export type EventType =
   | "MESSAGE_UPDATE"
   | "ACK_READ"
   | "READ"
-  | "UNREAD_MESSAGE"
   | "TYPING_START"
   | "TYPING_END"
+  | "ONLINE_USERS"
+  | "UNREAD_MESSAGE"
   | "REACTION"
 export type RealtimeMessage = {
   event_type: EventType
