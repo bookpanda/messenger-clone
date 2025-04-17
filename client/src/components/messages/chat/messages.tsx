@@ -16,6 +16,7 @@ import {
 
 interface MessageProps {
   message: ChatMessage
+  user: User
   sender: User
   handleAddReaction: (reaction: string) => void
 }
@@ -30,7 +31,7 @@ interface EmojiMap {
 const reactionEmojis = ["🥰", "😢", "😂", "😡", "👍"]
 
 export const IncomingMessage = (props: MessageProps) => {
-  const { message, sender, handleAddReaction } = props
+  const { message, user, sender, handleAddReaction } = props
   const { content, reactions } = message
 
   const [isHover, setHover] = useState(false)
@@ -130,7 +131,7 @@ export const IncomingMessage = (props: MessageProps) => {
                   className={cn("size-8 p-0 px-3 text-2xl", {
                     "bg-secondary-background": groupedReactions?.[
                       emoji
-                    ]?.senders.includes(sender.id),
+                    ]?.senders.includes(user.id),
                   })}
                   onClick={() => {
                     handleAddReaction(emoji)
@@ -156,7 +157,7 @@ export const IncomingMessage = (props: MessageProps) => {
 }
 
 export const OutgoingMessage = (props: MessageProps) => {
-  const { message, handleAddReaction, sender } = props
+  const { message, user, handleAddReaction } = props
   const { content, reactions } = message
 
   const [isHover, setHover] = useState(false)
@@ -233,7 +234,7 @@ export const OutgoingMessage = (props: MessageProps) => {
                   className={cn("size-8 p-0 px-3 text-2xl", {
                     "bg-secondary-background": groupedReactions?.[
                       emoji
-                    ]?.senders.includes(sender.id),
+                    ]?.senders.includes(user.id),
                   })}
                   onClick={() => {
                     handleAddReaction(emoji)

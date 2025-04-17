@@ -51,6 +51,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
               {message.sender_id !== user.id ? (
                 <IncomingMessage
                   message={message}
+                  user={user}
                   sender={sender}
                   handleAddReaction={(reaction: string) =>
                     handleAddReaction(message.id, reaction)
@@ -59,6 +60,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
               ) : (
                 <OutgoingMessage
                   message={message}
+                  user={user}
                   sender={sender}
                   handleAddReaction={(reaction: string) =>
                     handleAddReaction(message.id, reaction)
