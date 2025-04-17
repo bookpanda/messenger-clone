@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 
-import { useChatContext } from "@/contexts/chat-context"
-import { ChatInfo, ChatMessage, User } from "@/types"
+import { ChatMessage, User } from "@/types"
 
 import { IncomingMessage, OutgoingMessage } from "./messages"
 import { ReadBubbles } from "./read-bubble"

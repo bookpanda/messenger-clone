@@ -51,19 +51,22 @@ export const Message = ({
       }
       wsSendMessage(JSON.stringify(payload))
     },
-    [wsSendMessage]
+    [wsSendMessage, chatInfo.id]
   )
 
-  const ackRead = useCallback((messageId: number) => {
-    const payload: RealtimeMessage = {
-      event_type: "ACK_READ",
-      content: "<read>",
-      chat_id: chatInfo.id,
-      sender_id: user.id,
-      message_id: messageId,
-    }
-    wsSendMessage(JSON.stringify(payload))
-  }, [])
+  const ackRead = useCallback(
+    (messageId: number) => {
+      const payload: RealtimeMessage = {
+        event_type: "ACK_READ",
+        content: "<read>",
+        chat_id: chatInfo.id,
+        sender_id: user.id,
+        message_id: messageId,
+      }
+      wsSendMessage(JSON.stringify(payload))
+    },
+    [chatInfo.id, user.id, wsSendMessage]
+  )
 
   useEffect(() => {
     if (!lastMessage) return
@@ -168,7 +171,7 @@ export const Message = ({
         }
         break
     }
-  }, [lastMessage, sendMessage])
+  }, [lastMessage, sendMessage, ackRead, chatInfo.id, user.id])
 
   return (
     <div className="flex min-h-0 flex-1 gap-4 p-4">
