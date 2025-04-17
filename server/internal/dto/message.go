@@ -32,6 +32,7 @@ const (
 	EventRead          EventType = "READ"           // Outgoing message from server
 	EventTypingStart   EventType = "TYPING_START"   // Incoming message to server
 	EventTypingEnd     EventType = "TYPING_END"     // Incoming message to server
+	EventOnlineUsers   EventType = "ONLINE_USERS"   // Outgoing message from server
 
 	EventUnreadMessage EventType = "UNREAD_MESSAGE"
 	EventReaction      EventType = "REACTION"

@@ -1,5 +1,6 @@
 import { ReactNode } from "react"
 
+import { getMyChatsAction } from "@/actions/chat/get-my-chats"
 import { getAllUsersAction } from "@/actions/user/get-users"
 
 import { Header } from "@/components/header"
