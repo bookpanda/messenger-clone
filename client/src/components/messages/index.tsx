@@ -2,10 +2,9 @@
 
 import { useEffect } from "react"
 
-import { getMyChatsAction } from "@/actions/chat/get-my-chats"
-import { useChatStore } from "@/stores/chat"
-import { LastMessage, RealtimeMessage, User } from "@/types"
+import { RealtimeMessage, User } from "@/types"
 
+import { useChatList } from "./hooks/use-chat-list"
 import { useSocket } from "./hooks/use-socket"
 
 export const Messages = ({
@@ -15,23 +14,8 @@ export const Messages = ({
   accessToken: string
   user: User
 }) => {
-  const { chatList, updateChatLastMessage, setChatList } = useChatStore()
+  const { handleUpdateChatList } = useChatList()
   const { wsLastMessage } = useSocket({ accessToken })
-
-  // Duplicate
-  const handleNewMessage = async (message: RealtimeMessage) => {
-    if (!chatList.find((chat) => chat.id === message.chat_id)) {
-      const chatList = await getMyChatsAction()
-      setChatList(chatList)
-    } else {
-      const lastMessage: LastMessage = {
-        type: message.sender_id === user.id ? "outgoing" : "incoming",
-        message: message.content,
-        date: new Date(),
-      }
-      updateChatLastMessage(message.chat_id, lastMessage, true)
-    }
-  }
 
   useEffect(() => {
     if (!wsLastMessage) return
@@ -39,7 +23,7 @@ export const Messages = ({
 
     switch (message.event_type) {
       case "MESSAGE_UPDATE":
-        handleNewMessage(message)
+        handleUpdateChatList(message, true)
         break
     }
   }, [wsLastMessage])

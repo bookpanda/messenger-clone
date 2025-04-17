@@ -1,20 +1,13 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
-import { getMyChatsAction } from "@/actions/chat/get-my-chats"
-import { useChatStore } from "@/stores/chat"
-import {
-  ChatInfo,
-  ChatMessage,
-  LastMessage,
-  RealtimeMessage,
-  User,
-} from "@/types"
+import { ChatInfo, ChatMessage, RealtimeMessage, User } from "@/types"
 import { produce } from "immer"
 
 import { ChatBox } from "../chat"
 import { ChatInfoPanel } from "../chat-info"
+import { useChatList } from "../hooks/use-chat-list"
 import { useSocket } from "../hooks/use-socket"
 
 export const Message = ({
@@ -28,8 +21,7 @@ export const Message = ({
   chatInfo: ChatInfo
   chatHistory: ChatMessage[]
 }) => {
-  const { chatList, updateChatLastMessage, clearChatUnread, setChatList } =
-    useChatStore()
+  const { clearChatUnread, handleUpdateChatList } = useChatList()
   const [openChatInfo, setOpenChatInfo] = useState(true)
 
   const {
@@ -48,27 +40,6 @@ export const Message = ({
     clearChatUnread(chatInfo.id)
   }, [chatInfo.id])
 
-  const handleNewMessage = useCallback(
-    async (message: RealtimeMessage) => {
-      if (!chatList.find((chat) => chat.id === message.chat_id)) {
-        const chatList = await getMyChatsAction()
-        setChatList(chatList)
-      } else {
-        const lastMessage: LastMessage = {
-          type: message.sender_id === user.id ? "outgoing" : "incoming",
-          message: message.content,
-          date: new Date(),
-        }
-        updateChatLastMessage(
-          message.chat_id,
-          lastMessage,
-          message.chat_id !== chatInfo.id // If the message is not from the current chat, mark it as unread
-        )
-      }
-    },
-    [chatList, chatInfo.id, user.id]
-  )
-
   useEffect(() => {
     if (!wsLastMessage) return
     const message: RealtimeMessage = JSON.parse(wsLastMessage.data)
@@ -77,7 +48,7 @@ export const Message = ({
     switch (message.event_type) {
       case "MESSAGE_UPDATE":
         // Add Chat to sidebar if not exists and update current chat message
-        handleNewMessage(message)
+        handleUpdateChatList(message, message.chat_id !== chatInfo.id)
 
         // Current Chat's message arrived
         if (message.chat_id === chatInfo.id) {
