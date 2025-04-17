@@ -1,6 +1,7 @@
 import { joinChatAction } from "@/actions/chat/join-chat"
 import { useChatStore } from "@/stores/chat"
 import { User } from "@/types"
+import { useQueryClient } from "@tanstack/react-query"
 import { Check, PlusIcon } from "lucide-react"
 import Image from "next/image"
 import { toast } from "sonner"
@@ -25,15 +26,20 @@ export const CommunityCard = ({
   const { setTab } = useChatStore()
   const { revalidateChatList } = useChatList()
 
+  const queryClient = useQueryClient()
+
   const handleJoinChat = async () => {
     try {
       await joinChatAction(id)
+      await queryClient.invalidateQueries({
+        queryKey: ["community-chats"],
+      })
 
       setTab("inbox")
       revalidateChatList()
 
       toast.success(`Successfully joined ${name}.`)
-    } catch (error) {
+    } catch {
       toast.error("Failed to join chat")
     }
   }

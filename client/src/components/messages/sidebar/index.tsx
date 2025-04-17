@@ -1,7 +1,7 @@
 "use client"
 
 import { useChatStore } from "@/stores/chat"
-import { ChatInfo, CommunityInfo, User } from "@/types"
+import { ChatInfo, User } from "@/types"
 import Image from "next/image"
 
 import { CommunitiesTab } from "./communities-tab"
@@ -12,11 +12,9 @@ import { TabButton } from "./tab-button"
 
 export const Sidebar = ({
   chatList,
-  groupChats,
   allUsers,
 }: {
   chatList: ChatInfo[]
-  groupChats: CommunityInfo[]
   allUsers: User[]
 }) => {
   const { tab, setTab } = useChatStore()
@@ -68,7 +66,7 @@ export const Sidebar = ({
       <div className="flex flex-1 flex-col overflow-hidden">
         {tab === "inbox" && <InboxTab initialData={chatList} />}
         {tab === "people" && <PeopleTab />}
-        {tab === "communities" && <CommunitiesTab initialData={groupChats} />}
+        {tab === "communities" && <CommunitiesTab />}
       </div>
     </div>
   )

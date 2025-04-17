@@ -1,4 +1,4 @@
-import { ChatInfo, LastMessage, SidebarTab, User } from "@/types"
+import { ChatInfo, CommunityInfo, LastMessage, SidebarTab, User } from "@/types"
 import { create } from "zustand"
 
 interface ChatStore {
@@ -16,6 +16,12 @@ interface ChatStore {
 
   onlineUsers: User[]
   setOnlineUsers: (users: User[]) => void
+
+  peopleList: User[]
+  setPeopleList: (peopleList: User[]) => void
+
+  groupList: CommunityInfo[]
+  setGroupList: (groupList: CommunityInfo[]) => void
 }
 
 const useChatStore = create<ChatStore>((set) => ({
@@ -50,6 +56,12 @@ const useChatStore = create<ChatStore>((set) => ({
 
   onlineUsers: [],
   setOnlineUsers: (users) => set({ onlineUsers: users }),
+
+  peopleList: [],
+  setPeopleList: (peopleList) => set({ peopleList }),
+
+  groupList: [],
+  setGroupList: (groupList) => set({ groupList }),
 }))
 
 export { useChatStore }

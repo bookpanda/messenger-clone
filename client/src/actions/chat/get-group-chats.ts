@@ -2,7 +2,7 @@
 
 import { client } from "@/api/client"
 import { auth } from "@/auth"
-import { ChatInfo, CommunityInfo, LastMessage } from "@/types"
+import { CommunityInfo, LastMessage } from "@/types"
 
 export async function getGroupChatsAction(): Promise<CommunityInfo[]> {
   const session = await auth()
