@@ -185,6 +185,7 @@
         "type": "object"
       },
       "dto.ReactionResponse": {
+        "description": "nil if removed",
         "properties": {
           "created_at": { "type": "string" },
           "emoji": { "type": "string" },
@@ -206,6 +207,22 @@
           "content": { "type": "string" }
         },
         "required": ["chat_id", "content"],
+        "type": "object"
+      },
+      "dto.ToggleReactionRequest": {
+        "properties": { "emoji": { "type": "string" } },
+        "required": ["emoji"],
+        "type": "object"
+      },
+      "dto.ToggleReactionResponse": {
+        "properties": {
+          "action": {
+            "description": "\"created\" or \"removed\"",
+            "type": "string"
+          },
+          "reaction": { "$ref": "#/components/schemas/dto.ReactionResponse" }
+        },
+        "required": ["action"],
         "type": "object"
       },
       "dto.TokenResponse": {
