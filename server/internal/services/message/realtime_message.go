@@ -39,6 +39,7 @@ func (h *Handler) HandleRealTimeMessages(c *websocket.Conn) {
 	c.Close()
 }
 
+// Warning: Do not use msgReq.SenderID
 func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, senderID uint) {
 	defer wg.Done()
 
@@ -90,7 +91,7 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 		}
 
 		// Case II : When user sent message in chat
-		// field: EventType, Content, ChatID
+		// field: EventType, Content, msgReq.SChatID
 		if msgReq.EventType == dto.EventMessage {
 			// 1. Store Message in database
 			message, err := h.SendMessage(dto.SendMessageRequest{
@@ -114,7 +115,7 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 		// field: EventType, ChatID, MessageID
 		if msgReq.EventType == dto.EventAckRead {
 			// 1. Store in database that read by me
-			if err := h.markAsRead(msgReq.MessageID, msgReq.SenderID); err != nil {
+			if err := h.markAsRead(msgReq.MessageID, senderID); err != nil {
 				logger.Error("failed to mark message as read", slog.Any("error", err))
 				continue
 			}
