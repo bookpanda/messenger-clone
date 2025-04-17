@@ -706,6 +706,71 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/message/{id}/react": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Toggle reaction
+         * @description Add or remove a reaction (emoji) to a specific message
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Message ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            /** @description request request */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["dto.ToggleReactionRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.ToggleReactionResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/message/chat/{id}": {
         parameters: {
             query?: never;
@@ -1009,6 +1074,7 @@ export interface components {
         "dto.ModifyParticipantResponse": {
             participants: components["schemas"]["dto.UserResponse"][];
         };
+        /** @description nil if removed */
         "dto.ReactionResponse": {
             created_at: string;
             emoji: string;
@@ -1022,6 +1088,14 @@ export interface components {
         "dto.SendMessageRequest": {
             chat_id: number;
             content: string;
+        };
+        "dto.ToggleReactionRequest": {
+            emoji: string;
+        };
+        "dto.ToggleReactionResponse": {
+            /** @description "created" or "removed" */
+            action: string;
+            reaction?: components["schemas"]["dto.ReactionResponse"];
         };
         "dto.TokenResponse": {
             accessToken: string;

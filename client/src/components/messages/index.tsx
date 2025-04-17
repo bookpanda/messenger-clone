@@ -8,7 +8,11 @@ import { useChatList } from "./hooks/use-chat-list"
 import { useSocket } from "./hooks/use-socket"
 
 export const Messages = ({ accessToken }: { accessToken: string }) => {
-  const { handleUpdateChatList, setOnlineUsers } = useChatList()
+  const {
+    handleUpdateChatList,
+    setOnlineUsers,
+    handleReactionPreviewChatList,
+  } = useChatList()
   const { wsLastMessage } = useSocket({ accessToken })
 
   // Duplicate
@@ -23,6 +27,11 @@ export const Messages = ({ accessToken }: { accessToken: string }) => {
         break
       case "MESSAGE_UPDATE":
         handleUpdateChatList(message, true)
+        break
+      case "REACTION":
+        if (message.emoji_action) {
+          handleReactionPreviewChatList(message, "Someone", true)
+        }
         break
     }
   }, [wsLastMessage])
