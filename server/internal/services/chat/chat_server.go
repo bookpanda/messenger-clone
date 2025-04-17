@@ -194,3 +194,41 @@ func (s *Server) BroadcastToRoom(eventType dto.EventType, chatID uint, senderID 
 
 	return nil
 }
+
+func (s *Server) SendToUser(eventType dto.EventType, chatID uint, senderID uint, receiverID uint, messageID *uint, content string, emojiAction string) error {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	// Don't notify the sender themselves
+	if receiverID == senderID {
+		return nil
+	}
+
+	client, exists := s.users[receiverID]
+	if !exists || client == nil {
+		return nil
+	}
+
+	// Build the realtime message
+	msg := dto.SendRealtimeMessageRequest{
+		EventType: eventType,
+		Content:   content,
+		SenderID:  senderID,
+		ChatID:    chatID,
+	}
+	if messageID != nil {
+		msg.MessageID = *messageID
+	}
+	if emojiAction != "" {
+		msg.EmojiAction = emojiAction
+	}
+
+	// Marshal and send
+	jsonMsg, err := json.Marshal(msg)
+	if err != nil {
+		return errors.Wrap(err, "failed to marshal message")
+	}
+
+	client.Message <- string(jsonMsg)
+	return nil
+}

@@ -62,6 +62,7 @@ export type RealtimeMessage = {
   sender_id: number
   chat_id: number
   message_id?: number
+  emoji_action?: string
 }
 
 export type SidebarTab = "inbox" | "people" | "communities"

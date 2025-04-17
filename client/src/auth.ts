@@ -52,6 +52,7 @@ export const authOptions: NextAuthConfig = {
         user.refreshToken = data.result.refreshToken
         user.expireAt = data.result.exp
         user.user = data.result.user
+        // console.log("User data:", user.accessToken)
         return true
       } catch (error) {
         console.error("Error during sign in:", error)

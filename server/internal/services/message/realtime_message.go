@@ -7,6 +7,7 @@ import (
 
 	"github.com/bookpanda/messenger-clone/internal/dto"
 	"github.com/bookpanda/messenger-clone/internal/jwt"
+	"github.com/bookpanda/messenger-clone/internal/model"
 	"github.com/bookpanda/messenger-clone/internal/services/chat"
 	"github.com/bookpanda/messenger-clone/pkg/logger"
 	"github.com/gofiber/contrib/websocket"
@@ -150,6 +151,45 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 			// 1. Broadcast to all clients
 			if err := h.chatServer.BroadcastToRoom(msgReq.EventType, msgReq.ChatID, senderID, nil, msgReq.Content); err != nil {
 				logger.Error("failed to broadcast message", slog.Any("error", err))
+			}
+
+			continue
+		}
+
+		// Case V : Reaction toggle
+		if msgReq.EventType == dto.EventReaction {
+			// 1. Toggle reaction in DB
+			_, emojiAction, err := h.ToggleReaction(msgReq.MessageID, senderID, msgReq.Content)
+			if err != nil {
+				logger.Error("failed to toggle reaction", slog.Any("error", err))
+				continue
+			}
+
+			// 2. Broadcast to all clients for real-time emoji update
+			err = h.chatServer.BroadcastToRoom(dto.EventReaction, msgReq.ChatID, senderID, &msgReq.MessageID, msgReq.Content)
+			if err != nil {
+				logger.Error("failed to broadcast reaction message", slog.Any("error", err))
+			}
+
+			// 3. Find the owner of the message to notify (except sender)
+			var message model.Message
+			err = h.store.DB.First(&message, msgReq.MessageID).Error
+			if err != nil {
+				logger.Error("failed to get message owner", slog.Any("error", err))
+				continue
+			}
+
+			err = h.chatServer.SendToUser(
+				dto.EventReaction,
+				msgReq.ChatID,
+				senderID,
+				message.SenderID,
+				&msgReq.MessageID,
+				msgReq.Content,
+				emojiAction, // created or removed
+			)
+			if err != nil {
+				logger.Error("failed to send reaction preview to message owner", slog.Any("error", err))
 			}
 
 			continue

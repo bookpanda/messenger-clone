@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 
+import { toggleMessageReaction } from "@/actions/message/toggle-reaction"
 import { ChatInfo, ChatMessage, RealtimeMessage, User } from "@/types"
 import { produce } from "immer"
 
@@ -21,8 +22,12 @@ export const Message = ({
   chatInfo: ChatInfo
   chatHistory: ChatMessage[]
 }) => {
-  const { clearChatUnread, handleUpdateChatList, setOnlineUsers } =
-    useChatList()
+  const {
+    clearChatUnread,
+    handleUpdateChatList,
+    setOnlineUsers,
+    handleReactionPreviewChatList,
+  } = useChatList()
   const [openChatInfo, setOpenChatInfo] = useState(true)
 
   const {
@@ -31,6 +36,7 @@ export const Message = ({
     handleTyping,
     handleSendMessage,
     handleAckRead,
+    handleSendReaction,
   } = useSocket({ accessToken })
 
   const [messages, setMessages] = useState<ChatMessage[]>(chatHistory)
@@ -124,6 +130,37 @@ export const Message = ({
           )
         }
         break
+      case "REACTION":
+        // handleReactionPreviewChatList(message, user.name)
+        if (message.chat_id !== chatInfo.id) return
+        if (message.emoji_action) return
+        setMessages((prevMessages) =>
+          produce(prevMessages, (draft) => {
+            const msg = draft.find((m) => m.id === message.message_id)
+            if (!msg) return
+
+            const existingIndex = msg.reactions.findIndex(
+              (r) =>
+                r.sender_id === message.sender_id && r.emoji === message.content
+            )
+
+            if (existingIndex !== -1) {
+              // Toggle off → remove reaction
+              msg.reactions.splice(existingIndex, 1)
+            } else {
+              // Toggle on → add new reaction
+              msg.reactions.push({
+                id: Date.now(), // For UI only
+                emoji: message.content,
+                sender_id: message.sender_id,
+                message_id: message.message_id!,
+                created_at: new Date().toISOString(),
+              })
+            }
+          })
+        )
+
+        break
     }
   }, [wsLastMessage, chatInfo.id, user.id])
 
@@ -142,6 +179,9 @@ export const Message = ({
           handleTyping(chatInfo.id, type)
         }
         typingUserIDs={typingUserIDs}
+        handleToggleReaction={async (messageId, emoji) => {
+          handleSendReaction(chatInfo.id, messageId, emoji, user.id)
+        }}
       />
       {openChatInfo && (
         <ChatInfoPanel name={chatInfo.name} image={chatInfo.image} />

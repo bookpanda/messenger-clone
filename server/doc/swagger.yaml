@@ -201,6 +201,7 @@ components:
       - participants
       type: object
     dto.ReactionResponse:
+      description: nil if removed
       properties:
         created_at:
           type: string
@@ -235,6 +236,23 @@ components:
       required:
       - chat_id
       - content
+      type: object
+    dto.ToggleReactionRequest:
+      properties:
+        emoji:
+          type: string
+      required:
+      - emoji
+      type: object
+    dto.ToggleReactionResponse:
+      properties:
+        action:
+          description: '"created" or "removed"'
+          type: string
+        reaction:
+          $ref: '#/components/schemas/dto.ReactionResponse'
+      required:
+      - action
       type: object
     dto.TokenResponse:
       properties:
@@ -664,6 +682,45 @@ paths:
                 $ref: '#/components/schemas/dto.HttpError'
           description: Internal Server Error
       summary: Send message
+      tags:
+      - message
+  /api/v1/message/{id}/react:
+    post:
+      description: Add or remove a reaction (emoji) to a specific message
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dto.ToggleReactionRequest'
+        description: request request
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ToggleReactionResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Internal Server Error
+      summary: Toggle reaction
       tags:
       - message
   /api/v1/message/chat/{id}:

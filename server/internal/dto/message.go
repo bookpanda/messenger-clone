@@ -40,11 +40,12 @@ const (
 )
 
 type SendRealtimeMessageRequest struct {
-	EventType EventType `json:"event_type" validate:"required" binding:"required"`
-	Content   string    `json:"content" validate:"required" binding:"required"`
-	SenderID  uint      `json:"sender_id"`
-	ChatID    uint      `json:"chat_id"`
-	MessageID uint      `json:"message_id"`
+	EventType   EventType `json:"event_type" validate:"required" binding:"required"`
+	Content     string    `json:"content" validate:"required" binding:"required"`
+	SenderID    uint      `json:"sender_id"`
+	ChatID      uint      `json:"chat_id"`
+	MessageID   uint      `json:"message_id"`
+	EmojiAction string    `json:"emoji_action"` // "created" or "removed"
 }
 
 type UserLastRead struct {
