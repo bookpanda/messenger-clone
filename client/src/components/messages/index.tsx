@@ -29,7 +29,7 @@ export const Messages = ({ accessToken }: { accessToken: string }) => {
         handleUpdateChatList(message, true)
         break
       case "REACTION":
-        if (message.emoji_action && message.sender_id !== user.id) {
+        if (message.emoji_action) {
           handleReactionPreviewChatList(message, "Someone", true)
         }
         break
