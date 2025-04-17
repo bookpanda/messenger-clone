@@ -38,6 +38,7 @@ export const getChatAction = async (id: number): Promise<ChatInfo> => {
       image: friend?.profilePictureUrl || "/thumbnail.jpg",
       lastMessage,
       participants: chat.participants,
+      unreadCount: chat.unread_count,
     }
   }
 
@@ -47,5 +48,6 @@ export const getChatAction = async (id: number): Promise<ChatInfo> => {
     image: "/thumbnail.jpg", // TODO: Group Image
     lastMessage,
     participants: chat.participants,
+    unreadCount: chat.unread_count,
   }
 }

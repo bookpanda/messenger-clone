@@ -2,11 +2,7 @@
 
 import { Dispatch, SetStateAction } from "react"
 
-// import { sendMessage } from "@/actions/message/send-message"
-import { useChatContext } from "@/contexts/chat-context"
 import { ChatInfo, ChatMessage, EventType, User } from "@/types"
-import { produce } from "immer"
-import { useSession } from "next-auth/react"
 
 import { ChatHeader } from "./chat-header"
 import { ChatInput } from "./chat-input"
@@ -34,38 +30,35 @@ export const ChatBox = (props: ChatProps) => {
     sendMessage,
     typingUserIDs,
   } = props
-  const { data: session } = useSession()
 
-  const { currentChat, setMessages } = useChatContext()
-  if (!messages || !currentChat) {
+  if (!messages) {
     return null
   }
 
   const handleAddReaction = (messageId: number, emoji: string) => {
-    setMessages((prevMessages) =>
-      produce(prevMessages, (draft) => {
-        const message = draft.find((m) => m.id === messageId)
-        if (!message) return
-
-        const existingIndex = message.reactions.findIndex(
-          (r) => r.sender_id === session?.user?.userId && r.emoji === emoji
-        )
-
-        if (existingIndex !== -1) {
-          // remove the reaction if it already exists
-          message.reactions.splice(existingIndex, 1)
-        } else {
-          // add new reaction
-          message.reactions.push({
-            id: message.reactions.length + 1,
-            message_id: messageId,
-            sender_id: session?.user?.userId || 0,
-            emoji,
-            created_at: new Date().toDateString(),
-          })
-        }
-      })
-    )
+    console.log(messageId, emoji)
+    // setMessages((prevMessages) =>
+    //   produce(prevMessages, (draft) => {
+    //     const message = draft.find((m) => m.id === messageId)
+    //     if (!message) return
+    //     const existingIndex = message.reactions.findIndex(
+    //       (r) => r.sender_id === session?.user?.userId && r.emoji === emoji
+    //     )
+    //     if (existingIndex !== -1) {
+    //       // remove the reaction if it already exists
+    //       message.reactions.splice(existingIndex, 1)
+    //     } else {
+    //       // add new reaction
+    //       message.reactions.push({
+    //         id: message.reactions.length + 1,
+    //         message_id: messageId,
+    //         sender_id: session?.user?.userId || 0,
+    //         emoji,
+    //         created_at: new Date().toDateString(),
+    //       })
+    //     }
+    //   })
+    // )
   }
 
   const handleSendMessage = async (content: string) => {

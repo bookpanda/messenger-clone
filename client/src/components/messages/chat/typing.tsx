@@ -1,6 +1,5 @@
 "use client"
 
-import { useChatContext } from "@/contexts/chat-context"
 import { cn } from "@/lib/utils"
 import { User } from "@/types"
 import { Icon } from "@iconify/react/dist/iconify.js"

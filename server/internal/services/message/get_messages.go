@@ -21,7 +21,7 @@ import (
 // @Failure			400	{object}	dto.HttpError
 // @Failure			500	{object}	dto.HttpError
 func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
-	_, cancel := context.WithTimeout(c.UserContext(), time.Second*5)
+	ctx, cancel := context.WithTimeout(c.UserContext(), time.Second*5)
 	defer cancel()
 
 	chatID, err := strconv.ParseUint(c.Params("id"), 10, 0)
@@ -29,19 +29,23 @@ func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
 		return apperror.BadRequest("invalid chat id", err)
 	}
 
+	// Load chat with participants
 	var chat model.Chat
-	err = h.store.DB.Model(&model.Chat{}).
+	err = h.store.DB.WithContext(ctx).
+		Model(&model.Chat{}).
+		Preload("Participants").
 		Where("id = ?", chatID).
-		Preload("Participants").First(&chat).Error
+		First(&chat).Error
 	if err != nil {
 		return errors.Wrap(err, "failed to find chat")
 	}
 
-	// Check if user is a participant of the chat
-	userID, err := h.authMiddleware.GetUserIDFromContext(c.UserContext())
+	// Check if current user is a participant
+	userID, err := h.authMiddleware.GetUserIDFromContext(ctx)
 	if err != nil {
 		return apperror.Internal("failed to get user id from context", err)
 	}
+
 	isParticipant := false
 	for _, participant := range chat.Participants {
 		if participant.ID == userID {
@@ -50,32 +54,52 @@ func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
 		}
 	}
 	if !isParticipant {
-		return apperror.Forbidden("user is not a participant of the chat", errors.New("user is not a participant of the chat"))
+		return apperror.Forbidden("user is not a participant of the chat", errors.New("unauthorized access to chat"))
 	}
 
-	// get only read messages (inbox is deleted)
+	// 🔹 Load messages with ReadBy preloaded
 	var messages []model.Message
-	err = h.store.DB.Model(&model.Message{}).
-		Joins("JOIN inboxes ON inboxes.message_id = messages.id").
-		Where("messages.chat_id = ? AND (inboxes.user_id = ? AND inboxes.deleted_at IS NOT NULL)", chatID, userID).
+	err = h.store.DB.WithContext(ctx).
+		Model(&model.Message{}).
+		Where("chat_id = ?", chatID).
+		Order("created_at ASC").
+		Preload("Sender").
 		Preload("Reactions").
+		Preload("ReplyToMessage").
+		Preload("ReadBy").
 		Find(&messages).Error
 	if err != nil {
-		return errors.Wrap(err, "failed to load messages from inbox")
+		return errors.Wrap(err, "failed to load messages")
 	}
 
-	var userLastReads []dto.UserLastRead
-	err = h.store.DB.Raw(`
-		SELECT DISTINCT ON (user_id)
-			user_id, message_id, deleted_at 
-		FROM inboxes
-		WHERE deleted_at IS NOT NULL AND message_id IN (
-			SELECT id FROM messages WHERE chat_id = ?
-		) AND user_id <> ?
-		ORDER BY user_id, deleted_at DESC
-	`, chatID, userID).Scan(&userLastReads).Error
+	// Mark all unread messages as read by this user
+	// (only if not already in ReadBy)
+	var user model.User
+	if err := h.store.DB.WithContext(ctx).First(&user, userID).Error; err != nil {
+		return apperror.Internal("failed to fetch user", err)
+	}
 
-	result := dto.ToMessageResponseList(messages, userLastReads)
+	for _, m := range messages {
+		alreadyRead := false
+		for _, reader := range m.ReadBy {
+			if reader.ID == userID {
+				alreadyRead = true
+				break
+			}
+		}
+		if !alreadyRead {
+			err := h.store.DB.WithContext(ctx).
+				Model(&m).
+				Association("ReadBy").
+				Append(&user)
+			if err != nil {
+				return errors.Wrapf(err, "failed to mark message %d as read", m.ID)
+			}
+		}
+	}
+
+	// Convert to DTO
+	result := dto.ToMessageResponseList(messages)
 
 	return c.Status(fiber.StatusOK).JSON(dto.HttpListResponse[dto.MessageResponse]{
 		Result: result,

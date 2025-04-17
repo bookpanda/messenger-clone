@@ -9,6 +9,7 @@ import {
   RealtimeMessage,
   User,
 } from "@/types"
+import { useQueryClient } from "@tanstack/react-query"
 import { produce } from "immer"
 import useWebSocket from "react-use-websocket"
 
@@ -28,7 +29,7 @@ export const Message = ({
 }) => {
   const [openChatInfo, setOpenChatInfo] = useState(true)
 
-  const socketUrl = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/v1/message/ws?accessToken=${accessToken}&chatID=${chatInfo.id}`
+  const socketUrl = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/v1/message/ws?accessToken=${accessToken}`
   const { sendMessage: wsSendMessage, lastMessage } = useWebSocket(socketUrl, {
     onOpen: () => console.log("open"),
     onError: (event) => console.log("error", event),
@@ -43,24 +44,49 @@ export const Message = ({
       const payload: RealtimeMessage = {
         event_type: eventType,
         content,
+        chat_id: chatInfo.id,
         sender_id: 0, // don't care
       }
       if (messageID) {
         payload.message_id = messageID
       }
-      // console.log(`sendMessage`, payload)
       wsSendMessage(JSON.stringify(payload))
     },
-    [wsSendMessage]
+    [wsSendMessage, chatInfo.id]
   )
 
-  useEffect(() => {
-    // send interval 3 sec that I'm still active
-    const interval = setInterval(() => {
-      sendMessage("<still_active>", "STILL_ACTIVE")
-    }, 3000)
+  const ackRead = useCallback(
+    (messageId: number) => {
+      const payload: RealtimeMessage = {
+        event_type: "ACK_READ",
+        content: "<read>",
+        chat_id: chatInfo.id,
+        sender_id: user.id,
+        message_id: messageId,
+      }
+      wsSendMessage(JSON.stringify(payload))
+    },
+    [chatInfo.id, user.id, wsSendMessage]
+  )
 
-    return () => clearInterval(interval)
+  const queryClient = useQueryClient()
+  const revalidateChatList = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ["chats"],
+    })
+  }
+
+  useEffect(() => {
+    // send a connect message when the component mounts
+    const payload: RealtimeMessage = {
+      event_type: "CONNECT",
+      content: "<connect>",
+      chat_id: chatInfo.id,
+      sender_id: user.id,
+    }
+    wsSendMessage(JSON.stringify(payload))
+
+    revalidateChatList()
   }, [])
 
   useEffect(() => {
@@ -69,37 +95,46 @@ export const Message = ({
     console.log("message", message)
 
     switch (message.event_type) {
-      case "MESSAGE":
-        const newMessage: ChatMessage = {
-          id: message.message_id || 0,
-          chat_id: chatInfo.id,
-          sender_id: message.sender_id,
-          content: message.content,
-          created_at: new Date().toDateString(),
-          last_read_users: [],
-          reactions: [],
+      case "MESSAGE_UPDATE":
+        if (message.chat_id === chatInfo.id) {
+          const newMessage: ChatMessage = {
+            id: message.message_id || 0,
+            chat_id: chatInfo.id,
+            sender_id: message.sender_id,
+            content: message.content,
+            created_at: new Date().toDateString(),
+            read_by: [],
+            reactions: [],
+          }
+          setMessages((prevMessages) =>
+            produce(prevMessages, (draft) => {
+              draft.push(newMessage)
+            })
+          )
+
+          if (message.message_id) ackRead(message.message_id)
         }
-        setMessages((prevMessages) =>
-          produce(prevMessages, (draft) => {
-            draft.push(newMessage)
-          })
-        )
         break
-      case "STILL_ACTIVE":
-        setMessages((prevMessages) =>
-          produce(prevMessages, (draft) => {
-            const lastIndex = draft.length - 1
-            if (lastIndex < 0) return
+      case "READ":
+        if (message.chat_id === chatInfo.id && message.sender_id !== user.id) {
+          setMessages((prevMessages) =>
+            produce(prevMessages, (draft) => {
+              // Remove sender_id from all messages
+              for (const m of draft) {
+                const index = m.read_by.indexOf(message.sender_id)
+                if (index !== -1) {
+                  m.read_by.splice(index, 1)
+                }
+              }
 
-            // 1. Clear old last_read_users
-            for (let i = 0; i < lastIndex; i++) {
-              draft[i].last_read_users = []
-            }
-
-            // 2. Set last message's last_read_users to [99]
-            draft[lastIndex].last_read_users = [message.sender_id]
-          })
-        )
+              // Add sender_id only to the read message
+              const target = draft.find((m) => m.id === message.message_id)
+              if (target && !target.read_by.includes(message.sender_id)) {
+                target.read_by.push(message.sender_id)
+              }
+            })
+          )
+        }
         break
       case "UNREAD_MESSAGE":
         //   const newMessage: ChatMessage = {
@@ -132,45 +167,32 @@ export const Message = ({
         //   )
         // sendMessage("<read>", "READ", message.message_id)
         break
-      case "READ":
-        setMessages((prevMessages) =>
-          produce(prevMessages, (draft) => {
-            const prevReadMessage = draft.find((m) =>
-              m.last_read_users.includes(message.sender_id)
-            )
-            if (prevReadMessage) {
-              const index = prevReadMessage.last_read_users.indexOf(
-                message.sender_id
-              )
-              if (index !== -1) prevReadMessage.last_read_users.splice(index, 1)
-            }
-            const readMessage = draft.find((m) => m.id === message.message_id)
-            if (!readMessage) return
-            readMessage.last_read_users.push(message.sender_id)
-          })
-        )
-        break
+
       case "TYPING_START":
-        setTypingUserIDs((prev) =>
-          produce(prev, (draft) => {
-            if (!draft.includes(message.sender_id)) {
-              draft.push(message.sender_id)
-            }
-          })
-        )
+        if (message.chat_id === chatInfo.id && message.sender_id !== user.id) {
+          setTypingUserIDs((prev) =>
+            produce(prev, (draft) => {
+              if (!draft.includes(message.sender_id)) {
+                draft.push(message.sender_id)
+              }
+            })
+          )
+        }
         break
       case "TYPING_END":
-        setTypingUserIDs((prev) =>
-          produce(prev, (draft) => {
-            const index = draft.indexOf(message.sender_id)
-            if (index !== -1) {
-              draft.splice(index, 1)
-            }
-          })
-        )
+        if (message.chat_id === chatInfo.id && message.sender_id !== user.id) {
+          setTypingUserIDs((prev) =>
+            produce(prev, (draft) => {
+              const index = draft.indexOf(message.sender_id)
+              if (index !== -1) {
+                draft.splice(index, 1)
+              }
+            })
+          )
+        }
         break
     }
-  }, [lastMessage, sendMessage])
+  }, [lastMessage, sendMessage, ackRead, chatInfo.id, user.id])
 
   return (
     <div className="flex min-h-0 flex-1 gap-4 p-4">
