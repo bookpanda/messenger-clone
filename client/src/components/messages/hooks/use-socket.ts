@@ -51,11 +51,28 @@ export const useSocket = ({ accessToken }: { accessToken: string }) => {
     wsSendMessage(JSON.stringify(payload))
   }
 
+  const handleSendReaction = (
+    chatId: number,
+    messageId: number,
+    emoji: string,
+    senderId: number
+  ) => {
+    const payload: RealtimeMessage = {
+      event_type: "REACTION",
+      content: emoji,
+      chat_id: chatId,
+      message_id: messageId,
+      sender_id: senderId,
+    }
+    wsSendMessage(JSON.stringify(payload))
+  }
+
   return {
     wsLastMessage,
     handleOpenConnection,
     handleTyping,
     handleSendMessage,
     handleAckRead,
+    handleSendReaction,
   }
 }

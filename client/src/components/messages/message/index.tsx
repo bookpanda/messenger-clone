@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 
+import { toggleMessageReaction } from "@/actions/message/toggle-reaction"
 import { ChatInfo, ChatMessage, RealtimeMessage, User } from "@/types"
 import { produce } from "immer"
 
@@ -30,6 +31,7 @@ export const Message = ({
     handleTyping,
     handleSendMessage,
     handleAckRead,
+    handleSendReaction,
   } = useSocket({ accessToken })
 
   const [messages, setMessages] = useState<ChatMessage[]>(chatHistory)
@@ -114,6 +116,38 @@ export const Message = ({
           )
         }
         break
+      case "REACTION":
+        if (message.chat_id !== chatInfo.id) return
+        // if (message.message_id !== undefined) {
+        //   toggleMessageReaction(message.message_id, message.content)
+        // }
+        setMessages((prevMessages) =>
+          produce(prevMessages, (draft) => {
+            const msg = draft.find((m) => m.id === message.message_id)
+            if (!msg) return
+
+            const existingIndex = msg.reactions.findIndex(
+              (r) =>
+                r.sender_id === message.sender_id && r.emoji === message.content
+            )
+
+            if (existingIndex !== -1) {
+              // Toggle off → remove reaction
+              msg.reactions.splice(existingIndex, 1)
+            } else {
+              // Toggle on → add new reaction
+              msg.reactions.push({
+                id: Date.now(), // For UI only
+                emoji: message.content,
+                sender_id: message.sender_id,
+                message_id: message.message_id!,
+                created_at: new Date().toISOString(),
+              })
+            }
+          })
+        )
+
+        break
     }
   }, [wsLastMessage, chatInfo.id, user.id])
 
@@ -131,6 +165,12 @@ export const Message = ({
           handleTyping(chatInfo.id, type)
         }
         typingUserIDs={typingUserIDs}
+        handleToggleReaction={async (messageId, emoji) => {
+          // 1. Toggle via API
+          // await toggleMessageReaction(messageId, emoji)
+          // 2. Send real-time event
+          handleSendReaction(chatInfo.id, messageId, emoji, user.id)
+        }}
       />
       {openChatInfo && (
         <ChatInfoPanel name={chatInfo.name} image={chatInfo.image} />

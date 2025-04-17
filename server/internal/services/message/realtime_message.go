@@ -139,6 +139,24 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 			continue
 		}
 
+		// Case V : Reaction toggle
+		// field: EventType, ChatID, MessageID, Content (emoji)
+		if msgReq.EventType == dto.EventReaction {
+			// 1. Toggle reaction in DB
+			_, err := h.ToggleReaction(msgReq.MessageID, senderID, msgReq.Content)
+			if err != nil {
+				logger.Error("failed to toggle reaction", slog.Any("error", err))
+				continue
+			}
+
+			// 2. Broadcast to all clients
+			err = h.chatServer.BroadcastToRoom(dto.EventReaction, msgReq.ChatID, senderID, &msgReq.MessageID, msgReq.Content)
+			if err != nil {
+				logger.Error("failed to broadcast reaction message", slog.Any("error", err))
+			}
+			continue
+		}
+
 		// sender (receiver of message) has read
 		// if msgReq.EventType == dto.EventRead {
 		// 	err := h.store.DB.

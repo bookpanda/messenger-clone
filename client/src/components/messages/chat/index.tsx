@@ -17,6 +17,7 @@ interface ChatProps {
   handleSendMessage: (message: string) => void
   handleTyping: (type: "START" | "END") => void
   typingUserIDs: number[]
+  handleToggleReaction: (messageId: number, emoji: string) => void
 }
 
 export const ChatBox = (props: ChatProps) => {
@@ -28,20 +29,21 @@ export const ChatBox = (props: ChatProps) => {
     handleSendMessage,
     handleTyping,
     typingUserIDs,
+    handleToggleReaction,
   } = props
 
   if (!messages) {
     return null
   }
 
-  const handleToggleReaction = async (messageId: number, emoji: string) => {
-    try {
-      const result = await toggleMessageReaction(messageId, emoji)
-      console.log("reaction result:", result)
-    } catch (error) {
-      console.error("Failed to toggle reaction", error)
-    }
-  }
+  // const handleToggleReaction = async (messageId: number, emoji: string) => {
+  //   try {
+  //     const result = await toggleMessageReaction(messageId, emoji)
+  //     // console.log("reaction result:", result)
+  //   } catch (error) {
+  //     console.error("Failed to toggle reaction", error)
+  //   }
+  // }
 
   return (
     <div className="bg-primary-background text-primary-foreground flex h-full flex-1 flex-col overflow-hidden rounded-md">
