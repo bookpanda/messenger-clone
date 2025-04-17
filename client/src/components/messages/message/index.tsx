@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 
+import { getMyChatsAction } from "@/actions/chat/get-my-chats"
 import { useChatStore } from "@/stores/chat"
 import {
   ChatInfo,
@@ -28,7 +29,8 @@ export const Message = ({
   chatInfo: ChatInfo
   chatHistory: ChatMessage[]
 }) => {
-  const { updateChatLastMessage, clearChatUnread } = useChatStore()
+  const { chatList, updateChatLastMessage, clearChatUnread, setChatList } =
+    useChatStore()
   const [openChatInfo, setOpenChatInfo] = useState(true)
 
   const socketUrl = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/v1/message/ws?accessToken=${accessToken}`
@@ -84,6 +86,24 @@ export const Message = ({
     clearChatUnread(chatInfo.id)
   }, [])
 
+  const handleNewMessage = async (message: RealtimeMessage) => {
+    if (!chatList.find((chat) => chat.id === message.chat_id)) {
+      const chatList = await getMyChatsAction()
+      setChatList(chatList)
+    } else {
+      const lastMessage: LastMessage = {
+        type: message.sender_id === user.id ? "outgoing" : "incoming",
+        message: message.content,
+        date: new Date(),
+      }
+      updateChatLastMessage(
+        message.chat_id,
+        lastMessage,
+        message.chat_id !== chatInfo.id // If the message is not from the current chat, mark it as unread
+      )
+    }
+  }
+
   useEffect(() => {
     if (!lastMessage) return
     const message: RealtimeMessage = JSON.parse(lastMessage.data)
@@ -91,16 +111,7 @@ export const Message = ({
 
     switch (message.event_type) {
       case "MESSAGE_UPDATE":
-        const lastMessage: LastMessage = {
-          type: message.sender_id === user.id ? "outgoing" : "incoming",
-          message: message.content,
-          date: new Date(),
-        }
-        updateChatLastMessage(
-          message.chat_id,
-          lastMessage,
-          message.chat_id !== chatInfo.id // If the message is not from the current chat, mark it as unread
-        )
+        handleNewMessage(message)
 
         // Current Chat's message arrived
         if (message.chat_id === chatInfo.id) {
