@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction } from "react"
 
-import { ChatInfo, ChatMessage, EventType, User } from "@/types"
+import { ChatInfo, ChatMessage, User } from "@/types"
 
 import { ChatHeader } from "./chat-header"
 import { ChatInput } from "./chat-input"

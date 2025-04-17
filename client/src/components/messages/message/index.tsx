@@ -7,13 +7,11 @@ import { useChatStore } from "@/stores/chat"
 import {
   ChatInfo,
   ChatMessage,
-  EventType,
   LastMessage,
   RealtimeMessage,
   User,
 } from "@/types"
 import { produce } from "immer"
-import useWebSocket from "react-use-websocket"
 
 import { ChatBox } from "../chat"
 import { ChatInfoPanel } from "../chat-info"
@@ -48,25 +46,28 @@ export const Message = ({
   useEffect(() => {
     handleOpenConnection(chatInfo.id)
     clearChatUnread(chatInfo.id)
-  }, [])
+  }, [chatInfo.id])
 
-  const handleNewMessage = async (message: RealtimeMessage) => {
-    if (!chatList.find((chat) => chat.id === message.chat_id)) {
-      const chatList = await getMyChatsAction()
-      setChatList(chatList)
-    } else {
-      const lastMessage: LastMessage = {
-        type: message.sender_id === user.id ? "outgoing" : "incoming",
-        message: message.content,
-        date: new Date(),
+  const handleNewMessage = useCallback(
+    async (message: RealtimeMessage) => {
+      if (!chatList.find((chat) => chat.id === message.chat_id)) {
+        const chatList = await getMyChatsAction()
+        setChatList(chatList)
+      } else {
+        const lastMessage: LastMessage = {
+          type: message.sender_id === user.id ? "outgoing" : "incoming",
+          message: message.content,
+          date: new Date(),
+        }
+        updateChatLastMessage(
+          message.chat_id,
+          lastMessage,
+          message.chat_id !== chatInfo.id // If the message is not from the current chat, mark it as unread
+        )
       }
-      updateChatLastMessage(
-        message.chat_id,
-        lastMessage,
-        message.chat_id !== chatInfo.id // If the message is not from the current chat, mark it as unread
-      )
-    }
-  }
+    },
+    [chatList, chatInfo.id, user.id]
+  )
 
   useEffect(() => {
     if (!wsLastMessage) return

@@ -5,7 +5,6 @@ import { useEffect } from "react"
 import { getMyChatsAction } from "@/actions/chat/get-my-chats"
 import { useChatStore } from "@/stores/chat"
 import { LastMessage, RealtimeMessage, User } from "@/types"
-import useWebSocket from "react-use-websocket"
 
 import { useSocket } from "./hooks/use-socket"
 
@@ -30,7 +29,7 @@ export const Messages = ({
         message: message.content,
         date: new Date(),
       }
-      updateChatLastMessage(message.chat_id, lastMessage)
+      updateChatLastMessage(message.chat_id, lastMessage, true)
     }
   }
 

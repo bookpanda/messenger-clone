@@ -1,6 +1,6 @@
 import { getMyChatsAction } from "@/actions/chat/get-my-chats"
 import { useChatStore } from "@/stores/chat"
-import { LastMessage, RealtimeMessage, User } from "@/types"
+import { LastMessage, RealtimeMessage } from "@/types"
 import { useSession } from "next-auth/react"
 
 export const useChatList = () => {
