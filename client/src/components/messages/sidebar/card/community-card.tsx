@@ -1,4 +1,5 @@
 import { joinChatAction } from "@/actions/chat/join-chat"
+import { useChatStore } from "@/stores/chat"
 import { User } from "@/types"
 import { Check, PlusIcon } from "lucide-react"
 import Image from "next/image"
@@ -21,12 +22,16 @@ export const CommunityCard = ({
   participants: User[]
   isMember: boolean
 }) => {
+  const { setTab } = useChatStore()
   const { revalidateChatList } = useChatList()
 
   const handleJoinChat = async () => {
     try {
       await joinChatAction(id)
-      await revalidateChatList()
+
+      setTab("inbox")
+      revalidateChatList()
+
       toast.success(`Successfully joined ${name}.`)
     } catch (error) {
       toast.error("Failed to join chat")

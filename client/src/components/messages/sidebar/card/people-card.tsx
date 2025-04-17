@@ -1,5 +1,4 @@
 import { createChatAction } from "@/actions/chat/create-chat"
-import { getMyChatsAction } from "@/actions/chat/get-my-chats"
 import { useChatStore } from "@/stores/chat"
 import { User } from "@/types"
 import { useQueryClient } from "@tanstack/react-query"
