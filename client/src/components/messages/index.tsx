@@ -26,7 +26,9 @@ export const Messages = ({
         handleUpdateChatList(message, true)
         break
       case "REACTION":
-        handleReactionPreviewChatList(message, user.name, true)
+        if (message.emoji_action && message.sender_id !== user.id) {
+          handleReactionPreviewChatList(message, "Someone", true)
+        }
         break
     }
   }, [wsLastMessage])

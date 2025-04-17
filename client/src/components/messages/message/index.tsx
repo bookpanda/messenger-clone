@@ -121,9 +121,9 @@ export const Message = ({
         }
         break
       case "REACTION":
-        handleReactionPreviewChatList(message, user.name)
+        // handleReactionPreviewChatList(message, user.name)
         if (message.chat_id !== chatInfo.id) return
-
+        if (message.emoji_action) return
         setMessages((prevMessages) =>
           produce(prevMessages, (draft) => {
             const msg = draft.find((m) => m.id === message.message_id)
@@ -169,9 +169,6 @@ export const Message = ({
         }
         typingUserIDs={typingUserIDs}
         handleToggleReaction={async (messageId, emoji) => {
-          // 1. Toggle via API
-          // await toggleMessageReaction(messageId, emoji)
-          // 2. Send real-time event
           handleSendReaction(chatInfo.id, messageId, emoji, user.id)
         }}
       />

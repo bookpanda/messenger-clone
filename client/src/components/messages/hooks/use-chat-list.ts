@@ -47,16 +47,16 @@ export const useChatList = () => {
         setChatList(chatList)
       } else {
         const isSenderMe = message.sender_id === data?.user?.userId
+        if (message.emoji_action === "created") {
+          const previewContent = `${username} reacted "${message.content}" to your message`
 
-        const displayName = isSenderMe ? "You" : username || "Someone"
-        const previewContent = `${displayName} reacted "${message.content}" to a message`
-
-        const lastMessage: LastMessage = {
-          type: isSenderMe ? "outgoing" : "incoming",
-          message: previewContent,
-          date: new Date(),
+          const lastMessage: LastMessage = {
+            type: isSenderMe ? "outgoing" : "incoming",
+            message: previewContent,
+            date: new Date(),
+          }
+          updateChatLastMessage(message.chat_id, lastMessage, isUnread)
         }
-        updateChatLastMessage(message.chat_id, lastMessage, isUnread)
       }
     },
     [chatList, data?.user?.userId]
