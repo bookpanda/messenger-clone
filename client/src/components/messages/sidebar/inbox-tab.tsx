@@ -2,20 +2,25 @@
 
 import { useEffect } from "react"
 
+import { getMyChatsAction } from "@/actions/chat/get-my-chats"
 import { useChatStore } from "@/stores/chat"
-import { ChatInfo } from "@/types"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 
 import { ChatCard } from "./card/chat-card"
 
-export const InboxTab = ({ initialData }: { initialData: ChatInfo[] }) => {
+export const InboxTab = () => {
   const { id } = useParams<{ id: string }>()
   const { chatList: data, setChatList } = useChatStore()
 
+  const revalidate = async () => {
+    const groups = await getMyChatsAction()
+    setChatList(groups)
+  }
+
   useEffect(() => {
-    setChatList(initialData)
-  }, [initialData])
+    revalidate()
+  }, [])
 
   if (!data || data.length === 0) {
     return (
@@ -26,7 +31,7 @@ export const InboxTab = ({ initialData }: { initialData: ChatInfo[] }) => {
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
       {data.map((chat, idx) => (
         <Link key={`${chat.id}_${idx}`} href={`/messages/${chat.id}`}>
           <ChatCard

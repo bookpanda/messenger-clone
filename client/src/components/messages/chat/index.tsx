@@ -13,6 +13,7 @@ interface ChatProps {
   chatInfo: ChatInfo
   user: User
   messages: ChatMessage[]
+  participants: User[]
   setOpenChatInfo: Dispatch<SetStateAction<boolean>>
   handleSendMessage: (message: string) => void
   handleTyping: (type: "START" | "END") => void
@@ -25,6 +26,7 @@ export const ChatBox = (props: ChatProps) => {
     chatInfo,
     user,
     messages,
+    participants,
     setOpenChatInfo,
     handleSendMessage,
     handleTyping,
@@ -54,7 +56,7 @@ export const ChatBox = (props: ChatProps) => {
         setOpenChatInfo={setOpenChatInfo}
       />
       <ChatMessages
-        participants={chatInfo.participants}
+        participants={participants}
         user={user}
         messages={messages}
         handleToggleReaction={handleToggleReaction}
