@@ -1,21 +1,33 @@
 "use client"
 
+import { useState } from "react"
+
 import { useChatStore } from "@/stores/chat"
-import { ChatInfo } from "@/types"
+import { ChatInfo, User } from "@/types"
 import Image from "next/image"
 
+import { CreateGroup } from "./create-group"
 import { InboxTab } from "./inbox-tab"
 import { PeopleTab } from "./people-tab"
 import { TabButton } from "./tab-button"
 
-export const Sidebar = ({ chatList }: { chatList: ChatInfo[] }) => {
+export const Sidebar = ({
+  chatList,
+  allUsers,
+}: {
+  chatList: ChatInfo[]
+  allUsers: User[]
+}) => {
   const { tab, setTab } = useChatStore()
 
   const onlineUsers = useChatStore((state) => state.onlineUsers)
 
   return (
     <div className="bg-primary-background text-primary-foreground w-90 flex-initial space-y-6 p-4">
-      <h1 className="text-xl font-bold">Chats</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold">Chats</h1>
+        <CreateGroup allUsers={allUsers} />
+      </div>
       <div className="flex gap-4 overflow-x-auto">
         {onlineUsers.map((user) => (
           <div key={user.id} className="flex w-20 flex-col items-center gap-2">
