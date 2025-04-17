@@ -10,13 +10,7 @@ import { InboxTab } from "./inbox-tab"
 import { PeopleTab } from "./people-tab"
 import { TabButton } from "./tab-button"
 
-export const Sidebar = ({
-  chatList,
-  allUsers,
-}: {
-  chatList: ChatInfo[]
-  allUsers: User[]
-}) => {
+export const Sidebar = ({ allUsers }: { allUsers: User[] }) => {
   const { tab, setTab } = useChatStore()
 
   const onlineUsers = useChatStore((state) => state.onlineUsers)
@@ -64,7 +58,7 @@ export const Sidebar = ({
 
       {/* Tab Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        {tab === "inbox" && <InboxTab initialData={chatList} />}
+        {tab === "inbox" && <InboxTab />}
         {tab === "people" && <PeopleTab />}
         {tab === "communities" && <CommunitiesTab />}
       </div>

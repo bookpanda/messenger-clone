@@ -1,6 +1,8 @@
 import { FormEvent, useState } from "react"
 
 import { createChatGroupAction } from "@/actions/chat/create-group-chat"
+import { getMyChatsAction } from "@/actions/chat/get-my-chats"
+import { useChatStore } from "@/stores/chat"
 import { User } from "@/types"
 import { SquarePen } from "lucide-react"
 import Image from "next/image"
@@ -18,12 +20,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { MultiSelect } from "@/components/ui/multi-select"
 
-import { useChatList } from "../hooks/use-chat-list"
-
 export const CreateGroup = ({ allUsers }: { allUsers: User[] }) => {
   const [open, setOpen] = useState(false)
-
-  const { revalidateChatList } = useChatList()
+  const { setTab } = useChatStore()
 
   const userList = allUsers.map((user) => ({
     value: user.id.toString(),
@@ -52,8 +51,11 @@ export const CreateGroup = ({ allUsers }: { allUsers: User[] }) => {
         participantIds: selectedUsers,
       })
 
+      setTab("inbox")
+      const chatList = await getMyChatsAction()
+      useChatStore.setState({ chatList })
+
       setOpen(false)
-      revalidateChatList()
       setName("")
       setSelectedUsers([])
       toast.success("Chat created successfully")

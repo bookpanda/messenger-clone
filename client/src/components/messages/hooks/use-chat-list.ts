@@ -16,11 +16,6 @@ export const useChatList = () => {
 
   const { data } = useSession()
 
-  const revalidateChatList = async () => {
-    const chatList = await getMyChatsAction()
-    setChatList(chatList)
-  }
-
   const handleUpdateChatList = useCallback(
     async (message: RealtimeMessage, isUnread?: boolean) => {
       if (!chatList.find((chat) => chat.id === message.chat_id)) {
@@ -45,7 +40,6 @@ export const useChatList = () => {
     setChatList,
     clearChatUnread,
     handleUpdateChatList,
-    revalidateChatList,
     setOnlineUsers,
   }
 }

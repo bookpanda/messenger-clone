@@ -16,7 +16,6 @@ interface PeopleCardProps {
 
 export const PeopleCard = ({ friend }: PeopleCardProps) => {
   const { setTab } = useChatStore()
-  const { revalidateChatList } = useChatList()
 
   const queryClient = useQueryClient()
 
@@ -30,8 +29,6 @@ export const PeopleCard = ({ friend }: PeopleCardProps) => {
       })
 
       setTab("inbox")
-
-      revalidateChatList()
 
       toast.success("Chat created successfully")
     } catch {

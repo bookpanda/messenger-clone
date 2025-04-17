@@ -7,7 +7,6 @@ import { Header } from "@/components/header"
 import { Sidebar } from "@/components/messages/sidebar"
 
 export default async function Layout({ children }: { children: ReactNode }) {
-  const chatList = await getMyChatsAction()
   const allUsers = await getAllUsersAction()
 
   return (
@@ -15,7 +14,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
       <Header />
 
       <div className="flex min-h-0 flex-1">
-        <Sidebar chatList={chatList} allUsers={allUsers} />
+        <Sidebar allUsers={allUsers} />
         <main className="flex flex-1 flex-col">{children}</main>
       </div>
     </div>

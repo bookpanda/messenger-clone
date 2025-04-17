@@ -24,7 +24,6 @@ export const CommunityCard = ({
   isMember: boolean
 }) => {
   const { setTab } = useChatStore()
-  const { revalidateChatList } = useChatList()
 
   const queryClient = useQueryClient()
 
@@ -36,7 +35,6 @@ export const CommunityCard = ({
       })
 
       setTab("inbox")
-      revalidateChatList()
 
       toast.success(`Successfully joined ${name}.`)
     } catch {
