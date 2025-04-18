@@ -86,19 +86,19 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 				}
 			}
 
-			// 3. Broadcast current participants to all clients
-			participants, err := h.getCurrentParticipantsInChat(msgReq.ChatID)
+			// 3. Broadcast new chat info to all clients in room
+			chat, err := h.getChat(msgReq.ChatID)
 			if err != nil {
 				logger.Error("failed to get participants", slog.Any("error", err))
 				continue
 			}
-			userList := dto.ToParticipantResponseList(participants)
-			jsonPayload, err := json.Marshal(userList)
+			chatInfo := dto.ToChatResponse(chat, nil, 0)
+			jsonPayload, err := json.Marshal(chatInfo)
 			if err != nil {
 				logger.Error("failed to marshal online user list", err)
 				return
 			}
-			if err := h.chatServer.BroadcastToRoom(dto.EventChatParticipants, msgReq.ChatID, 0, nil, string(jsonPayload)); err != nil {
+			if err := h.chatServer.BroadcastToRoom(dto.EventChatInfoUpdate, msgReq.ChatID, 0, nil, string(jsonPayload)); err != nil {
 				logger.Error("failed to broadcast message", slog.Any("error", err))
 			}
 

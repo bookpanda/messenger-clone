@@ -24,17 +24,16 @@ type SendMessageRequest struct {
 type EventType string
 
 const (
-	EventError            EventType = "ERROR"
-	EventConnect          EventType = "CONNECT"           // Incoming message to server
-	EventMessage          EventType = "MESSAGE"           // Incoming message to server
-	EventMessageUpdate    EventType = "MESSAGE_UPDATE"    // Outgoing message from server
-	EventAckRead          EventType = "ACK_READ"          // Incoming message to server
-	EventRead             EventType = "READ"              // Outgoing message from server
-	EventTypingStart      EventType = "TYPING_START"      // Incoming message to server
-	EventTypingEnd        EventType = "TYPING_END"        // Incoming message to server
-	EventOnlineUsers      EventType = "ONLINE_USERS"      // Outgoing message from server
-	EventChatParticipants EventType = "CHAT_PARTICIPANTS" // Outgoing message from server
-	EventChatUpdate       EventType = "CHAT_UPDATE"       // Outgoing message from server
+	EventError          EventType = "ERROR"
+	EventConnect        EventType = "CONNECT"          // Incoming message to server
+	EventMessage        EventType = "MESSAGE"          // Incoming message to server
+	EventMessageUpdate  EventType = "MESSAGE_UPDATE"   // Outgoing message from server
+	EventAckRead        EventType = "ACK_READ"         // Incoming message to server
+	EventRead           EventType = "READ"             // Outgoing message from server
+	EventTypingStart    EventType = "TYPING_START"     // Incoming message to server
+	EventTypingEnd      EventType = "TYPING_END"       // Incoming message to server
+	EventOnlineUsers    EventType = "ONLINE_USERS"     // Outgoing message from server
+	EventChatInfoUpdate EventType = "CHAT_INFO_UPDATE" // Outgoing message from server
 
 	EventTabInboxUpdate     EventType = "TAB_INBOX_UPDATE"     // Outgoing message from server
 	EventTabPeopleUpdate    EventType = "TAB_PEOPLE_UPDATE"    // Outgoing message from server
@@ -64,7 +63,7 @@ func (e EventType) String() string {
 
 func ValidateEventType(eventType string) bool {
 	switch EventType(eventType) {
-	case EventError, EventConnect, EventMessage, EventMessageUpdate, EventAckRead, EventRead, EventTypingStart, EventTypingEnd, EventReaction:
+	case EventError, EventConnect, EventMessage, EventMessageUpdate, EventAckRead, EventRead, EventTypingStart, EventTypingEnd, EventReaction, EventChatInfoUpdate:
 		return true
 	}
 	return false

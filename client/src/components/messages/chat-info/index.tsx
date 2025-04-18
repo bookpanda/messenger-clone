@@ -26,7 +26,7 @@ export const ChatInfoPanel = ({
       <div className="flex flex-col items-center gap-3">
         <div className="relative size-20">
           <Image
-            src={chatInfo.image}
+            src={chatInfo.image || "/thumbnail.jpg"}
             alt={chatInfo.name}
             className="rounded-full object-cover"
             fill
