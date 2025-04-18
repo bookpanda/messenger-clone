@@ -10,15 +10,5 @@ export default async function Page() {
     redirect("/")
   }
 
-  return (
-    <Messages
-      accessToken={session.accessToken}
-      user={{
-        id: session.user.userId,
-        name: session.user.name,
-        email: session.user.email,
-        profilePictureUrl: session.user.image,
-      }}
-    />
-  )
+  return <Messages accessToken={session.accessToken} />
 }
