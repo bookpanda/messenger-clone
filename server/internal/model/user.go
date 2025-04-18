@@ -37,9 +37,9 @@ type CachedTokens struct {
 
 type User struct {
 	gorm.Model
-	Name              string `gorm:"not null"`
-	Email             string `gorm:"not null;unique"`
+	Name              string
+	Email             string `gorm:"unique"`
 	ProfilePictureURL string
 
-	Chats []Chat `gorm:"many2many:chat_participants;"`
+	Chats []ChatParticipant `gorm:"foreignKey:UserID"`
 }

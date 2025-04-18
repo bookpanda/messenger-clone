@@ -1,3 +1,4 @@
+import { Participant } from "@/types"
 import { Lock, Pin } from "lucide-react"
 import Image from "next/image"
 
@@ -9,12 +10,18 @@ import {
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 
+import { ChangeNickname } from "./change-nickname"
+
 export const ChatInfoPanel = ({
+  chatId,
   name,
   image,
+  participants,
 }: {
+  chatId: number
   name: string
   image: string
+  participants: Participant[]
 }) => {
   return (
     <div className="bg-primary-background text-primary-foreground w-75 space-y-5 rounded-md px-3 py-4">
@@ -78,13 +85,7 @@ export const ChatInfoPanel = ({
               <span className="text-xl">🤩</span>
               <span>Change emoji</span>
             </Button>
-            <Button
-              variant="ghost"
-              className="hover:text-primary-foreground h-auto w-full justify-start rounded-md p-2.5 hover:bg-white/10 hover:no-underline"
-            >
-              <span className="font-light">Aa</span>
-              <span>Edit nicknames</span>
-            </Button>
+            <ChangeNickname chatId={chatId} participants={participants} />
           </AccordionContent>
         </AccordionItem>
       </Accordion>

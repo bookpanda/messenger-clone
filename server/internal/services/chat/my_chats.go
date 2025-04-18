@@ -20,31 +20,33 @@ import (
 // @Failure			400	{object}	dto.HttpError
 // @Failure			500	{object}	dto.HttpError
 func (h *Handler) HandleGetMyChats(c *fiber.Ctx) error {
-	ctx, cancel := context.WithTimeout(c.UserContext(), time.Second*5)
+	ctx, cancel := context.WithTimeout(c.UserContext(), 5*time.Second)
 	defer cancel()
 
 	userID, err := h.authMiddleware.GetUserIDFromContext(ctx)
 	if err != nil {
-		return errors.Wrap(err, "failed to get user id from context")
+		return errors.Wrap(err, "failed to get user ID from context")
 	}
 
-	// Step 1: Load user's chats with participants
-	var user model.User
+	// 1. Load user's ChatParticipant records with Chat & Participants
+	var chatParticipants []model.ChatParticipant
 	err = h.store.DB.WithContext(ctx).
-		Model(&model.User{}).
-		Where("id = ?", userID).
-		Preload("Chats.Participants").
-		Find(&user).Error
+		Preload("Chat.Participants.User"). // full chat data with participants
+		Where("user_id = ?", userID).
+		Find(&chatParticipants).Error
 	if err != nil {
-		return apperror.Internal("failed to get chats", err)
+		return apperror.Internal("failed to get user's chats", err)
 	}
 
-	// Step 2: Get latest message per chat
-	chatIDs := make([]uint, len(user.Chats))
-	for i, chat := range user.Chats {
-		chatIDs[i] = chat.ID
+	// 2. Extract Chat list
+	chats := make([]model.Chat, len(chatParticipants))
+	chatIDs := make([]uint, len(chatParticipants))
+	for i, cp := range chatParticipants {
+		chats[i] = cp.Chat
+		chatIDs[i] = cp.ChatID
 	}
 
+	// 3. Load latest messages
 	var lastMessages []model.Message
 	err = h.store.DB.WithContext(ctx).Raw(`
 		SELECT DISTINCT ON (chat_id) *
@@ -56,7 +58,7 @@ func (h *Handler) HandleGetMyChats(c *fiber.Ctx) error {
 		return apperror.Internal("failed to get last messages", err)
 	}
 
-	// Step 3: Get unread count per chat (messages not sent by user and not read by user)
+	// 4. Load unread counts
 	type UnreadCountResult struct {
 		ChatID      uint `gorm:"column:chat_id"`
 		UnreadCount int  `gorm:"column:unread_count"`
@@ -76,14 +78,13 @@ func (h *Handler) HandleGetMyChats(c *fiber.Ctx) error {
 		return apperror.Internal("failed to get unread counts", err)
 	}
 
-	// Step 4: Build map of unread counts for fast lookup
 	unreadMap := make(map[uint]uint)
 	for _, uc := range unreadCounts {
 		unreadMap[uc.ChatID] = uint(uc.UnreadCount)
 	}
 
-	// Step 5: Call DTO converter with unread info
-	result := dto.ToChatResponseList(user.Chats, lastMessages, unreadMap)
+	// 5. Transform into ChatResponse list
+	result := dto.ToChatResponseList(chats, lastMessages, unreadMap)
 
 	return c.Status(fiber.StatusOK).JSON(dto.HttpListResponse[dto.ChatResponse]{
 		Result: result,

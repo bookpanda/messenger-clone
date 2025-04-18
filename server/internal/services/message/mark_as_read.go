@@ -7,12 +7,11 @@ import (
 )
 
 func (h *Handler) markAsRead(messageID, userID uint) error {
-	// 1. Load the message with ReadBy and Chat.Participants
+	// 1. Load the message with ReadBy and Chat.Participants (with User)
 	var message model.Message
 	err := h.store.DB.
 		Preload("ReadBy").
-		Preload("Chat").
-		Preload("Chat.Participants").
+		Preload("Chat.Participants.User").
 		First(&message, messageID).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -21,10 +20,10 @@ func (h *Handler) markAsRead(messageID, userID uint) error {
 		return errors.Wrap(err, "failed to load message")
 	}
 
-	// 2. Check that the user is a participant of the chat
+	// 2. Check that userID is a participant
 	isParticipant := false
-	for _, participant := range message.Chat.Participants {
-		if participant.ID == userID {
+	for _, p := range message.Chat.Participants {
+		if p.UserID == userID {
 			isParticipant = true
 			break
 		}
@@ -33,20 +32,20 @@ func (h *Handler) markAsRead(messageID, userID uint) error {
 		return errors.New("user is not a participant of the chat")
 	}
 
-	// 3. Check if already read
+	// 3. Skip if already read
 	for _, reader := range message.ReadBy {
 		if reader.ID == userID {
-			return nil // already marked as read
+			return nil
 		}
 	}
 
-	// 4. Load user (required for GORM association)
+	// 4. Load user model
 	var user model.User
 	if err := h.store.DB.First(&user, userID).Error; err != nil {
 		return errors.Wrap(err, "failed to load user")
 	}
 
-	// 5. Append user to ReadBy association
+	// 5. Append to ReadBy association
 	if err := h.store.DB.
 		Model(&message).
 		Association("ReadBy").
