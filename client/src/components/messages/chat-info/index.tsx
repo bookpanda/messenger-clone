@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 
 import { ChangeColor } from "./change-color"
 import { ChangeEmoji } from "./change-emoji"
+import { ChangeChatName } from "./change-name"
 import { ChangeNickname } from "./change-nickname"
 
 export const ChatInfoPanel = ({
@@ -62,6 +63,9 @@ export const ChatInfoPanel = ({
             Customize chat
           </AccordionTrigger>
           <AccordionContent className="p-0">
+            {chatInfo.isGroup && (
+              <ChangeChatName chatId={chatId} initialName={chatInfo.name} />
+            )}
             <ChangeColor chatId={chatId} initialColor={chatInfo.color} />
             <ChangeEmoji chatId={chatId} initialEmoji={chatInfo.emoji} />
             <ChangeNickname
