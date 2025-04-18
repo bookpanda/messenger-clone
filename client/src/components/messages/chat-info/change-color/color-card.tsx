@@ -7,7 +7,7 @@ export const ColorCard = ({
 }: {
   color: string
   isActive: boolean
-  onClick: () => void
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void
 }) => {
   return (
     <button

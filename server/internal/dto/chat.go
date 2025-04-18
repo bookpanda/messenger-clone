@@ -55,6 +55,18 @@ type ChangeNicknameRequest struct {
 	Nickname string `json:"nickname" validate:"required"`
 }
 
+type ChangeChatNameRequest struct {
+	Name string `json:"name" validate:"required,min=1,max=100"`
+}
+
+type ChangeChatColorRequest struct {
+	Color string `json:"color" validate:"required"`
+}
+
+type ChangeChatEmojiRequest struct {
+	Emoji string `json:"emoji" validate:"required"`
+}
+
 type ParticipantResponse struct {
 	UserResponse
 	Nickname string `json:"nickname" binding:"required"`

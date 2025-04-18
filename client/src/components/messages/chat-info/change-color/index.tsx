@@ -1,7 +1,9 @@
 import { FormEvent, useState } from "react"
 
+import { changeChatColor } from "@/actions/chat/change-color"
 import { Participant } from "@/types"
 import Image from "next/image"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -33,10 +35,21 @@ export const ChangeColor = ({
   const [open, setOpen] = useState(false)
   const [color, setColor] = useState(initialColor)
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
 
-    console.log("Selected color:", color)
+    try {
+      await changeChatColor({
+        chatId,
+        color,
+      })
+
+      toast.success("Chat color changed successfully")
+    } catch {
+      toast.error("Failed to change chat color")
+    }
+
+    setOpen(false)
   }
 
   return (
@@ -68,7 +81,10 @@ export const ChangeColor = ({
                 key={option.name}
                 color={option.color}
                 isActive={color === option.color}
-                onClick={() => setColor(option.color)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setColor(option.color)
+                }}
               />
             ))}
           </div>
