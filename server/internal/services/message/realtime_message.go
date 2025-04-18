@@ -92,7 +92,7 @@ func (h *Handler) receiveRealtimeMessage(wg *sync.WaitGroup, c *websocket.Conn, 
 				logger.Error("failed to get participants", slog.Any("error", err))
 				continue
 			}
-			userList := dto.ToUserResponseList(participants)
+			userList := dto.ToParticipantResponseList(participants)
 			jsonPayload, err := json.Marshal(userList)
 			if err != nil {
 				logger.Error("failed to marshal online user list", err)

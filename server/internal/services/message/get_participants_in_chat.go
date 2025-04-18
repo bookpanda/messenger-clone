@@ -5,7 +5,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (h *Handler) getCurrentParticipantsInChat(chatID uint) ([]model.User, error) {
+func (h *Handler) getCurrentParticipantsInChat(chatID uint) ([]model.ChatParticipant, error) {
 	var chat model.Chat
 
 	err := h.store.DB.
@@ -15,10 +15,5 @@ func (h *Handler) getCurrentParticipantsInChat(chatID uint) ([]model.User, error
 		return nil, errors.Wrap(err, "failed to load chat participants")
 	}
 
-	users := make([]model.User, len(chat.Participants))
-	for i, p := range chat.Participants {
-		users[i] = p.User
-	}
-
-	return users, nil
+	return chat.Participants, nil
 }

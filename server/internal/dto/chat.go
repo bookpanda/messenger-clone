@@ -3,12 +3,12 @@ package dto
 import "github.com/bookpanda/messenger-clone/internal/model"
 
 type ChatResponse struct {
-	ID           uint             `json:"id" binding:"required"`
-	Name         string           `json:"name" binding:"required"`
-	IsDirect     bool             `json:"is_direct" binding:"required"`
-	Participants []UserResponse   `json:"participants" binding:"required"`
-	UnreadCount  uint             `json:"unread_count" binding:"required"`
-	LastMessage  *MessageResponse `json:"last_message,omitempty"`
+	ID           uint                  `json:"id" binding:"required"`
+	Name         string                `json:"name" binding:"required"`
+	IsDirect     bool                  `json:"is_direct" binding:"required"`
+	Participants []ParticipantResponse `json:"participants" binding:"required"`
+	UnreadCount  uint                  `json:"unread_count" binding:"required"`
+	LastMessage  *MessageResponse      `json:"last_message,omitempty"`
 }
 
 type CreateChatRequest struct {
@@ -46,7 +46,32 @@ type ModifyParticipantRequest struct {
 }
 
 type ModifyParticipantResponse struct {
-	Participants []UserResponse `json:"participants" binding:"required"`
+	Participants []ParticipantResponse `json:"participants" binding:"required"`
+}
+
+type ParticipantResponse struct {
+	UserResponse
+	Nickname string `json:"nickname" binding:"required"`
+}
+
+func ToParticipantResponse(user model.User, nickname string) ParticipantResponse {
+	return ParticipantResponse{
+		UserResponse: UserResponse{
+			ID:                user.ID,
+			Name:              user.Name,
+			Email:             user.Email,
+			ProfilePictureURL: user.ProfilePictureURL,
+		},
+		Nickname: nickname,
+	}
+}
+
+func ToParticipantResponseList(participants []model.ChatParticipant) []ParticipantResponse {
+	participantResponses := make([]ParticipantResponse, len(participants))
+	for i, cp := range participants {
+		participantResponses[i] = ToParticipantResponse(cp.User, cp.Nickname)
+	}
+	return participantResponses
 }
 
 func ToChatResponse(chat model.Chat, lastMessage *model.Message, unreadCount uint) ChatResponse {
@@ -56,17 +81,11 @@ func ToChatResponse(chat model.Chat, lastMessage *model.Message, unreadCount uin
 		lastMsg = &msg
 	}
 
-	// Extract []User from []ChatParticipant
-	var users []model.User
-	for _, cp := range chat.Participants {
-		users = append(users, cp.User)
-	}
-
 	return ChatResponse{
 		ID:           chat.ID,
 		Name:         chat.Name,
 		IsDirect:     chat.IsDirect,
-		Participants: ToUserResponseList(users),
+		Participants: ToParticipantResponseList(chat.Participants),
 		LastMessage:  lastMsg,
 		UnreadCount:  unreadCount,
 	}

@@ -12,7 +12,7 @@ components:
           type: string
         participants:
           items:
-            $ref: '#/components/schemas/dto.UserResponse'
+            $ref: '#/components/schemas/dto.ParticipantResponse'
           type: array
           uniqueItems: false
         unread_count:
@@ -194,11 +194,30 @@ components:
       properties:
         participants:
           items:
-            $ref: '#/components/schemas/dto.UserResponse'
+            $ref: '#/components/schemas/dto.ParticipantResponse'
           type: array
           uniqueItems: false
       required:
       - participants
+      type: object
+    dto.ParticipantResponse:
+      properties:
+        email:
+          type: string
+        id:
+          type: integer
+        name:
+          type: string
+        nickname:
+          type: string
+        profilePictureUrl:
+          type: string
+      required:
+      - email
+      - id
+      - name
+      - nickname
+      - profilePictureUrl
       type: object
     dto.ReactionResponse:
       description: nil if removed

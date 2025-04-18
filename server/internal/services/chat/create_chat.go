@@ -90,7 +90,7 @@ func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
 
 	// 4. Create chat & attach participants
 	var chat *model.Chat
-	var finalParticipants []model.User
+	var finalParticipants []model.ChatParticipant
 
 	if err := h.store.DB.Transaction(func(tx *gorm.DB) error {
 		chat, err = h.createChat(req.Name, req.IsDirect)
@@ -111,7 +111,7 @@ func (h *Handler) HandleCreateChat(c *fiber.Ctx) error {
 			ID:           chat.ID,
 			Name:         chat.Name,
 			IsDirect:     chat.IsDirect,
-			Participants: dto.ToUserResponseList(finalParticipants),
+			Participants: dto.ToParticipantResponseList(finalParticipants),
 		},
 	})
 }

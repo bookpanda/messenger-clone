@@ -1,23 +1,30 @@
 import { useEffect, useRef } from "react"
 
-import { ChatMessage, User } from "@/types"
+import { ChatMessage, Participant, User } from "@/types"
 
 import { IncomingMessage, OutgoingMessage } from "./messages"
 import { ReadBubbles } from "./read-bubble"
 import { TypingMessage } from "./typing"
 
 interface ChatMessagesProps {
-  participants: User[]
+  participants: Participant[]
   user: User
   messages: ChatMessage[]
   typingUserIDs: number[]
   handleToggleReaction: (messageId: number, reaction: string) => void
+  isGroup: boolean
 }
 
 // TODO: Refactor send isMe with participants
 export const ChatMessages = (props: ChatMessagesProps) => {
-  const { participants, user, messages, typingUserIDs, handleToggleReaction } =
-    props
+  const {
+    participants,
+    user,
+    messages,
+    typingUserIDs,
+    handleToggleReaction,
+    isGroup,
+  } = props
 
   const endOfMessagesRef = useRef<HTMLDivElement>(null)
 
@@ -31,7 +38,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto p-4">
-      <div className="space-y-2">
+      <div className="space-y-4">
         {/* Chat messages go here */}
         {messages.map((message, idx) => {
           const sender = participants.find(
@@ -55,6 +62,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
                   handleToggleReaction={(reaction: string) =>
                     handleToggleReaction(message.id, reaction)
                   }
+                  isGroup={isGroup}
                 />
               ) : (
                 <OutgoingMessage
@@ -64,6 +72,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
                   handleToggleReaction={(reaction: string) =>
                     handleToggleReaction(message.id, reaction)
                   }
+                  isGroup={isGroup}
                 />
               )}
               <ReadBubbles users={lastReadUsers} />

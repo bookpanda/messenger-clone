@@ -1009,7 +1009,7 @@ export interface components {
             is_direct: boolean;
             last_message?: components["schemas"]["dto.MessageResponse"];
             name: string;
-            participants: components["schemas"]["dto.UserResponse"][];
+            participants: components["schemas"]["dto.ParticipantResponse"][];
             unread_count: number;
         };
         "dto.CreateChatRequest": {
@@ -1072,7 +1072,14 @@ export interface components {
             participants: string[];
         };
         "dto.ModifyParticipantResponse": {
-            participants: components["schemas"]["dto.UserResponse"][];
+            participants: components["schemas"]["dto.ParticipantResponse"][];
+        };
+        "dto.ParticipantResponse": {
+            email: string;
+            id: number;
+            name: string;
+            nickname: string;
+            profilePictureUrl: string;
         };
         /** @description nil if removed */
         "dto.ReactionResponse": {

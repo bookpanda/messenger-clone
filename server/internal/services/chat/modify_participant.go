@@ -56,7 +56,7 @@ func (h *Handler) HandleModifyParticipants(c *fiber.Ctx) error {
 	}
 
 	result := dto.ModifyParticipantResponse{
-		Participants: dto.ToUserResponseList(finalParticipants),
+		Participants: dto.ToParticipantResponseList(finalParticipants),
 	}
 
 	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.ModifyParticipantResponse]{
@@ -92,7 +92,7 @@ func (h *Handler) VerifyParticipants(participants []string) ([]model.User, error
 	return participantUsers, nil
 }
 
-func (h *Handler) ModifyParticipants(action dto.ParticipantAction, chatID uint, participants []model.User) ([]model.User, error) {
+func (h *Handler) ModifyParticipants(action dto.ParticipantAction, chatID uint, participants []model.User) ([]model.ChatParticipant, error) {
 	var chat model.Chat
 	if err := h.store.DB.Preload("Participants.User").First(&chat, chatID).Error; err != nil {
 		return nil, apperror.Internal("failed to load chat participants", err)
@@ -147,7 +147,7 @@ func (h *Handler) ModifyParticipants(action dto.ParticipantAction, chatID uint, 
 		return nil, apperror.BadRequest("invalid action", errors.New("action must be ADD or REMOVE"))
 	}
 
-	// Reload updated participant list
+	// Reload updated ChatParticipants with User info
 	var updatedParticipants []model.ChatParticipant
 	if err := h.store.DB.
 		Preload("User").
@@ -156,11 +156,5 @@ func (h *Handler) ModifyParticipants(action dto.ParticipantAction, chatID uint, 
 		return nil, apperror.Internal("failed to reload participants", err)
 	}
 
-	// Extract just the users to return
-	var resultUsers []model.User
-	for _, cp := range updatedParticipants {
-		resultUsers = append(resultUsers, cp.User)
-	}
-
-	return resultUsers, nil
+	return updatedParticipants, nil
 }
