@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction } from "react"
 
-import { ChatInfo, ChatMessage, Participant, User } from "@/types"
+import { ChatInfo, ChatMessage, User } from "@/types"
 
 import { ChatHeader } from "./chat-header"
 import { ChatInput } from "./chat-input"
@@ -12,9 +12,6 @@ interface ChatProps {
   chatInfo: ChatInfo
   user: User
   messages: ChatMessage[]
-  color: string
-  emoji: string
-  participants: Participant[]
   setOpenChatInfo: Dispatch<SetStateAction<boolean>>
   handleSendMessage: (message: string) => void
   handleTyping: (type: "START" | "END") => void
@@ -27,9 +24,6 @@ export const ChatBox = (props: ChatProps) => {
     chatInfo,
     user,
     messages,
-    color,
-    emoji,
-    participants,
     setOpenChatInfo,
     handleSendMessage,
     handleTyping,
@@ -50,18 +44,18 @@ export const ChatBox = (props: ChatProps) => {
         setOpenChatInfo={setOpenChatInfo}
       />
       <ChatMessages
-        participants={participants}
+        participants={chatInfo.participants}
         user={user}
         messages={messages}
         handleToggleReaction={handleToggleReaction}
         typingUserIDs={typingUserIDs}
         isGroup={chatInfo.isGroup}
-        color={color}
+        color={chatInfo.color}
       />
       <ChatInput
         handleSendMessage={handleSendMessage}
         handleTyping={handleTyping}
-        emoji={emoji}
+        emoji={chatInfo.emoji}
       />
     </div>
   )

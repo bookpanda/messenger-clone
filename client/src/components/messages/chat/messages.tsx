@@ -86,13 +86,11 @@ export const IncomingMessage = (props: MessageProps) => {
         )}
         <div className="flex items-center gap-2">
           <div
-            className={cn(
-              "bg-chat-incoming-message-bubble-background-color relative rounded-full",
-              {
-                "px-3 py-2": !isEmoji(content),
-                "text-3xl": isEmoji(content),
-              }
-            )}
+            className={cn("relative rounded-full", {
+              "bg-chat-incoming-message-bubble-background-color px-3 py-2":
+                !isEmoji(content),
+              "text-3xl": isEmoji(content),
+            })}
           >
             <p>{content}</p>
             <div className="absolute -bottom-3 left-3 z-10">
