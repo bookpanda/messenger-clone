@@ -2,7 +2,6 @@
 
 import { Dispatch, SetStateAction } from "react"
 
-import { toggleMessageReaction } from "@/actions/message/toggle-reaction"
 import { ChatInfo, ChatMessage, Participant, User } from "@/types"
 
 import { ChatHeader } from "./chat-header"

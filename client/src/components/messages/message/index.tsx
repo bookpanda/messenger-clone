@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 
-import { toggleMessageReaction } from "@/actions/message/toggle-reaction"
 import {
   ChatInfo,
   ChatMessage,
@@ -28,12 +27,8 @@ export const Message = ({
   chatInfo: ChatInfo
   chatHistory: ChatMessage[]
 }) => {
-  const {
-    clearChatUnread,
-    handleUpdateChatList,
-    setOnlineUsers,
-    handleReactionPreviewChatList,
-  } = useChatList()
+  const { clearChatUnread, handleUpdateChatList, setOnlineUsers } =
+    useChatList()
   const [openChatInfo, setOpenChatInfo] = useState(true)
 
   const {
