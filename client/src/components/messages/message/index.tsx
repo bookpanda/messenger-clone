@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react"
 
+import { chatResponseToChatInfo } from "@/lib/utils"
 import {
+  Chat,
   ChatInfo,
   ChatMessage,
   Participant,
@@ -62,8 +64,8 @@ export const Message = ({
         setOnlineUsers(onlineUsers)
         break
       case "CHAT_INFO_UPDATE":
-        const chatInfo: ChatInfo = JSON.parse(message.content)
-        setChatInfo(chatInfo)
+        const chat: Chat = JSON.parse(message.content)
+        setChatInfo(chatResponseToChatInfo(chat))
         break
       case "MESSAGE_UPDATE":
         // Add Chat to sidebar if not exists and update current chat message
