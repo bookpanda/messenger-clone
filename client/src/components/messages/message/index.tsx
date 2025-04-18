@@ -190,7 +190,11 @@ export const Message = ({
         }}
       />
       {openChatInfo && (
-        <ChatInfoPanel name={chatInfo.name} image={chatInfo.image} />
+        <ChatInfoPanel
+          name={chatInfo.name}
+          image={chatInfo.image}
+          participants={participants}
+        />
       )}
     </div>
   )
