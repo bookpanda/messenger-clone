@@ -30,7 +30,7 @@ export function chatResponseToChatInfo(chat: Chat, userId?: number) {
 
     return {
       id: chat.id,
-      name: friend?.name || "",
+      name: friend?.nickname || friend?.name,
       image: friend?.profilePictureUrl || "/thumbnail.jpg",
       color: chat.color,
       emoji: chat.emoji,
