@@ -27,7 +27,7 @@ export const ChatHeader = (props: ChatHeaderProps) => {
       <div className="flex items-center gap-2">
         <div className="relative size-10">
           <Image
-            src={image}
+            src={image || "/thumbnail.jpg"}
             alt=""
             fill
             className="rounded-full object-cover"

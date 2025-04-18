@@ -8,10 +8,11 @@ import { Input } from "@/components/ui/input"
 interface ChatInputProps {
   handleSendMessage: (text: string) => void
   handleTyping: (type: "START" | "END") => void
+  emoji: string
 }
 
 export const ChatInput = (props: ChatInputProps) => {
-  const { handleSendMessage, handleTyping } = props
+  const { handleSendMessage, handleTyping, emoji } = props
 
   const [message, setMessage] = useState("")
   const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -72,10 +73,11 @@ export const ChatInput = (props: ChatInputProps) => {
       </form>
       <Button
         size="icon"
-        className="text-chat-composer-button-color size-auto rounded-full p-1"
+        className="text-chat-composer-button-color size-9 rounded-full text-xl"
         variant="ghost"
+        onClick={() => handleSendMessage(emoji)}
       >
-        <ThumbsUp className="size-5" />
+        {emoji}
       </Button>
     </div>
   )

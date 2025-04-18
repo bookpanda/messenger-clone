@@ -1,4 +1,4 @@
-import { Participant } from "@/types"
+import { ChatInfo, Participant } from "@/types"
 import { Lock, Pin } from "lucide-react"
 import Image from "next/image"
 
@@ -10,31 +10,30 @@ import {
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 
+import { ChangeColor } from "./change-color"
+import { ChangeEmoji } from "./change-emoji"
+import { ChangeChatName } from "./change-name"
 import { ChangeNickname } from "./change-nickname"
 
 export const ChatInfoPanel = ({
   chatId,
-  name,
-  image,
-  participants,
+  chatInfo,
 }: {
   chatId: number
-  name: string
-  image: string
-  participants: Participant[]
+  chatInfo: ChatInfo
 }) => {
   return (
     <div className="bg-primary-background text-primary-foreground w-75 space-y-5 rounded-md px-3 py-4">
       <div className="flex flex-col items-center gap-3">
         <div className="relative size-20">
           <Image
-            src={image}
-            alt={name}
+            src={chatInfo.image || "/thumbnail.jpg"}
+            alt={chatInfo.name}
             className="rounded-full object-cover"
             fill
           />
         </div>
-        <h2 className="font-medium">{name}</h2>
+        <h2 className="font-medium">{chatInfo.name}</h2>
       </div>
 
       <div className="flex justify-center">
@@ -64,28 +63,15 @@ export const ChatInfoPanel = ({
             Customize chat
           </AccordionTrigger>
           <AccordionContent className="p-0">
-            <Button
-              variant="ghost"
-              className="hover:text-primary-foreground h-auto w-full justify-start rounded-md p-2.5 hover:bg-white/10 hover:no-underline"
-            >
-              <div className="relative size-5">
-                <Image
-                  src="/minecraft-themes.jpg"
-                  alt=""
-                  fill
-                  className="rounded-full object-cover"
-                />
-              </div>
-              <span>Change themes</span>
-            </Button>
-            <Button
-              variant="ghost"
-              className="hover:text-primary-foreground h-auto w-full justify-start rounded-md p-2.5 hover:bg-white/10 hover:no-underline"
-            >
-              <span className="text-xl">🤩</span>
-              <span>Change emoji</span>
-            </Button>
-            <ChangeNickname chatId={chatId} participants={participants} />
+            {chatInfo.isGroup && (
+              <ChangeChatName chatId={chatId} initialName={chatInfo.name} />
+            )}
+            <ChangeColor chatId={chatId} initialColor={chatInfo.color} />
+            <ChangeEmoji chatId={chatId} initialEmoji={chatInfo.emoji} />
+            <ChangeNickname
+              chatId={chatId}
+              participants={chatInfo.participants}
+            />
           </AccordionContent>
         </AccordionItem>
       </Accordion>
