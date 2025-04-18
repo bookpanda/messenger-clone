@@ -2,32 +2,31 @@ package seeds
 
 import (
 	"github.com/bookpanda/messenger-clone/internal/model"
-	"gorm.io/gorm"
 )
 
 var Chats = []model.Chat{
 	{
 		Name: "Group 1",
-		Participants: []model.User{
-			{Model: gorm.Model{ID: 1}},
-			{Model: gorm.Model{ID: 2}},
-			{Model: gorm.Model{ID: 3}},
+		Participants: []model.ChatParticipant{
+			{UserID: 1},
+			{UserID: 2},
+			{UserID: 3},
 		},
 	},
 	{
 		Name: "Group 2",
-		Participants: []model.User{
-			{Model: gorm.Model{ID: 4}},
-			{Model: gorm.Model{ID: 5}},
-			{Model: gorm.Model{ID: 6}},
+		Participants: []model.ChatParticipant{
+			{UserID: 4},
+			{UserID: 5},
+			{UserID: 6},
 		},
 	},
 	{
 		Name: "Group 3",
-		Participants: []model.User{
-			{Model: gorm.Model{ID: 1}},
-			{Model: gorm.Model{ID: 3}},
-			{Model: gorm.Model{ID: 5}},
+		Participants: []model.ChatParticipant{
+			{UserID: 1},
+			{UserID: 3},
+			{UserID: 5},
 		},
 	},
 }

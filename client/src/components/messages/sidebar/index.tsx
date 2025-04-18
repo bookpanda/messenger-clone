@@ -1,7 +1,7 @@
 "use client"
 
 import { useChatStore } from "@/stores/chat"
-import { ChatInfo, User } from "@/types"
+import { User } from "@/types"
 import Image from "next/image"
 
 import { CommunitiesTab } from "./communities-tab"

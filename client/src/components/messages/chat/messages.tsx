@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 
 import { cn } from "@/lib/utils"
-import { ChatMessage, User } from "@/types"
+import { ChatMessage, Participant, User } from "@/types"
 import { EllipsisVertical, Smile } from "lucide-react"
 import Image from "next/image"
 
@@ -16,9 +16,10 @@ import {
 
 interface MessageProps {
   message: ChatMessage
-  user: User
-  sender: User
+  user: User // me
+  sender: Participant // sender
   handleToggleReaction: (reaction: string) => void
+  isGroup: boolean
 }
 
 interface EmojiMap {
@@ -31,7 +32,7 @@ interface EmojiMap {
 const reactionEmojis = ["🥰", "😢", "😂", "😡", "👍"]
 
 export const IncomingMessage = (props: MessageProps) => {
-  const { message, user, sender, handleToggleReaction } = props
+  const { message, user, sender, handleToggleReaction, isGroup } = props
   const { content, reactions } = message
 
   const [isHover, setHover] = useState(false)
@@ -77,83 +78,88 @@ export const IncomingMessage = (props: MessageProps) => {
           className="rounded-full object-cover"
         />
       </div>
-      <div className="flex items-center gap-2">
-        <div className="bg-chat-incoming-message-bubble-background-color relative rounded-full px-3 py-2">
-          <p>{content}</p>
-          <div className="absolute -bottom-3 left-3 z-10">
-            {Object.keys(groupedReactions).length > 0 && (
-              <div className="bg-primary-background flex max-w-full items-center space-x-1 rounded-full px-0.5 py-0.5 text-sm shadow-sm">
-                {Object.entries(groupedReactions)
-                  .slice(0, 3)
-                  .map(([emoji]) => (
-                    <span key={emoji} className="text-md mx-0 leading-none">
-                      {emoji}
+      <div>
+        {isGroup && (
+          <p className="ml-4 text-xs">{sender.nickname || sender.name}</p>
+        )}
+        <div className="flex items-center gap-2">
+          <div className="bg-chat-incoming-message-bubble-background-color relative rounded-full px-3 py-2">
+            <p>{content}</p>
+            <div className="absolute -bottom-3 left-3 z-10">
+              {Object.keys(groupedReactions).length > 0 && (
+                <div className="bg-primary-background flex max-w-full items-center space-x-1 rounded-full px-0.5 py-0.5 text-sm shadow-sm">
+                  {Object.entries(groupedReactions)
+                    .slice(0, 3)
+                    .map(([emoji]) => (
+                      <span key={emoji} className="text-md mx-0 leading-none">
+                        {emoji}
+                      </span>
+                    ))}
+                  {totalReactions > 1 && (
+                    <span className="font-sm mr-1 ml-1 text-xs text-gray-300">
+                      {Object.values(groupedReactions).reduce(
+                        (sum, r) => sum + r.count,
+                        0
+                      )}
                     </span>
-                  ))}
-                {totalReactions > 1 && (
-                  <span className="font-sm mr-1 ml-1 text-xs text-gray-300">
-                    {Object.values(groupedReactions).reduce(
-                      (sum, r) => sum + r.count,
-                      0
-                    )}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-        <div
-          className={cn("items-center gap-2", {
-            hidden: !isHover,
-            flex: isHover,
-          })}
-        >
-          <Popover open={isReactionOpen} onOpenChange={setReactionOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                size="icon"
-                variant="secondary"
-                className="bg-secondary-background text-primary-foreground size-auto rounded-full p-1 hover:bg-white/10"
-              >
-                <Smile className="size-5" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              side="top"
-              className={cn(
-                "bg-primary-background text-primary-foreground w-auto rounded-full border border-none border-white/20 px-3 py-2",
-                {
-                  hidden: !isHover,
-                  flex: isHover,
-                }
+                  )}
+                </div>
               )}
-            >
-              {reactionEmojis.map((emoji, idx) => (
-                <Button
-                  key={idx}
-                  variant="ghost"
-                  className={cn("size-8 p-0 px-3 text-2xl", {
-                    "bg-secondary-background": groupedReactions?.[
-                      emoji
-                    ]?.senders.includes(user.id),
-                  })}
-                  onClick={() => {
-                    handleToggleReaction(emoji)
-                    setReactionOpen(false)
-                  }}
-                >
-                  {emoji}
-                </Button>
-              ))}
-            </PopoverContent>
-          </Popover>
-          <Button
-            size="icon"
-            variant="secondary"
-            className="bg-secondary-background text-primary-foreground size-auto rounded-full p-1 hover:bg-white/10"
+            </div>
+          </div>
+          <div
+            className={cn("items-center gap-2", {
+              hidden: !isHover,
+              flex: isHover,
+            })}
           >
-            <EllipsisVertical className="size-5" />
-          </Button>
+            <Popover open={isReactionOpen} onOpenChange={setReactionOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="bg-secondary-background text-primary-foreground size-auto rounded-full p-1 hover:bg-white/10"
+                >
+                  <Smile className="size-5" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                side="top"
+                className={cn(
+                  "bg-primary-background text-primary-foreground w-auto rounded-full border border-none border-white/20 px-3 py-2",
+                  {
+                    hidden: !isHover,
+                    flex: isHover,
+                  }
+                )}
+              >
+                {reactionEmojis.map((emoji, idx) => (
+                  <Button
+                    key={idx}
+                    variant="ghost"
+                    className={cn("size-8 p-0 px-3 text-2xl", {
+                      "bg-secondary-background": groupedReactions?.[
+                        emoji
+                      ]?.senders.includes(user.id),
+                    })}
+                    onClick={() => {
+                      handleToggleReaction(emoji)
+                      setReactionOpen(false)
+                    }}
+                  >
+                    {emoji}
+                  </Button>
+                ))}
+              </PopoverContent>
+            </Popover>
+            <Button
+              size="icon"
+              variant="secondary"
+              className="bg-secondary-background text-primary-foreground size-auto rounded-full p-1 hover:bg-white/10"
+            >
+              <EllipsisVertical className="size-5" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

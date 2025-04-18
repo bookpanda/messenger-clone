@@ -16,14 +16,20 @@ func GenerateMessagesForChats(chats []model.Chat) []model.Message {
 	var messages []model.Message
 
 	for _, chat := range chats {
+		if len(chat.Participants) == 0 {
+			continue // skip chats with no participants
+		}
+
 		numMessages := rand.Intn(38) + 3 // between 3 and 40 messages
+
 		for i := 0; i < numMessages; i++ {
 			sender := chat.Participants[rand.Intn(len(chat.Participants))]
+
 			messages = append(messages, model.Message{
 				Type:     model.MessageTypeText,
 				Content:  sampleContents[rand.Intn(len(sampleContents))],
 				ChatID:   chat.ID,
-				SenderID: sender.ID,
+				SenderID: sender.UserID,
 			})
 		}
 	}

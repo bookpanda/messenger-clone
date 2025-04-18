@@ -33,7 +33,7 @@ func (h *Handler) HandleGetGroupChats(c *fiber.Ctx) error {
 	err = h.store.DB.WithContext(ctx).
 		Model(&model.Chat{}).
 		Where("is_direct = false").
-		Preload("Participants").
+		Preload("Participants.User").
 		Find(&chats).Error
 	if err != nil {
 		return apperror.Internal("failed to load group chats", err)
