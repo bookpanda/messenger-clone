@@ -29,6 +29,8 @@ export type ChatInfo = {
   id: number
   name: string
   image: string
+  color: string
+  emoji: string
   isGroup: boolean
   lastMessage: LastMessage | null
   participants: Participant[]

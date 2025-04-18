@@ -6,6 +6,8 @@ type ChatResponse struct {
 	ID           uint                  `json:"id" binding:"required"`
 	Name         string                `json:"name" binding:"required"`
 	IsDirect     bool                  `json:"is_direct" binding:"required"`
+	Color        string                `json:"color" binding:"required"`
+	Emoji        string                `json:"emoji" binding:"required"`
 	Participants []ParticipantResponse `json:"participants" binding:"required"`
 	UnreadCount  uint                  `json:"unread_count" binding:"required"`
 	LastMessage  *MessageResponse      `json:"last_message,omitempty"`
@@ -89,6 +91,8 @@ func ToChatResponse(chat model.Chat, lastMessage *model.Message, unreadCount uin
 		ID:           chat.ID,
 		Name:         chat.Name,
 		IsDirect:     chat.IsDirect,
+		Color:        chat.Color,
+		Emoji:        chat.Emoji,
 		Participants: ToParticipantResponseList(chat.Participants),
 		LastMessage:  lastMsg,
 		UnreadCount:  unreadCount,

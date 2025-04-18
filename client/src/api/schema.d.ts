@@ -1073,6 +1073,8 @@ export interface components {
             nickname: string;
         };
         "dto.ChatResponse": {
+            color: string;
+            emoji: string;
             id: number;
             is_direct: boolean;
             last_message?: components["schemas"]["dto.MessageResponse"];

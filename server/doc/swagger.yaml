@@ -9,6 +9,10 @@ components:
       type: object
     dto.ChatResponse:
       properties:
+        color:
+          type: string
+        emoji:
+          type: string
         id:
           type: integer
         is_direct:
@@ -25,6 +29,8 @@ components:
         unread_count:
           type: integer
       required:
+      - color
+      - emoji
       - id
       - is_direct
       - name

@@ -34,6 +34,11 @@ const (
 	EventTypingEnd        EventType = "TYPING_END"        // Incoming message to server
 	EventOnlineUsers      EventType = "ONLINE_USERS"      // Outgoing message from server
 	EventChatParticipants EventType = "CHAT_PARTICIPANTS" // Outgoing message from server
+	EventChatUpdate       EventType = "CHAT_UPDATE"       // Outgoing message from server
+
+	EventTabInboxUpdate     EventType = "TAB_INBOX_UPDATE"     // Outgoing message from server
+	EventTabPeopleUpdate    EventType = "TAB_PEOPLE_UPDATE"    // Outgoing message from server
+	EventTabCommunityUpdate EventType = "TAB_COMMUNITY_UPDATE" // Outgoing message from server
 
 	EventUnreadMessage EventType = "UNREAD_MESSAGE"
 	EventReaction      EventType = "REACTION"

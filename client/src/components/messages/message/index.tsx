@@ -42,6 +42,8 @@ export const Message = ({
 
   const [messages, setMessages] = useState<ChatMessage[]>(chatHistory)
   const [participants, setParticipants] = useState<Participant[]>([])
+  const [color, setColor] = useState<string>(chatInfo.color)
+  const [emoji, setEmoji] = useState<string>(chatInfo.emoji)
   const [typingUserIDs, setTypingUserIDs] = useState<number[]>([])
 
   useEffect(() => {
@@ -172,6 +174,8 @@ export const Message = ({
         user={user}
         chatInfo={chatInfo}
         messages={messages}
+        color={color}
+        emoji={emoji}
         participants={participants}
         handleSendMessage={(message: string) =>
           handleSendMessage(chatInfo.id, message)
