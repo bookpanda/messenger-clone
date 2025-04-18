@@ -49,6 +49,10 @@ type ModifyParticipantResponse struct {
 	Participants []ParticipantResponse `json:"participants" binding:"required"`
 }
 
+type ChangeNicknameRequest struct {
+	Nickname string `json:"nickname" validate:"required"`
+}
+
 type ParticipantResponse struct {
 	UserResponse
 	Nickname string `json:"nickname" binding:"required"`

@@ -13,10 +13,12 @@ import { Button } from "@/components/ui/button"
 import { ChangeNickname } from "./change-nickname"
 
 export const ChatInfoPanel = ({
+  chatId,
   name,
   image,
   participants,
 }: {
+  chatId: number
   name: string
   image: string
   participants: Participant[]
@@ -83,7 +85,7 @@ export const ChatInfoPanel = ({
               <span className="text-xl">🤩</span>
               <span>Change emoji</span>
             </Button>
-            <ChangeNickname participants={participants} />
+            <ChangeNickname chatId={chatId} participants={participants} />
           </AccordionContent>
         </AccordionItem>
       </Accordion>

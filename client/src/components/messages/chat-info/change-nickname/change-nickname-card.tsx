@@ -1,24 +1,40 @@
 import { FormEvent, useState } from "react"
 
+import { changeNickname } from "@/actions/chat/change-nickname"
 import { Participant } from "@/types"
 import { Check, PenLine } from "lucide-react"
 import Image from "next/image"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 export const ChangeNicknameCard = ({
+  chatId,
   participant,
 }: {
+  chatId: number
   participant: Participant
 }) => {
   const [isEditing, setIsEditing] = useState(false)
 
   const [nickname, setNickname] = useState(participant.nickname)
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    console.log("change nickname")
+
+    try {
+      await changeNickname({
+        chatId,
+        participantId: participant.id,
+        nickname,
+      })
+
+      toast.success("Nickname changed successfully")
+    } catch {
+      toast.error("Failed to change nickname")
+    }
+
     setIsEditing(false)
   }
 

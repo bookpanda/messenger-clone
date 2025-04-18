@@ -1,6 +1,4 @@
 import { Participant } from "@/types"
-import { PenLine } from "lucide-react"
-import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -10,15 +8,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 
 import { ChangeNicknameCard } from "./change-nickname-card"
 
 export const ChangeNickname = ({
+  chatId,
   participants,
 }: {
+  chatId: number
   participants: Participant[]
 }) => {
   return (
@@ -42,6 +39,7 @@ export const ChangeNickname = ({
           {participants.map((participant) => (
             <ChangeNicknameCard
               key={participant.id + "-change-nickname"}
+              chatId={chatId}
               participant={participant}
             />
           ))}

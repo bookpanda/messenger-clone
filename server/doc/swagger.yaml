@@ -1,5 +1,12 @@
 components:
   schemas:
+    dto.ChangeNicknameRequest:
+      properties:
+        nickname:
+          type: string
+      required:
+      - nickname
+      type: object
     dto.ChatResponse:
       properties:
         id:
@@ -548,6 +555,49 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Join Group Chat
+      tags:
+      - chat
+  /api/v1/chat/{id}/participant/{participantId}/nickname:
+    patch:
+      description: Add/remove participants to/from chat
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: Participant ID
+        in: path
+        name: participantId
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dto.ChangeNicknameRequest'
+        description: request request
+        required: true
+      responses:
+        "204":
+          description: No Content
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.HttpError'
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Modify participants
       tags:
       - chat
   /api/v1/chat/{id}/participants:

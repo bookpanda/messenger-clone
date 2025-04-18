@@ -191,6 +191,7 @@ export const Message = ({
       />
       {openChatInfo && (
         <ChatInfoPanel
+          chatId={chatInfo.id}
           name={chatInfo.name}
           image={chatInfo.image}
           participants={participants}
