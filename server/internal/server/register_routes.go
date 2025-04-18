@@ -43,6 +43,9 @@ func (s *Server) RegisterRoutes(
 	chat.Post("/:id/join", authMiddleware.Auth, chatHandler.HandleJoinChat)
 	chat.Patch("/:id/participants", authMiddleware.Auth, chatHandler.HandleModifyParticipants)
 	chat.Patch("/:id/participant/:participantId/nickname", authMiddleware.Auth, chatHandler.HandleParticipantChangeNickname)
+	chat.Patch("/:id/name", authMiddleware.Auth, chatHandler.HandleChangeChatName)
+	chat.Patch("/:id/color", authMiddleware.Auth, chatHandler.HandleChangeChatColor)
+	chat.Patch("/:id/emoji", authMiddleware.Auth, chatHandler.HandleChangeChatEmoji)
 
 	// message
 	message := v1.Group("/message")

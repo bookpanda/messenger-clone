@@ -29,7 +29,8 @@ export default async function Page({
         email: session.user.email,
         profilePictureUrl: session.user.image,
       }}
-      chatInfo={chatInfo}
+      chatId={chatInfo.id}
+      initialChatInfo={chatInfo}
       chatHistory={chatHistory}
     />
   )

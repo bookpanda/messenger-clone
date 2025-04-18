@@ -355,6 +355,114 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/chat/{id}/color": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change chat color
+         * @description Update the color of a chat
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Chat ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            /** @description New color */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["dto.ChangeChatColorRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/chat/{id}/emoji": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change chat emoji
+         * @description Update the emoji of a chat
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Chat ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            /** @description New emoji */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["dto.ChangeChatEmojiRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
     "/api/v1/chat/{id}/join": {
         parameters: {
             query?: never;
@@ -420,6 +528,69 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat/{id}/name": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change chat name
+         * @description Update the name of a chat
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Chat ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            /** @description New name */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["dto.ChangeChatNameRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
         trace?: never;
     };
     "/api/v1/chat/{id}/participant/{participantId}/nickname": {
@@ -1069,10 +1240,21 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        "dto.ChangeChatColorRequest": {
+            color: string;
+        };
+        "dto.ChangeChatEmojiRequest": {
+            emoji: string;
+        };
+        "dto.ChangeChatNameRequest": {
+            name: string;
+        };
         "dto.ChangeNicknameRequest": {
             nickname: string;
         };
         "dto.ChatResponse": {
+            color: string;
+            emoji: string;
             id: number;
             is_direct: boolean;
             last_message?: components["schemas"]["dto.MessageResponse"];

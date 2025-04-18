@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react"
 
-import { cn } from "@/lib/utils"
+import { cn, isEmoji } from "@/lib/utils"
 import { ChatMessage, Participant, User } from "@/types"
 import { EllipsisVertical, Smile } from "lucide-react"
+import { isIP } from "net"
 import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
@@ -20,6 +21,7 @@ interface MessageProps {
   sender: Participant // sender
   handleToggleReaction: (reaction: string) => void
   isGroup: boolean
+  color: string
 }
 
 interface EmojiMap {
@@ -83,7 +85,13 @@ export const IncomingMessage = (props: MessageProps) => {
           <p className="ml-4 text-xs">{sender.nickname || sender.name}</p>
         )}
         <div className="flex items-center gap-2">
-          <div className="bg-chat-incoming-message-bubble-background-color relative rounded-full px-3 py-2">
+          <div
+            className={cn("relative rounded-full", {
+              "bg-chat-incoming-message-bubble-background-color px-3 py-2":
+                !isEmoji(content),
+              "text-3xl": isEmoji(content),
+            })}
+          >
             <p>{content}</p>
             <div className="absolute -bottom-3 left-3 z-10">
               {Object.keys(groupedReactions).length > 0 && (
@@ -167,7 +175,7 @@ export const IncomingMessage = (props: MessageProps) => {
 }
 
 export const OutgoingMessage = (props: MessageProps) => {
-  const { message, user, handleToggleReaction } = props
+  const { message, user, handleToggleReaction, color } = props
   const { content, reactions } = message
 
   const [isHover, setHover] = useState(false)
@@ -261,7 +269,13 @@ export const OutgoingMessage = (props: MessageProps) => {
             </PopoverContent>
           </Popover>
         </div>
-        <div className="bg-chat-outgoing-message-bubble-background-color relative rounded-full px-3 py-2">
+        <div
+          className={cn("relative rounded-full", {
+            "px-3 py-2": !isEmoji(content),
+            "text-3xl": isEmoji(content),
+          })}
+          style={{ backgroundColor: !isEmoji(content) ? color : "transparent" }}
+        >
           <p>{content}</p>
           <div className="absolute right-3 -bottom-3 z-10">
             {Object.keys(groupedReactions).length > 0 && (
