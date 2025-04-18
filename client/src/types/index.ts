@@ -16,6 +16,7 @@ export type LastMessage = {
 
 export type Chat = components["schemas"]["dto.ChatResponse"]
 export type User = components["schemas"]["dto.UserResponse"]
+export type Participant = components["schemas"]["dto.ParticipantResponse"]
 export type ChatMessage = components["schemas"]["dto.MessageResponse"]
 export type Reaction = components["schemas"]["dto.ReactionResponse"]
 
@@ -28,8 +29,9 @@ export type ChatInfo = {
   id: number
   name: string
   image: string
+  isGroup: boolean
   lastMessage: LastMessage | null
-  participants: User[]
+  participants: Participant[]
   unreadCount: number
 }
 
@@ -39,7 +41,7 @@ export type CommunityInfo = {
   id: number
   name: string
   image: string
-  participants: User[]
+  participants: Participant[]
   isMember: boolean
 }
 

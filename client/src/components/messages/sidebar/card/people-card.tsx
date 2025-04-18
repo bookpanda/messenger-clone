@@ -8,8 +8,6 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 
-import { useChatList } from "../../hooks/use-chat-list"
-
 interface PeopleCardProps {
   friend: User
 }

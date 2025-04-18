@@ -12,7 +12,6 @@ import (
 	"github.com/bookpanda/messenger-clone/pkg/apperror"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
-	"gorm.io/gorm"
 )
 
 // @Summary			Modify participants
@@ -57,7 +56,7 @@ func (h *Handler) HandleModifyParticipants(c *fiber.Ctx) error {
 	}
 
 	result := dto.ModifyParticipantResponse{
-		Participants: dto.ToUserResponseList(finalParticipants),
+		Participants: dto.ToParticipantResponseList(finalParticipants),
 	}
 
 	return c.Status(fiber.StatusOK).JSON(dto.HttpResponse[dto.ModifyParticipantResponse]{
@@ -93,18 +92,17 @@ func (h *Handler) VerifyParticipants(participants []string) ([]model.User, error
 	return participantUsers, nil
 }
 
-func (h *Handler) ModifyParticipants(action dto.ParticipantAction, chatID uint, participants []model.User) ([]model.User, error) {
+func (h *Handler) ModifyParticipants(action dto.ParticipantAction, chatID uint, participants []model.User) ([]model.ChatParticipant, error) {
 	var chat model.Chat
-	if err := h.store.DB.Preload("Participants").First(&chat, chatID).Error; err != nil {
+	if err := h.store.DB.Preload("Participants.User").First(&chat, chatID).Error; err != nil {
 		return nil, apperror.Internal("failed to load chat participants", err)
 	}
 
-	existingMap := make(map[uint]struct{}, len(chat.Participants))
-	for _, participant := range chat.Participants {
-		existingMap[participant.ID] = struct{}{}
+	existingMap := make(map[uint]struct{})
+	for _, cp := range chat.Participants {
+		existingMap[cp.UserID] = struct{}{}
 	}
 
-	// prepare participants and check for conflict
 	var conflictIDs []string
 	for _, p := range participants {
 		_, exists := existingMap[p.ID]
@@ -115,7 +113,6 @@ func (h *Handler) ModifyParticipants(action dto.ParticipantAction, chatID uint, 
 			conflictIDs = append(conflictIDs, strconv.FormatUint(uint64(p.ID), 10))
 		}
 	}
-
 	if len(conflictIDs) > 0 {
 		var msg string
 		if action == dto.AddParticipant {
@@ -126,30 +123,38 @@ func (h *Handler) ModifyParticipants(action dto.ParticipantAction, chatID uint, 
 		return nil, apperror.BadRequest("conflict in participants", errors.New(msg+strings.Join(conflictIDs, ", ")))
 	}
 
-	var err error
+	// Perform DB write
 	switch action {
 	case dto.AddParticipant:
-		err = h.store.DB.Model(&model.Chat{
-			Model: gorm.Model{
-				ID: chatID,
-			},
-		}).Association("Participants").Append(participants)
+		for _, p := range participants {
+			cp := model.ChatParticipant{
+				ChatID: chatID,
+				UserID: p.ID,
+			}
+			if err := h.store.DB.Create(&cp).Error; err != nil {
+				return nil, apperror.Internal("failed to add participant", err)
+			}
+		}
 	case dto.RemoveParticipant:
-		err = h.store.DB.Model(&model.Chat{
-			Model: gorm.Model{
-				ID: chatID,
-			},
-		}).Association("Participants").Delete(participants)
+		for _, p := range participants {
+			if err := h.store.DB.
+				Where("chat_id = ? AND user_id = ?", chatID, p.ID).
+				Delete(&model.ChatParticipant{}).Error; err != nil {
+				return nil, apperror.Internal("failed to remove participant", err)
+			}
+		}
 	default:
 		return nil, apperror.BadRequest("invalid action", errors.New("action must be ADD or REMOVE"))
 	}
-	if err != nil {
-		return nil, apperror.Internal("failed to add participants to chat", err)
+
+	// Reload updated ChatParticipants with User info
+	var updatedParticipants []model.ChatParticipant
+	if err := h.store.DB.
+		Preload("User").
+		Where("chat_id = ?", chatID).
+		Find(&updatedParticipants).Error; err != nil {
+		return nil, apperror.Internal("failed to reload participants", err)
 	}
 
-	if err := h.store.DB.Preload("Participants").First(&chat, chatID).Error; err != nil {
-		return nil, apperror.Internal("failed to load chat with participants", err)
-	}
-
-	return chat.Participants, nil
+	return updatedParticipants, nil
 }

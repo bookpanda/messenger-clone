@@ -21,46 +21,44 @@ import (
 // @Failure			400	{object}	dto.HttpError
 // @Failure			500	{object}	dto.HttpError
 func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
-	ctx, cancel := context.WithTimeout(c.UserContext(), time.Second*5)
+	ctx, cancel := context.WithTimeout(c.UserContext(), 5*time.Second)
 	defer cancel()
 
-	chatID, err := strconv.ParseUint(c.Params("id"), 10, 0)
+	// 1. Parse Chat ID
+	chatID, err := strconv.ParseUint(c.Params("id"), 10, 64)
 	if err != nil {
-		return apperror.BadRequest("invalid chat id", err)
+		return apperror.BadRequest("invalid chat ID", err)
 	}
 
-	// Load chat with participants
+	// 2. Get Current User
+	userID, err := h.authMiddleware.GetUserIDFromContext(ctx)
+	if err != nil {
+		return apperror.Internal("failed to get user ID from context", err)
+	}
+
+	// 3. Load Chat & Check Participant
 	var chat model.Chat
 	err = h.store.DB.WithContext(ctx).
-		Model(&model.Chat{}).
-		Preload("Participants").
-		Where("id = ?", chatID).
-		First(&chat).Error
+		Preload("Participants.User").
+		First(&chat, chatID).Error
 	if err != nil {
 		return errors.Wrap(err, "failed to find chat")
 	}
 
-	// Check if current user is a participant
-	userID, err := h.authMiddleware.GetUserIDFromContext(ctx)
-	if err != nil {
-		return apperror.Internal("failed to get user id from context", err)
-	}
-
 	isParticipant := false
-	for _, participant := range chat.Participants {
-		if participant.ID == userID {
+	for _, p := range chat.Participants {
+		if p.UserID == userID {
 			isParticipant = true
 			break
 		}
 	}
 	if !isParticipant {
-		return apperror.Forbidden("user is not a participant of the chat", errors.New("unauthorized access to chat"))
+		return apperror.Forbidden("you are not a participant in this chat", errors.New("access denied"))
 	}
 
-	// 🔹 Load messages with ReadBy preloaded
+	// 4. Load Messages
 	var messages []model.Message
 	err = h.store.DB.WithContext(ctx).
-		Model(&model.Message{}).
 		Where("chat_id = ?", chatID).
 		Order("created_at ASC").
 		Preload("Sender").
@@ -72,33 +70,32 @@ func (h *Handler) HandleGetMessages(c *fiber.Ctx) error {
 		return errors.Wrap(err, "failed to load messages")
 	}
 
-	// Mark all unread messages as read by this user
-	// (only if not already in ReadBy)
+	// 5. Load Current User for ReadBy association
 	var user model.User
 	if err := h.store.DB.WithContext(ctx).First(&user, userID).Error; err != nil {
 		return apperror.Internal("failed to fetch user", err)
 	}
 
+	// 6. Mark Unread Messages as Read
 	for _, m := range messages {
 		alreadyRead := false
-		for _, reader := range m.ReadBy {
-			if reader.ID == userID {
+		for _, r := range m.ReadBy {
+			if r.ID == userID {
 				alreadyRead = true
 				break
 			}
 		}
 		if !alreadyRead {
-			err := h.store.DB.WithContext(ctx).
+			if err := h.store.DB.WithContext(ctx).
 				Model(&m).
 				Association("ReadBy").
-				Append(&user)
-			if err != nil {
+				Append(&user); err != nil {
 				return errors.Wrapf(err, "failed to mark message %d as read", m.ID)
 			}
 		}
 	}
 
-	// Convert to DTO
+	// 7. Return Result
 	result := dto.ToMessageResponseList(messages)
 
 	return c.Status(fiber.StatusOK).JSON(dto.HttpListResponse[dto.MessageResponse]{
