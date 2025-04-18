@@ -31,8 +31,12 @@ export const Message = ({
   initialChatInfo: ChatInfo
   chatHistory: ChatMessage[]
 }) => {
-  const { clearChatUnread, handleUpdateChatList, setOnlineUsers } =
-    useChatList()
+  const {
+    clearChatUnread,
+    handleUpdateChatList,
+    setOnlineUsers,
+    handleReactionPreviewChatList,
+  } = useChatList()
   const [openChatInfo, setOpenChatInfo] = useState(true)
 
   const {
@@ -136,7 +140,11 @@ export const Message = ({
         }
         break
       case "REACTION":
-        // handleReactionPreviewChatList(message, user.name)
+        handleReactionPreviewChatList(
+          message,
+          user.name,
+          message.chat_id !== chatId
+        )
         if (message.chat_id !== chatId) return
         if (message.emoji_action) return
         setMessages((prevMessages) =>
