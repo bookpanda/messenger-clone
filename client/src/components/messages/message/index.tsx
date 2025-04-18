@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react"
 
+import { chatResponseToChatInfo } from "@/lib/utils"
 import {
+  Chat,
   ChatInfo,
   ChatMessage,
   Participant,
@@ -19,12 +21,14 @@ import { useSocket } from "../hooks/use-socket"
 export const Message = ({
   accessToken,
   user,
-  chatInfo,
+  chatId,
+  initialChatInfo,
   chatHistory,
 }: {
   accessToken: string
   user: User
-  chatInfo: ChatInfo
+  chatId: number
+  initialChatInfo: ChatInfo
   chatHistory: ChatMessage[]
 }) => {
   const { clearChatUnread, handleUpdateChatList, setOnlineUsers } =
@@ -40,14 +44,14 @@ export const Message = ({
     handleSendReaction,
   } = useSocket({ accessToken })
 
+  const [chatInfo, setChatInfo] = useState<ChatInfo>(initialChatInfo)
   const [messages, setMessages] = useState<ChatMessage[]>(chatHistory)
-  const [participants, setParticipants] = useState<Participant[]>([])
   const [typingUserIDs, setTypingUserIDs] = useState<number[]>([])
 
   useEffect(() => {
-    handleOpenConnection(chatInfo.id)
-    clearChatUnread(chatInfo.id)
-  }, [chatInfo.id])
+    handleOpenConnection(chatId)
+    clearChatUnread(chatId)
+  }, [chatId])
 
   useEffect(() => {
     if (!wsLastMessage) return
@@ -59,19 +63,19 @@ export const Message = ({
         const onlineUsers: User[] = JSON.parse(message.content)
         setOnlineUsers(onlineUsers)
         break
-      case "CHAT_PARTICIPANTS":
-        const users: Participant[] = JSON.parse(message.content)
-        setParticipants(users)
+      case "CHAT_INFO_UPDATE":
+        const chat: Chat = JSON.parse(message.content)
+        setChatInfo(chatResponseToChatInfo(chat))
         break
       case "MESSAGE_UPDATE":
         // Add Chat to sidebar if not exists and update current chat message
-        handleUpdateChatList(message, message.chat_id !== chatInfo.id)
+        handleUpdateChatList(message, message.chat_id !== chatId)
 
         // Current Chat's message arrived
-        if (message.chat_id === chatInfo.id) {
+        if (message.chat_id === chatId) {
           const newMessage: ChatMessage = {
             id: message.message_id || 0,
-            chat_id: chatInfo.id,
+            chat_id: chatId,
             sender_id: message.sender_id,
             content: message.content,
             created_at: new Date().toDateString(),
@@ -84,11 +88,11 @@ export const Message = ({
             })
           )
 
-          if (message.message_id) handleAckRead(chatInfo.id, message.message_id)
+          if (message.message_id) handleAckRead(chatId, message.message_id)
         }
         break
       case "READ":
-        if (message.chat_id === chatInfo.id && message.sender_id !== user.id) {
+        if (message.chat_id === chatId && message.sender_id !== user.id) {
           setMessages((prevMessages) =>
             produce(prevMessages, (draft) => {
               // Remove sender_id from all messages
@@ -109,7 +113,7 @@ export const Message = ({
         }
         break
       case "TYPING_START":
-        if (message.chat_id === chatInfo.id && message.sender_id !== user.id) {
+        if (message.chat_id === chatId && message.sender_id !== user.id) {
           setTypingUserIDs((prev) =>
             produce(prev, (draft) => {
               if (!draft.includes(message.sender_id)) {
@@ -120,7 +124,7 @@ export const Message = ({
         }
         break
       case "TYPING_END":
-        if (message.chat_id === chatInfo.id && message.sender_id !== user.id) {
+        if (message.chat_id === chatId && message.sender_id !== user.id) {
           setTypingUserIDs((prev) =>
             produce(prev, (draft) => {
               const index = draft.indexOf(message.sender_id)
@@ -133,7 +137,7 @@ export const Message = ({
         break
       case "REACTION":
         // handleReactionPreviewChatList(message, user.name)
-        if (message.chat_id !== chatInfo.id) return
+        if (message.chat_id !== chatId) return
         if (message.emoji_action) return
         setMessages((prevMessages) =>
           produce(prevMessages, (draft) => {
@@ -163,7 +167,7 @@ export const Message = ({
 
         break
     }
-  }, [wsLastMessage, chatInfo.id, user.id])
+  }, [wsLastMessage, chatId, user.id])
 
   return (
     <div className="flex min-h-0 flex-1 gap-4 p-4">
@@ -172,26 +176,16 @@ export const Message = ({
         user={user}
         chatInfo={chatInfo}
         messages={messages}
-        participants={participants}
         handleSendMessage={(message: string) =>
-          handleSendMessage(chatInfo.id, message)
+          handleSendMessage(chatId, message)
         }
-        handleTyping={(type: "START" | "END") =>
-          handleTyping(chatInfo.id, type)
-        }
+        handleTyping={(type: "START" | "END") => handleTyping(chatId, type)}
         typingUserIDs={typingUserIDs}
         handleToggleReaction={async (messageId, emoji) => {
-          handleSendReaction(chatInfo.id, messageId, emoji, user.id)
+          handleSendReaction(chatId, messageId, emoji, user.id)
         }}
       />
-      {openChatInfo && (
-        <ChatInfoPanel
-          chatId={chatInfo.id}
-          name={chatInfo.name}
-          image={chatInfo.image}
-          participants={participants}
-        />
-      )}
+      {openChatInfo && <ChatInfoPanel chatId={chatId} chatInfo={chatInfo} />}
     </div>
   )
 }

@@ -58,21 +58,19 @@ func (h *Handler) HandleParticipantChangeNickname(c *fiber.Ctx) error {
 	}
 
 	// 5. Get All participants in Chat
-	var chat model.Chat
-	if err := h.store.DB.
-		Preload("Participants.User").
-		First(&chat, chatID).Error; err != nil {
-		return apperror.Internal("failed to load chat participants", err)
+	chat, err := h.getChat(uint(chatID))
+	if err != nil {
+		return apperror.Internal("failed to get chat", err)
 	}
 
-	participants := dto.ToParticipantResponseList(chat.Participants)
+	chatInfo := dto.ToChatResponse(chat, nil, 0)
 
 	// 6. Broadcast the change to all participants
-	jsonPayload, err := json.Marshal(participants)
+	jsonPayload, err := json.Marshal(chatInfo)
 	if err != nil {
 		return apperror.Internal("failed to marshal participants", err)
 	}
-	if err := h.chatServer.BroadcastToRoom(dto.EventChatParticipants, uint(chatID), 0, nil, string(jsonPayload)); err != nil {
+	if err := h.chatServer.BroadcastToRoom(dto.EventChatInfoUpdate, uint(chatID), 0, nil, string(jsonPayload)); err != nil {
 		return apperror.Internal("failed to broadcast message", err)
 	}
 

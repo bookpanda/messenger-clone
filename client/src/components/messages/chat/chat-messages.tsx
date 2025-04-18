@@ -13,6 +13,7 @@ interface ChatMessagesProps {
   typingUserIDs: number[]
   handleToggleReaction: (messageId: number, reaction: string) => void
   isGroup: boolean
+  color: string
 }
 
 // TODO: Refactor send isMe with participants
@@ -24,6 +25,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
     typingUserIDs,
     handleToggleReaction,
     isGroup,
+    color,
   } = props
 
   const endOfMessagesRef = useRef<HTMLDivElement>(null)
@@ -63,6 +65,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
                     handleToggleReaction(message.id, reaction)
                   }
                   isGroup={isGroup}
+                  color={color}
                 />
               ) : (
                 <OutgoingMessage
@@ -73,6 +76,7 @@ export const ChatMessages = (props: ChatMessagesProps) => {
                     handleToggleReaction(message.id, reaction)
                   }
                   isGroup={isGroup}
+                  color={color}
                 />
               )}
               <ReadBubbles users={lastReadUsers} />

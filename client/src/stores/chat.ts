@@ -13,6 +13,7 @@ interface ChatStore {
     isUnread?: boolean
   ) => void
   clearChatUnread: (chatId: number) => void
+  changeChatListName: (chatId: number, name: string) => void
 
   onlineUsers: User[]
   setOnlineUsers: (users: User[]) => void
@@ -49,6 +50,17 @@ const useChatStore = create<ChatStore>((set) => ({
           ? {
               ...chat,
               unreadCount: 0,
+            }
+          : chat
+      ),
+    })),
+  changeChatListName: (chatId, name) =>
+    set((state) => ({
+      chatList: state.chatList.map((chat) =>
+        chat.id === chatId
+          ? {
+              ...chat,
+              name,
             }
           : chat
       ),

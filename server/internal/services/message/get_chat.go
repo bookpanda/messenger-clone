@@ -5,15 +5,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (h *Handler) getCurrentParticipantsInChat(chatID uint) ([]model.ChatParticipant, error) {
+func (h *Handler) getChat(chatID uint) (model.Chat, error) {
 	var chat model.Chat
 
 	err := h.store.DB.
 		Preload("Participants.User").
 		First(&chat, chatID).Error
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to load chat participants")
+		return model.Chat{}, errors.Wrap(err, "failed to load chat participants")
 	}
 
-	return chat.Participants, nil
+	return chat, nil
 }

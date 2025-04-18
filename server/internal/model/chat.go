@@ -13,9 +13,10 @@ type ChatParticipant struct {
 
 type Chat struct {
 	gorm.Model
-	Name     string
-	IsDirect bool
-
+	Name         string
+	IsDirect     bool
+	Color        string `gorm:"default:'#0e92eb'"`
+	Emoji        string `gorm:"default:'👍'"`
 	Messages     []Message
 	Participants []ChatParticipant `gorm:"foreignKey:ChatID"`
 }
