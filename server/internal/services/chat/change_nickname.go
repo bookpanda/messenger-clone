@@ -2,6 +2,7 @@ package chat
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 	"time"
 
@@ -56,6 +57,25 @@ func (h *Handler) HandleParticipantChangeNickname(c *fiber.Ctx) error {
 		return apperror.Internal("failed to update nickname", err)
 	}
 
-	// 5. Return success
+	// 5. Get All participants in Chat
+	var chat model.Chat
+	if err := h.store.DB.
+		Preload("Participants.User").
+		First(&chat, chatID).Error; err != nil {
+		return apperror.Internal("failed to load chat participants", err)
+	}
+
+	participants := dto.ToParticipantResponseList(chat.Participants)
+
+	// 6. Broadcast the change to all participants
+	jsonPayload, err := json.Marshal(participants)
+	if err != nil {
+		return apperror.Internal("failed to marshal participants", err)
+	}
+	if err := h.chatServer.BroadcastToRoom(dto.EventChatParticipants, uint(chatID), 0, nil, string(jsonPayload)); err != nil {
+		return apperror.Internal("failed to broadcast message", err)
+	}
+
+	// 7. Return success
 	return c.SendStatus(fiber.StatusNoContent)
 }

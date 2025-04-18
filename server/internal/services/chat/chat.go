@@ -8,6 +8,7 @@ import (
 
 type Handler struct {
 	store          *database.Store
+	chatServer     *Server
 	validate       *validator.Validate
 	authMiddleware authentication.AuthMiddleware
 }
@@ -16,6 +17,7 @@ func NewHandler(store *database.Store, validate *validator.Validate,
 	authMiddleware authentication.AuthMiddleware) *Handler {
 	return &Handler{
 		store:          store,
+		chatServer:     NewServer(store, validate),
 		validate:       validate,
 		authMiddleware: authMiddleware,
 	}
