@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react"
 
 import { toggleMessageReaction } from "@/actions/message/toggle-reaction"
-import { ChatInfo, ChatMessage, RealtimeMessage, User } from "@/types"
+import {
+  ChatInfo,
+  ChatMessage,
+  Participant,
+  RealtimeMessage,
+  User,
+} from "@/types"
 import { produce } from "immer"
 
 import { ChatBox } from "../chat"
@@ -40,7 +46,7 @@ export const Message = ({
   } = useSocket({ accessToken })
 
   const [messages, setMessages] = useState<ChatMessage[]>(chatHistory)
-  const [participants, setParticipants] = useState<User[]>([])
+  const [participants, setParticipants] = useState<Participant[]>([])
   const [typingUserIDs, setTypingUserIDs] = useState<number[]>([])
 
   useEffect(() => {
@@ -59,7 +65,7 @@ export const Message = ({
         setOnlineUsers(onlineUsers)
         break
       case "CHAT_PARTICIPANTS":
-        const users: User[] = JSON.parse(message.content)
+        const users: Participant[] = JSON.parse(message.content)
         setParticipants(users)
         break
       case "MESSAGE_UPDATE":
@@ -184,7 +190,12 @@ export const Message = ({
         }}
       />
       {openChatInfo && (
-        <ChatInfoPanel name={chatInfo.name} image={chatInfo.image} />
+        <ChatInfoPanel
+          chatId={chatInfo.id}
+          name={chatInfo.name}
+          image={chatInfo.image}
+          participants={participants}
+        />
       )}
     </div>
   )

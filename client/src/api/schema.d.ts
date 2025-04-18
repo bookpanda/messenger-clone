@@ -422,6 +422,71 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/chat/{id}/participant/{participantId}/nickname": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Modify participants
+         * @description Add/remove participants to/from chat
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Chat ID */
+                    id: number;
+                    /** @description Participant ID */
+                    participantId: number;
+                };
+                cookie?: never;
+            };
+            /** @description request request */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["dto.ChangeNicknameRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["dto.HttpError"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
     "/api/v1/chat/{id}/participants": {
         parameters: {
             query?: never;
@@ -1004,12 +1069,15 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        "dto.ChangeNicknameRequest": {
+            nickname: string;
+        };
         "dto.ChatResponse": {
             id: number;
             is_direct: boolean;
             last_message?: components["schemas"]["dto.MessageResponse"];
             name: string;
-            participants: components["schemas"]["dto.UserResponse"][];
+            participants: components["schemas"]["dto.ParticipantResponse"][];
             unread_count: number;
         };
         "dto.CreateChatRequest": {
@@ -1072,7 +1140,14 @@ export interface components {
             participants: string[];
         };
         "dto.ModifyParticipantResponse": {
-            participants: components["schemas"]["dto.UserResponse"][];
+            participants: components["schemas"]["dto.ParticipantResponse"][];
+        };
+        "dto.ParticipantResponse": {
+            email: string;
+            id: number;
+            name: string;
+            nickname: string;
+            profilePictureUrl: string;
         };
         /** @description nil if removed */
         "dto.ReactionResponse": {

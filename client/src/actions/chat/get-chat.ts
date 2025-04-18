@@ -37,6 +37,7 @@ export const getChatAction = async (id: number): Promise<ChatInfo> => {
       id: chat.id,
       name: friend?.name || "",
       image: friend?.profilePictureUrl || "/thumbnail.jpg",
+      isGroup: !chat.is_direct,
       lastMessage,
       participants: chat.participants,
       unreadCount: chat.unread_count,
@@ -47,6 +48,7 @@ export const getChatAction = async (id: number): Promise<ChatInfo> => {
     id: chat.id,
     name: chat.name,
     image: "/thumbnail.jpg", // TODO: Group Image
+    isGroup: !chat.is_direct,
     lastMessage,
     participants: chat.participants,
     unreadCount: chat.unread_count,

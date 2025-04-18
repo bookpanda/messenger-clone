@@ -172,14 +172,14 @@ func (s *Server) BroadcastToRoom(eventType dto.EventType, chatID uint, senderID 
 
 	// Fetch chat participants
 	var chat model.Chat
-	err = s.store.DB.Preload("Participants").First(&chat, chatID).Error
+	err = s.store.DB.Preload("Participants.User").First(&chat, chatID).Error
 	if err != nil {
 		return errors.Wrap(err, "failed to load chat participants")
 	}
 
 	// Send to participants (either all or exclude sender depending on event type)
 	for _, participant := range chat.Participants {
-		client, ok := s.users[participant.ID]
+		client, ok := s.users[participant.UserID]
 		if !ok || client == nil {
 			continue
 		}

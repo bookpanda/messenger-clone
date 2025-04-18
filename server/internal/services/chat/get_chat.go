@@ -34,7 +34,7 @@ func (h *Handler) HandleGetChat(c *fiber.Ctx) error {
 	var chat model.Chat
 	err = h.store.DB.
 		Model(&model.Chat{}).
-		Preload("Participants").
+		Preload("Participants.User").
 		Joins("JOIN chat_participants ON chat_participants.chat_id = chats.id").
 		Where("chats.id = ?", req.ID).
 		Where("chat_participants.user_id = ?", userID).
