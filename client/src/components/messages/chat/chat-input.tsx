@@ -1,6 +1,6 @@
 import { SyntheticEvent, useRef, useState } from "react"
 
-import { Images, ThumbsUp } from "lucide-react"
+import { Images } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"

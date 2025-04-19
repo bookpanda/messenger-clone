@@ -1,8 +1,6 @@
 import { FormEvent, useState } from "react"
 
 import { changeChatColor } from "@/actions/chat/change-color"
-import { Participant } from "@/types"
-import Image from "next/image"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"

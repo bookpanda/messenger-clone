@@ -2,7 +2,6 @@ import { FormEvent, useState } from "react"
 
 import { changeChatEmoji } from "@/actions/chat/change-emoji"
 import { cn } from "@/lib/utils"
-import { Participant } from "@/types"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
