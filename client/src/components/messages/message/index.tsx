@@ -3,14 +3,7 @@
 import { useEffect, useState } from "react"
 
 import { chatResponseToChatInfo } from "@/lib/utils"
-import {
-  Chat,
-  ChatInfo,
-  ChatMessage,
-  Participant,
-  RealtimeMessage,
-  User,
-} from "@/types"
+import { Chat, ChatInfo, ChatMessage, RealtimeMessage, User } from "@/types"
 import { produce } from "immer"
 
 import { ChatBox } from "../chat"

@@ -1,7 +1,7 @@
 import { client } from "@/api/client"
 import { auth } from "@/auth"
 import { chatResponseToChatInfo } from "@/lib/utils"
-import { ChatInfo, LastMessage } from "@/types"
+import { ChatInfo } from "@/types"
 import { redirect } from "next/navigation"
 
 export const getChatAction = async (id: number): Promise<ChatInfo> => {
