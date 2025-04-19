@@ -62,7 +62,7 @@ export const Message = ({
         break
       case "CHAT_INFO_UPDATE":
         const chat: Chat = JSON.parse(message.content)
-        setChatInfo(chatResponseToChatInfo(chat))
+        setChatInfo(chatResponseToChatInfo(chat, user.id))
         break
       case "MESSAGE_UPDATE":
         // Add Chat to sidebar if not exists and update current chat message
