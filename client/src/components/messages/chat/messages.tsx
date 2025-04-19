@@ -5,7 +5,6 @@ import { useEffect, useState } from "react"
 import { cn, isEmoji } from "@/lib/utils"
 import { ChatMessage, Participant, User } from "@/types"
 import { EllipsisVertical, Smile } from "lucide-react"
-import { isIP } from "net"
 import Image from "next/image"
 
 import { Button } from "@/components/ui/button"

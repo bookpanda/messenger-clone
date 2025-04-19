@@ -1,4 +1,4 @@
-import { ChatInfo, Participant } from "@/types"
+import { ChatInfo } from "@/types"
 import { Lock, Pin } from "lucide-react"
 import Image from "next/image"
 

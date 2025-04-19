@@ -1,6 +1,5 @@
 import { FormEvent, useState } from "react"
 
-import { changeChatEmoji } from "@/actions/chat/change-emoji"
 import { changeChatName } from "@/actions/chat/change-name"
 import { useChatStore } from "@/stores/chat"
 import { Pen } from "lucide-react"
